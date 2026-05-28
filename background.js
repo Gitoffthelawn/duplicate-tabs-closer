@@ -90,6 +90,7 @@ const onCompletedTab = async (details) => {
 			} else {
 				refreshDuplicateTabsInfo(tab.windowId);
 			}
+			if (environment.isChrome) setBadge(tab.windowId, tab.id);
 		}
 	}
 };
@@ -106,6 +107,7 @@ const onUpdatedTab = async (tabId, changeInfo, tab) => {
 			} else {
 				refreshDuplicateTabsInfo(tab.windowId);
 			}
+			if (environment.isChrome) setBadge(tab.windowId, tab.id);
 		}
 		else if (isChromeURL(tab.url) || isBlankURL(tab.url)) {
 			tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
@@ -114,6 +116,7 @@ const onUpdatedTab = async (tabId, changeInfo, tab) => {
 			} else {
 				refreshDuplicateTabsInfo(tab.windowId);
 			}
+			if (environment.isChrome) setBadge(tab.windowId, tab.id);
 		}
 	}
 };
@@ -149,7 +152,6 @@ const onDetachedTab = async (detachedTabId, detachInfo) => {
 const onActivatedTab = async (activeInfo) => {
 	await ensureInitialized();
 	if (environment.isFirefox) return;
-	if (tabsInfo.isClosingTab(activeInfo.tabId)) return;
 	setBadge(activeInfo.windowId, activeInfo.tabId);
 };
 

@@ -15,11 +15,15 @@ const setBadge = async (windowId, activeTabId) => {
 		setWindowBadgeBackgroundColor(windowId, backgroundColor);
 	}
 	else {
-		// eslint-disable-next-line no-param-reassign
-		activeTabId = activeTabId || await getActiveTabId(windowId);
 		if (activeTabId) {
 			setTabBadgeText(activeTabId, nbDuplicateTabs);
 			setTabBadgeBackgroundColor(activeTabId, backgroundColor);
+		} else {
+			const tabs = await getTabs({ windowId: windowId });
+			if (tabs) tabs.forEach(tab => {
+				setTabBadgeText(tab.id, nbDuplicateTabs);
+				setTabBadgeBackgroundColor(tab.id, backgroundColor);
+			});
 		}
 	}
 };
