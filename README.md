@@ -176,7 +176,10 @@ Available in the **Options page** only.
 
 ### Hotkey
 
-* **Ctrl+Alt+W** to close all duplicate tabs (can be reconfigured in the browser's keyboard shortcuts settings)
+* **Chrome / Edge / Opera / Vivaldi / Brave:** **Ctrl+Shift+W** to close all duplicate tabs
+* **Firefox:** **Ctrl+Alt+W** to close all duplicate tabs
+
+Both shortcuts can be reconfigured in the browser's keyboard shortcuts settings.
 
 To change the shortcut:
 

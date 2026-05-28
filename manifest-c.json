@@ -27,7 +27,7 @@
   "commands": {
     "close-duplicate-tabs": {
       "suggested_key": {
-        "default": "Ctrl+Alt+W"
+        "default": "Ctrl+Shift+W"
       },
       "description": "Close all duplicate tabs"
     }
