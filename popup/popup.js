@@ -100,9 +100,7 @@ const saveOption = (name, value, refresh) => sendMessage("setStoredOption", { "n
 const requestGetDuplicateTabs = () => sendMessage("getDuplicateTabs", { "windowId": activeWindowId });
 
 const setPanelOptions = async () => {
-    const response = await sendMessage("getStoredOptions");
-    const storedOptions = response.data.storedOptions;
-    const lockedKeys = response.data.lockedKeys;
+    const { storedOptions, lockedKeys } = await getStoredOptions();
     let collapseOptions = true;
     for (const storedOption in storedOptions) {
         const value = storedOptions[storedOption].value;

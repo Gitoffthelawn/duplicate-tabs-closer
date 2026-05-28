@@ -210,17 +210,22 @@ const getStoredOptions = () => Promise.all([
             resolve(localOptions);
         });
     }),
-    // chrome.storage.managed is supported on Firefox 57 and later
-    !chrome.storage.managed ? null : new Promise((resolve) => {
-        chrome.storage.managed.get(null, managedOptions => {
-            if (chrome.runtime.lastError) {
-                if (chrome.runtime.lastError.message !== "Managed storage manifest not found") {
-                    console.error("getStoredOptions error on getting managed storage:", chrome.runtime.lastError.message);
+    // chrome.storage.managed is supported on Firefox 57 and later.
+    // On Windows Enterprise, the GP check can block for 5-10s on Chrome startup.
+    // Race against a 500ms timeout so the extension initializes quickly.
+    !chrome.storage.managed ? null : Promise.race([
+        new Promise((resolve) => {
+            chrome.storage.managed.get(null, managedOptions => {
+                if (chrome.runtime.lastError) {
+                    if (chrome.runtime.lastError.message !== "Managed storage manifest not found") {
+                        console.error("getStoredOptions error on getting managed storage:", chrome.runtime.lastError.message);
+                    }
                 }
-            }
-            resolve(managedOptions);
-        });
-    })
+                resolve(managedOptions);
+            });
+        }),
+        new Promise(resolve => setTimeout(() => resolve(null), 100))
+    ])
 ]).then(results => {
     const [localOptions, managedOptions] = results;
     return {
@@ -247,13 +252,12 @@ const saveStoredOptions = async (options, overwrite) => {
     });
 };
 
-// eslint-disable-next-line no-unused-vars
-const sendMessage = (action, data) => new Promise((resolve, reject) => {
+const _sendMessageOnce = (action, data) => new Promise((resolve, reject) => {
     const CHROME_SEND_MESSAGE_CALLBACK_NO_RESPONSE_MESSAGE = "The message port closed before a response was received.";
     chrome.runtime.sendMessage({ action: action, data: data }, response => {
         if (chrome.runtime.lastError) {
             if (chrome.runtime.lastError.message === CHROME_SEND_MESSAGE_CALLBACK_NO_RESPONSE_MESSAGE) {
-                resolve();
+                resolve(undefined);
             } else {
                 reject(chrome.runtime.lastError);
             }
@@ -263,6 +267,16 @@ const sendMessage = (action, data) => new Promise((resolve, reject) => {
         }
     });
 });
+
+// eslint-disable-next-line no-unused-vars
+const sendMessage = async (action, data, retries = 3, retryDelay = 300) => {
+    for (let i = 0; i < retries; i++) {
+        const response = await _sendMessageOnce(action, data);
+        if (response !== undefined) return response;
+        if (i < retries - 1) await wait(retryDelay);
+    }
+    return undefined;
+};
 
 // eslint-disable-next-line no-unused-vars
 const titleSimilarity = (a, b) => {

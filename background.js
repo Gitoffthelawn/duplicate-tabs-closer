@@ -167,6 +167,7 @@ const onCommand = async (command) => {
 
 // MV3: event listeners must be registered synchronously at top level (no await before this point),
 // so the service worker can receive events immediately on restart.
+chrome.runtime.onStartup.addListener(() => ensureInitialized());
 chrome.tabs.onCreated.addListener(onCreatedTab);
 chrome.webNavigation.onBeforeNavigate.addListener(onBeforeNavigate);
 chrome.tabs.onAttached.addListener(onAttached);
