@@ -240,6 +240,10 @@ body {
     scrollbar-width: thin;
 }
 
+#duplicateTabsCard .card-body {
+    overflow: hidden;
+}
+
 .form-group {
     margin-bottom: 4px;
 }
