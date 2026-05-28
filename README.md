@@ -186,3 +186,35 @@ To change the shortcut:
 * **Chrome / Edge / Brave / Vivaldi:** open `chrome://extensions/shortcuts`
 * **Opera:** open `opera://extensions/shortcuts`
 * **Firefox:** open `about:addons`, click the gear icon, then choose *Manage Extension Shortcuts*
+
+## Building
+
+A build script is included that packages the extension for each browser.
+
+**Requirements:** Windows with PowerShell (built-in on Windows 7 and later).
+
+Run from the repository root:
+
+```bat
+build\build.bat
+```
+
+Or run the PowerShell script directly:
+
+```powershell
+# Build both Chrome and Firefox packages (default)
+powershell -ExecutionPolicy Bypass -File build\build.ps1
+
+# Build Chrome only
+powershell -ExecutionPolicy Bypass -File build\build.ps1 -Target chrome
+
+# Build Firefox only
+powershell -ExecutionPolicy Bypass -File build\build.ps1 -Target firefox
+```
+
+**Output files** (created in the repository root):
+
+| File | Browser |
+| --- | --- |
+| `duplicate-tabs-closer-chrome.zip` | Chrome, Edge, Opera, Vivaldi, Brave |
+| `duplicate-tabs-closer-firefox.xpi` | Firefox |
