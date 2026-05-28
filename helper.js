@@ -5,9 +5,9 @@
 const wait = timeout => new Promise(resolve => setTimeout(resolve, timeout));
 
 // eslint-disable-next-line no-unused-vars
-const debounce = (func, delay) => {
+const debounce = (func, delay, immediate = true) => {
     const storedArguments = new Map();
-    return (...args) => {
+    const debouncedFn = (...args) => {
         const windowId = args[0] || 1;
         const later = () => {
             const laterArgs = storedArguments.get(windowId);
@@ -21,27 +21,42 @@ const debounce = (func, delay) => {
             }
         };
 
-        if (!storedArguments.has(windowId)) {
-            func(args[1] || args[0]);
-            setTimeout(later, delay);
-            storedArguments.set(windowId, null);
+        if (immediate) {
+            if (!storedArguments.has(windowId)) {
+                func(args[1] || args[0]);
+                setTimeout(later, delay);
+                storedArguments.set(windowId, null);
+            }
+            else {
+                storedArguments.set(windowId, args[1] || args[0] || 1);
+            }
         }
         else {
+            const alreadyQueued = storedArguments.has(windowId);
             storedArguments.set(windowId, args[1] || args[0] || 1);
+            if (!alreadyQueued) setTimeout(later, delay);
         }
     };
+    debouncedFn.cleanup = (windowId) => { storedArguments.delete(windowId); };
+    return debouncedFn;
 };
 
 // eslint-disable-next-line no-unused-vars
-const isTabComplete = tab => tab.status === "complete";
+const tabExists = async (tabId) => {
+    const tab = await getTab(tabId, true);
+    return tab !== null;
+};
+
+// eslint-disable-next-line no-unused-vars
+const isTabComplete = tab => tab.status === "complete" || tab.status === "unloaded";
 
 // eslint-disable-next-line no-unused-vars
 const isTabLoading = tab => tab.status === "loading";
 
 // eslint-disable-next-line no-unused-vars
-const getTab = (tabId) => new Promise((resolve) => {
+const getTab = (tabId, silent = false) => new Promise((resolve) => {
     chrome.tabs.get(tabId, tab => {
-        if (chrome.runtime.lastError) console.error("getTab error:", chrome.runtime.lastError.message);
+        if (chrome.runtime.lastError && !silent) console.error("getTab error:", chrome.runtime.lastError.message);
         resolve(chrome.runtime.lastError ? null : tab);
     });
 });
@@ -143,7 +158,7 @@ const removeTab = (tabId) => new Promise((resolve, reject) => {
 
 // eslint-disable-next-line no-unused-vars
 const setIcon = (details) => new Promise((resolve) => {
-    chrome.browserAction.setIcon(details, () => {
+    chrome.action.setIcon(details, () => {
         if (chrome.runtime.lastError) console.error("setIcon error:", chrome.runtime.lastError.message);
         resolve();
     });
@@ -151,14 +166,14 @@ const setIcon = (details) => new Promise((resolve) => {
 
 // eslint-disable-next-line no-unused-vars
 const getTabBadgeText = (tabId) => new Promise((resolve) => {
-    chrome.browserAction.getBadgeText({ tabId: tabId }, badgeText => {
+    chrome.action.getBadgeText({ tabId: tabId }, badgeText => {
         if (chrome.runtime.lastError) console.error("getTabBadgeText error:", chrome.runtime.lastError.message);
         resolve(badgeText);
     });
 });
 
 // eslint-disable-next-line no-unused-vars
-const getWindowBadgeText = (windowId) => browser.browserAction.getBadgeText({ windowId: windowId });
+const getWindowBadgeText = (windowId) => browser.action.getBadgeText({ windowId: windowId });
 
 // eslint-disable-next-line no-unused-vars
 const setTabBadgeText = (tabId, text) => new Promise((resolve) => {
@@ -166,26 +181,26 @@ const setTabBadgeText = (tabId, text) => new Promise((resolve) => {
         console.error("setTabBadgeText error: no tabId");
         resolve();
         return;
-    }    
-    chrome.browserAction.setBadgeText({ tabId: tabId, text: text }, () => {
+    }
+    chrome.action.setBadgeText({ tabId: tabId, text: text }, () => {
         if (chrome.runtime.lastError) console.error("setTabBadgeText error:", chrome.runtime.lastError.message);
         resolve();
     });
 });
 
 // eslint-disable-next-line no-unused-vars
-const setWindowBadgeText = (windowId, text) => browser.browserAction.setBadgeText({ windowId: windowId, text: text });
+const setWindowBadgeText = (windowId, text) => browser.action.setBadgeText({ windowId: windowId, text: text });
 
 // eslint-disable-next-line no-unused-vars
 const setTabBadgeBackgroundColor = (tabId, color) => new Promise((resolve) => {
-    chrome.browserAction.setBadgeBackgroundColor({ tabId: tabId, color: color }, () => {
+    chrome.action.setBadgeBackgroundColor({ tabId: tabId, color: color }, () => {
         if (chrome.runtime.lastError) console.error("setTabBadgeBackgroundColor error:", chrome.runtime.lastError.message);
         resolve();
     });
 });
 
 // eslint-disable-next-line no-unused-vars
-const setWindowBadgeBackgroundColor = (windowId, color) => browser.browserAction.setBadgeBackgroundColor({ windowId: windowId, color: color });
+const setWindowBadgeBackgroundColor = (windowId, color) => browser.action.setBadgeBackgroundColor({ windowId: windowId, color: color });
 
 // eslint-disable-next-line no-unused-vars
 const getStoredOptions = () => Promise.all([
@@ -199,11 +214,7 @@ const getStoredOptions = () => Promise.all([
     !chrome.storage.managed ? null : new Promise((resolve) => {
         chrome.storage.managed.get(null, managedOptions => {
             if (chrome.runtime.lastError) {
-                if (chrome.runtime.lastError.message === "Managed storage manifest not found") {
-                    // only log warning as that is expected when no manifest file is found
-                    console.warn("could not get managed options:", chrome.runtime.lastError.message);
-                }
-                else {
+                if (chrome.runtime.lastError.message !== "Managed storage manifest not found") {
                     console.error("getStoredOptions error on getting managed storage:", chrome.runtime.lastError.message);
                 }
             }
@@ -237,21 +248,6 @@ const saveStoredOptions = async (options, overwrite) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const getPlatformInfo = () => new Promise((resolve) => {
-    chrome.runtime.getPlatformInfo(info => {
-        if (chrome.runtime.lastError) console.error("getPlatformInfo error:", chrome.runtime.lastError.message);
-        resolve(info);
-    });
-});
-
-// eslint-disable-next-line no-unused-vars
-const getFirefoxMajorVersion = async () => {
-    const browserInfo = await browser.runtime.getBrowserInfo();
-    const majorVersion = parseInt(browserInfo.version.split(".")[0], 10);
-    return majorVersion;
-};
-
-// eslint-disable-next-line no-unused-vars
 const sendMessage = (action, data) => new Promise((resolve, reject) => {
     const CHROME_SEND_MESSAGE_CALLBACK_NO_RESPONSE_MESSAGE = "The message port closed before a response was received.";
     chrome.runtime.sendMessage({ action: action, data: data }, response => {
@@ -267,6 +263,23 @@ const sendMessage = (action, data) => new Promise((resolve, reject) => {
         }
     });
 });
+
+// eslint-disable-next-line no-unused-vars
+const titleSimilarity = (a, b) => {
+    const s1 = a.toLowerCase(), s2 = b.toLowerCase();
+    const m = s1.length, n = s2.length;
+    if (m === 0 && n === 0) return 100;
+    if (m === 0 || n === 0) return 0;
+    const prev = Array.from({ length: n + 1 }, (_, i) => i);
+    for (let i = 1; i <= m; i++) {
+        const curr = [i];
+        for (let j = 1; j <= n; j++) {
+            curr[j] = s1[i-1] === s2[j-1] ? prev[j-1] : 1 + Math.min(prev[j], curr[j-1], prev[j-1]);
+        }
+        prev.splice(0, prev.length, ...curr);
+    }
+    return Math.round((1 - prev[n] / Math.max(m, n)) * 100);
+};
 
 // eslint-disable-next-line no-unused-vars
 const areSameArrays = (array1, array2) => {

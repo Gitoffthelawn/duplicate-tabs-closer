@@ -19,6 +19,10 @@
     "message": "Показати панель",
     "description": "Show panel"
   },
+  "openPopupOnDuplicateDetected": {
+    "message": "Відкривати панель при виявленні дубліката",
+    "description": "Open popup panel when a new duplicate tab is detected"
+  },
   "tabPriority": {
     "message": "Пріоритет",
     "description": "Priority"
@@ -34,10 +38,6 @@
   "keepReloadOlderTab": {
     "message": "Зберегти й оновити старішу вкладку",
     "description": "Keep and reload older tab"
-  },
-  "keepTabWithHistory": {
-    "message": "Зберегти вкладку з історією",
-    "description": "Keep tab with history"
   },
   "keeptabwithHttps": {
     "message": "Зберегти вкладку з https",
@@ -60,7 +60,7 @@
     "description": "Default tab behaviour"
   },
   "matchingRules": {
-    "message": "Matching rules",
+    "message": "Правила відповідності",
     "description": "Matching rules"
   },
   "ignoreHashPart": {
@@ -76,16 +76,28 @@
     "description": "Ignore path part in URL"
   },
   "ignore3w": {
-    "message": "Ignore 'www' in URL domain name",
+    "message": "Ігнорувати 'www' у доменному імені URL",
     "description": "Ignore 'www' in URL domain name"
   },
   "caseInsensitive": {
-    "message": "Ignore case in URL",
+    "message": "Ігнорувати регістр букв в URL",
     "description": "Ignore case in URL"
   },
   "compareWithTitle": {
     "message": "Порівняти заголовки вкладок",
     "description": "Compare with title"
+  },
+  "titleSimilarityThreshold": {
+    "message": "% збіг заголовків",
+    "description": "Minimum title similarity to consider tabs as duplicates"
+  },
+  "urlRegexRules": {
+    "message": "Правила URL",
+    "description": "URL pattern rules"
+  },
+  "titleRegexRules": {
+    "message": "Правила заголовків",
+    "description": "Title pattern rules"
   },
   "duplicatetabs": {
     "message": "Дублікати вкладок",
@@ -104,27 +116,19 @@
     "description": "All windows"
   },
   "containerActivewindow": {
-    "message": "Container in active window",
+    "message": "Контейнер в активному вікні",
     "description": "Container in active window"
   },
   "containerAllwindows": {
-    "message": "Container in all windows",
+    "message": "Контейнер у всіх вікнах",
     "description": "Container in all windows"
-  },
-  "hideWhiteListedDuplicateTabs": {
-    "message": "Hide whitelisted duplicate tabs",
-    "description": "Hide whitelisted duplicate tabs"
-  },
-  "groupDuplicateTabs": {
-    "message": "Group duplicate tabs",
-    "description": "Group duplicate tabs"
   },
   "closeAllDuplicateTabs": {
     "message": "Закрити всі дублікати вкладок",
     "description": "Close all"
   },
   "whiteList": {
-    "message": "ホワイトリスト",
+    "message": "Дозволені URL",
     "description": "Whitelisted URLs"
   },
   "customization": {
@@ -148,15 +152,63 @@
     "description": "No duplicate tabs"    
   },
   "closePopup": {
-    "message": "Close popup panel after closing duplicate tabs",
-    "description": "Close popup panel after closing duplicate tabs"    
+    "message": "Закрити спливаюче вікно після закриття дублікатів вкладок",
+    "description": "Close popup panel after closing duplicate tabs"
   },
   "moreOptions": {
-    "message":  "More options...",
+    "message":  "Більше налаштувань...",
     "description":  "More options..."
   },
   "shrunkMode": {
-    "message":  "Shrunk mode:\nWhen activated, hide unpinned options.",
+    "message":  "Компактний режим:\nПри активації приховує незакріплені параметри.",
     "description":  "Shrunk mode\nWhen activated, hide unpinned options."
-  }  
+  },
+  "theme": {
+    "message": "Тема",
+    "description": "Theme selector"
+  },
+  "themeLight": {
+    "message": "Sky",
+    "description": "Sky light theme"
+  },
+  "themeOcean": {
+    "message": "Ocean Night",
+    "description": "Ocean Night dark theme"
+  },
+  "themeCharcoal": {
+    "message": "Charcoal",
+    "description": "Charcoal dark theme"
+  },
+  "themePurple": {
+    "message": "Midnight Purple",
+    "description": "Midnight Purple dark theme"
+  },
+  "themeTeal": {
+    "message": "Dark Teal",
+    "description": "Dark Teal theme"
+  },
+  "themeOled": {
+    "message": "OLED Black",
+    "description": "OLED Black theme"
+  },
+  "themeSage": {
+    "message": "Sage",
+    "description": "Sage light theme"
+  },
+  "themeRose": {
+    "message": "Rose",
+    "description": "Rose light theme"
+  },
+  "themeAmber": {
+    "message": "Amber",
+    "description": "Amber light theme"
+  },
+  "themeSlate": {
+    "message": "Slate",
+    "description": "Slate light theme"
+  },
+  "themeViolet": {
+    "message": "Violet",
+    "description": "Violet light theme"
+  }
 }

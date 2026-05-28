@@ -2,6 +2,18 @@
 
 let activeWindowId = chrome.windows.WINDOW_ID_NONE;
 let lastDuplicateTabs = {};
+let panelInitialized = false;
+
+const escapeHTML = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+
+const applyTheme = (value) => {
+  const darkThemes = ["ocean", "charcoal", "purple", "teal", "oled"];
+  const lightThemes = ["sage", "rose", "amber", "slate", "violet"];
+  const isDark = darkThemes.includes(value);
+  document.documentElement.setAttribute("data-bs-theme", isDark ? "dark" : "light");
+  document.documentElement.classList.remove(...[...darkThemes, ...lightThemes].map(t => `theme-${t}`));
+  if (value !== "light") document.documentElement.classList.add(`theme-${value}`);
+};
 
 const initialize = async () => {
   await Promise.all([setPanelOptions(), saveActiveWindowId()]);
@@ -9,12 +21,45 @@ const initialize = async () => {
   localizePopup(document.documentElement);
 };
 
+const getHighlightBounds = (textarea) => {
+  const cs = window.getComputedStyle(textarea);
+  const pt = parseFloat(cs.paddingTop);
+  const text = textarea.value;
+  const pos = textarea.selectionStart;
+  const lineStart = text.lastIndexOf('\n', pos - 1) + 1;
+  const lineEndRaw = text.indexOf('\n', pos);
+  const lineEnd = lineEndRaw === -1 ? text.length : lineEndRaw;
+  let m = textarea._mirror;
+  if (!m) {
+    m = document.createElement('div');
+    m.setAttribute('aria-hidden', 'true');
+    m.style.cssText = 'position:fixed;top:-9999px;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;padding:0;margin:0;border:0;box-sizing:content-box;';
+    document.body.appendChild(m);
+    textarea._mirror = m;
+  }
+  m.style.width = (textarea.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)) + 'px';
+  m.style.font = cs.font;
+  m.style.lineHeight = cs.lineHeight;
+  let topOffset = 0;
+  if (lineStart > 0) {
+    m.textContent = text.substring(0, lineStart);
+    topOffset = m.scrollHeight;
+  }
+  m.textContent = text.substring(lineStart, lineEnd) || ' ';
+  return { top: pt + topOffset, bottom: pt + topOffset + m.scrollHeight };
+};
+
 // eslint-disable-next-line max-lines-per-function
 const loadPopupEvents = () => {
 
   /* Save checkbox settings */
-  $(".list-group input[type='checkbox'").on("change", function () {
-    if (this.id.endsWith("Pinned")) toggleExpendGroup(this.id, true, true);
+  $(".list-group input[type='checkbox']").on("change", function () {
+    if (this.id.endsWith("_popup")) {
+      saveOption(this.id, this.checked, false);
+      return;
+    }
+    if (this.id === "compareWithTitle") $("#titleSimilarityThreshold").prop("disabled", !this.checked);
+    else if (this.id === "ignorePathPart") updateIgnorePathPartDependents(this.checked);
     const refresh = this.className.includes("checkbox-filter");
     saveOption(this.id, this.checked, refresh);
   });
@@ -25,11 +70,19 @@ const loadPopupEvents = () => {
     const refresh = this.id === "scope";
     saveOption(this.id, this.value, refresh);
     if (this.id === "onDuplicateTabDetected") changeAutoCloseOptionState(this.value, true);
+    else if (this.id === "theme") applyTheme(this.value);
   });
 
   /* Save badge color settings */
   $(".list-group input[type='color']").on("change", function () {
     saveOption(this.id, this.value);
+  });
+
+  /* Save title similarity threshold */
+  $(".list-group #titleSimilarityThreshold").on("change", function () {
+    const val = Math.min(100, Math.max(1, parseInt(this.value) || 100));
+    this.value = val;
+    saveOption("titleSimilarityThreshold", val, true);
   });
 
   /* Save whiteList settings */
@@ -38,6 +91,25 @@ const loadPopupEvents = () => {
     whiteList = cleanUpWhiteList(whiteList);
     setWhiteList(whiteList);
     saveOption(this.id, whiteList, false);
+  });
+
+  /* Save URL/title pattern rules */
+  $("#urlRegexRules, #titleRegexRules").on("change", function () {
+    const cleaned = cleanUpWhiteList($(this).val());
+    $(`#${this.id}`).val(cleaned);
+    saveOption(this.id, cleaned, true);
+  });
+
+  /* Current line highlight for pattern rule textareas */
+  const applyLineHighlight = (textarea) => {
+    const { top, bottom } = getHighlightBounds(textarea);
+    const s = textarea.scrollTop;
+    textarea.style.backgroundImage = `linear-gradient(transparent ${top - s}px, rgba(0, 0, 0, 0.075) ${top - s}px, rgba(0, 0, 0, 0.075) ${bottom - s}px, transparent ${bottom - s}px)`;
+  };
+  $("#urlRegexRules, #titleRegexRules, #whiteList").on("keyup click select focus scroll", function () {
+    applyLineHighlight(this);
+  }).on("blur", function () {
+    this.style.backgroundImage = "";
   });
 
   /* Active selected tab */
@@ -56,11 +128,6 @@ const loadPopupEvents = () => {
   /* Close all */
   $("#closeDuplicateTabsBtn").on("click", function () {
     if (!$(this).hasClass("disabled")) requestCloseDuplicateTabs();
-  });
-
-  /* Toggle subitem panels */
-  $(".list-group-item-title").on("click", function () {
-    toggleExpendGroup(this.id, false);
   });
 
 };
@@ -86,46 +153,35 @@ const changeAutoCloseOptionState = (state, resize) => {
   if (resize) resizeDuplicateTabsPanel();
 };
 
-const toggleExpendGroup = (groupId, checkbox, resize) => {
-  if (checkbox) {
-    const thumbChecked = $(`#${groupId}`).prop("checked");
-    const listGroupId = groupId.replace("Pinned", "");
-    $(`#${listGroupId}Body`).toggleClass("hidden", !thumbChecked);
-    if ((thumbChecked && $(`#${listGroupId}`).hasClass("list-group-collapsed")) || (!thumbChecked && $(`#${listGroupId}`).hasClass("list-group-expanded"))) {
-      $(`#${listGroupId}`).toggleClass("list-group-expanded list-group-collapsed");
-    }
-    if (resize) resizeDuplicateTabsPanel();
-  }
-  else {
-    $(`#${groupId}Body`).toggleClass("hidden");
-    $(`#${groupId}`).toggleClass("list-group-expanded list-group-collapsed");
-    resizeDuplicateTabsPanel();
-  }
-  $(".list-group-item").toggleClass("list-group-item-overflow", $(".card-body").css("height") >= $(".card-body").css("max-height"));
+const updateIgnorePathPartDependents = (checked) => {
+  $("#ignoreSearchPart").prop("disabled", checked);
+  $("#ignoreHashPart").prop("disabled", checked);
 };
 
 const setDuplicateTabsTable = (duplicateTabs) => {
   if (areSameArrays(duplicateTabs, lastDuplicateTabs)) return;
+  const isUpdate = panelInitialized;
+  panelInitialized = true;
   lastDuplicateTabs = duplicateTabs ? Array.from(duplicateTabs) : null;
   $("#duplicateTabsTableBody").empty();
   if (duplicateTabs) {
     let tableRows = "";
     duplicateTabs.forEach(duplicateTab => {
       const containerStyle = duplicateTab.containerColor ? `style='text-decoration:underline; text-decoration-color: ${duplicateTab.containerColor};'` : "";
-      const title = (duplicateTab.windowId === activeWindowId) ? duplicateTab.title : `<em>${duplicateTab.title}</em>`;
-      const tdTabIcon = `<td class='td-tab-icon'><img src='${duplicateTab.icon}' alt=''></td>`;
-      const tdTabTitle = `<td class='td-tab-title' ${containerStyle}>${title}</td>`;
-      const tdCloseButton = "<td class='td-close-button'><button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button></td>";
+      const title = (duplicateTab.windowId === activeWindowId) ? escapeHTML(duplicateTab.title) : `<em>${escapeHTML(duplicateTab.title)}</em>`;
+      const tdTabIcon = `<td class='td-tab-icon'><img src='${escapeHTML(duplicateTab.icon)}' alt=''></td>`;
+      const tdTabTitle = `<td class='td-tab-title' ${containerStyle} title='${escapeHTML(duplicateTab.url)}'>${title}</td>`;
+      const tdCloseButton = "<td class='td-close-button'><button type='button' class='btn-tab-close' aria-label='Close'>&times;</button></td>";
       tableRows += `<tr tabId='${duplicateTab.id}' windowId='${duplicateTab.windowId}'>${tdTabIcon}${tdTabTitle}${tdCloseButton}</tr>`;
     });
     $("#duplicateTabsTableBody").append(tableRows);
     $("#closeDuplicateTabsBtn").toggleClass("disabled", false);
   }
   else {
-    $("#duplicateTabsTableBody").append(`<td class='td-tab-text'><em>${chrome.i18n.getMessage("noDuplicateTabs")}.</em></td>`);
+    $("#duplicateTabsTableBody").append(`<tr><td class='td-tab-text' colspan='3'><em>${chrome.i18n.getMessage("noDuplicateTabs")}.</em></td></tr>`);
     $("#closeDuplicateTabsBtn").toggleClass("disabled", true);
   }
-  resizeDuplicateTabsPanel(true);
+  resizeDuplicateTabsPanel(isUpdate);
 };
 
 const resizeDuplicateTabsPanel = (refresh) => {
@@ -135,7 +191,7 @@ const resizeDuplicateTabsPanel = (refresh) => {
   const nbRows = lastDuplicateTabs ? lastDuplicateTabs.length : 1;
   const maxRows = Math.min(nbRows, Math.floor((maxOptionsCardHeight - $("#optionsCard").height() + (minRow * rowHeight)) / rowHeight));
   $("#duplicateTabsTableContainer").toggleClass("table-scrollable-overflow", nbRows > maxRows);
-  if (refresh && (nbRows > maxRows)) highlightBottomScrollShadow();
+
   $("#duplicateTabsTableContainer").css("height", maxRows * rowHeight);
 };
 
@@ -161,10 +217,18 @@ const setPanelOption = (details) => {
     $("#whiteList").val(value);
     if (isLockedKey) $("#whiteList").prop("disabled", true);
   }
+  else if (storedOption === "urlRegexRules" || storedOption === "titleRegexRules") {
+    $(`#${storedOption}`).val(value);
+    if (isLockedKey) $(`#${storedOption}`).prop("disabled", true);
+  }
   else {
     if (typeof (value) === "boolean") {
       $(`#${storedOption}`).prop("checked", value);
-      if (storedOption.endsWith("Pinned")) toggleExpendGroup(storedOption, true);
+      if (storedOption === "compareWithTitle") $("#titleSimilarityThreshold").prop("disabled", !value);
+      else if (storedOption === "ignorePathPart") updateIgnorePathPartDependents(value);
+    }
+    else if (typeof (value) === "number") {
+      $(`#${storedOption}`).val(value);
     }
     else if (value.startsWith("#")) {
       // badge color value
@@ -173,6 +237,7 @@ const setPanelOption = (details) => {
     else {
       $(`#${storedOption} option[value='${value}']`).prop("selected", true);
       if (storedOption === "onDuplicateTabDetected") changeAutoCloseOptionState(value, resize);
+      else if (storedOption === "theme") applyTheme(value);
     }
     if (isLockedKey) $(`#${storedOption}`).prop("disabled", true);
   }
@@ -185,6 +250,7 @@ const setPanelOptions = async () => {
   for (const storedOption in storedOptions) {
     setPanelOption({ storedOption: storedOption, value: storedOptions[storedOption].value, isLockedKey: lockedKeys.includes(storedOption) });
   }
+  updateIgnorePathPartDependents(storedOptions.ignorePathPart ? storedOptions.ignorePathPart.value : false);
 };
 
 const handleMessage = (message) => {
@@ -213,6 +279,6 @@ const localizePopup = (node) => {
 let highlightBottomScrollShadowTimer = null;
 const highlightBottomScrollShadow = () => {
   clearTimeout(highlightBottomScrollShadowTimer);
-  $("#duplicateTabsTableContainer").toggleClass("table-scrollable-shadow", true);
-  highlightBottomScrollShadowTimer = setTimeout(() => $("#duplicateTabsTableContainer").toggleClass("table-scrollable-shadow", false), 400);
+  $("#duplicateTabsTableContainer").toggleClass("highlight-scroll-bottom", true);
+  highlightBottomScrollShadowTimer = setTimeout(() => $("#duplicateTabsTableContainer").toggleClass("highlight-scroll-bottom", false), 400);
 };

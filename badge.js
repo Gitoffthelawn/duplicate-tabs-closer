@@ -2,8 +2,8 @@
 
 // eslint-disable-next-line no-unused-vars
 const setBadgeIcon = () => {
-	chrome.browserAction.setIcon({ path: options.autoCloseTab ? "images/auto_close_16.png" : "images/manual_close_16.png" });
-	if (environment.isFirefox) browser.browserAction.setBadgeTextColor({ color: "white" });
+	chrome.action.setIcon({ path: options.autoCloseTab ? "images/auto_close_16.png" : "images/manual_close_16.png" });
+	if (environment.isFirefox) browser.action.setBadgeTextColor({ color: "white" });
 };
 
 const setBadge = async (windowId, activeTabId) => {
@@ -32,9 +32,16 @@ const getNbDuplicateTabs = (duplicateTabsGroups) => {
 	return nbDuplicateTabs;
 };
 
-const updateBadgeValue = (nbDuplicateTabs, windowId) => {
+const updateBadgeValue = async (nbDuplicateTabs, windowId) => {
+	if (tabsInfo.hasNbDuplicateTabs(windowId) && tabsInfo.getNbDuplicateTabs(windowId) === nbDuplicateTabs.toString()) return;
+	const prevCount = tabsInfo.hasNbDuplicateTabs(windowId) ? parseInt(tabsInfo.getNbDuplicateTabs(windowId)) : 0;
 	tabsInfo.setNbDuplicateTabs(windowId, nbDuplicateTabs);
 	setBadge(windowId);
+	if (options.openPopupOnDuplicateDetected && nbDuplicateTabs > prevCount && !(await isPanelOptionOpen())) {
+		chrome.storage.session.set({ autoOpenedPopup: true }).then(() => {
+			chrome.action.openPopup().catch(() => {});
+		});
+	}
 };
 
 // eslint-disable-next-line no-unused-vars

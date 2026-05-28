@@ -1,14 +1,30 @@
 "use strict";
 
-const isUrlWhiteListed = (url) => {
-    const matches = options.whiteList.filter(pattern => pattern.test(url));
-    return matches.length !== 0;
+const isUrlWhiteListed = (url) => options.whiteList.some(pattern => pattern.test(url));
+
+const matchByUrlPattern = (url1, url2) => {
+    for (const { source, regex } of options.urlRegexRules) {
+        if (regex.test(url1) && regex.test(url2)) return source;
+    }
+    return null;
+};
+
+const matchByTitlePattern = (title1, title2) => {
+    for (const { source, regex } of options.titleRegexRules) {
+        if (regex.test(title1) && regex.test(title2)) return source;
+    }
+    return null;
 };
 
 const matchTitle = (tab1, tab2) => {
     if (options.compareWithTitle) {
-        if ((isTabComplete(tab1) && isTabComplete(tab2)) && (tab1.title === tab2.title)) {
-            return true;
+        if (isTabComplete(tab1) && isTabComplete(tab2)) {
+            if (options.titleSimilarityThreshold >= 100)
+                return tab1.title.toLowerCase() === tab2.title.toLowerCase();
+            const t = options.titleSimilarityThreshold;
+            const maxLen = Math.max(tab1.title.length, tab2.title.length);
+            if (maxLen > 0 && Math.abs(tab1.title.length - tab2.title.length) > maxLen * (1 - t / 100)) return false;
+            return titleSimilarity(tab1.title, tab2.title) >= t;
         }
     }
     return false;
@@ -105,48 +121,52 @@ const getCloseInfo = (details) => {
 const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loadingUrl) => {
     const observedTabUrl = loadingUrl || observedTab.url;
     const observedWindowsId = observedTab.windowId;
+    await tabsInfo.awaitPendingCheck(observedTab.id);
+    if (tabsInfo.isIntentionalDuplicate(observedTab.id)) return;
     if (isUrlWhiteListed(observedTabUrl)) {
         if (isTabComplete(observedTab)) refreshDuplicateTabsInfo(observedWindowsId);
         return;
     }
     const queryInfo = {};
-    queryInfo.status = queryComplete ? "complete" : null;
-    queryInfo.url = getMatchPatternURL(observedTabUrl);
+    if (isValidURL(observedTabUrl) && options.urlRegexRules.length === 0 && options.titleRegexRules.length === 0) queryInfo.url = getMatchPatternURL(observedTabUrl);
     queryInfo.windowId = options.searchInAllWindows ? null : observedWindowsId;
     if (environment.isFirefox) queryInfo.cookieStoreId = options.searchPerContainer ? observedTab.cookieStoreId : null;
     const openedTabs = await getTabs(queryInfo);
-    if (openedTabs.length > 1) {
-        const matchingObservedTabUrl = getMatchingURL(observedTabUrl);
-        let match = false;
-        for (const openedTab of openedTabs) {
-            if ((openedTab.id === observedTab.id) || tabsInfo.isIgnoredTab(openedTab.id) || (isBlankURL(openedTab.url) && !isTabComplete(openedTab))) continue;
-            if ((getMatchingURL(openedTab.url) === matchingObservedTabUrl) || matchTitle(openedTab, observedTab)) {
-                match = true;
-                const [tabToCloseId, remainingTabInfo] = getCloseInfo({ observedTab: observedTab, observedTabUrl: observedTabUrl, openedTab: openedTab });
-                closeDuplicateTab(tabToCloseId, remainingTabInfo);
-                if (remainingTabInfo.observedTabClosed) break;
-            }
+    if (!openedTabs || openedTabs.length <= 1) return;
+    const matchingObservedTabUrl = getMatchingURL(observedTabUrl);
+    let match = false;
+    for (const openedTab of openedTabs) {
+        if ((openedTab.id === observedTab.id) || tabsInfo.isClosingTab(openedTab.id)) continue;
+        if (queryComplete && !isTabComplete(openedTab)) continue;
+        if ((getMatchingURL(openedTab.url) === matchingObservedTabUrl)
+            || matchTitle(openedTab, observedTab)
+            || matchByUrlPattern(openedTab.url, observedTabUrl)
+            || (isTabComplete(openedTab) && isTabComplete(observedTab) && matchByTitlePattern(openedTab.title, observedTab.title))) {
+            match = true;
+            const [tabToCloseId, remainingTabInfo] = getCloseInfo({ observedTab: observedTab, observedTabUrl: observedTabUrl, openedTab: openedTab });
+            closeDuplicateTab(tabToCloseId, remainingTabInfo);
+            if (remainingTabInfo.observedTabClosed) break;
         }
-        if (!match) {
-            if (tabsInfo.hasDuplicateTabs(observedWindowsId)) refreshDuplicateTabsInfo(observedWindowsId);
-            else if (environment.isChrome && observedTab.active) setBadge(observedTab.windowId, observedTab.id);
-        }
+    }
+    if (!match) {
+        if (tabsInfo.hasDuplicateTabs(observedWindowsId)) refreshDuplicateTabsInfo(observedWindowsId);
+        else if (environment.isChrome && observedTab.active) setBadge(observedTab.windowId, observedTab.id);
     }
 };
 
 const closeDuplicateTab = async (tabToCloseId, remainingTabInfo) => {
     try {
-        tabsInfo.ignoreTab(tabToCloseId, true);
+        tabsInfo.setClosingTab(tabToCloseId, true);
         await removeTab(tabToCloseId);
     }
     catch (ex) {
-        tabsInfo.ignoreTab(tabToCloseId, false);
+        tabsInfo.setClosingTab(tabToCloseId, false);
         return;
     }
-    if (tabsInfo.hasTab(tabToCloseId)) {
-        await wait(10);
-        if (tabsInfo.hasTab(tabToCloseId)) {
-            tabsInfo.ignoreTab(tabToCloseId, false);
+    if (await tabExists(tabToCloseId)) {
+        await wait(200);
+        if (await tabExists(tabToCloseId)) {
+            tabsInfo.setClosingTab(tabToCloseId, false);
             refreshDuplicateTabsInfo(remainingTabInfo.windowId);
             return;
         }
@@ -163,9 +183,9 @@ const _handleRemainingTab = async (details) => {
         focusTab(details.tabId, details.windowId);
     }
     if (details.reloadTab) {
-        tabsInfo.ignoreTab(details.tabId, true);
+        tabsInfo.setClosingTab(details.tabId, true);
         await reloadTab(details.tabId);
-        tabsInfo.ignoreTab(details.tabId, false);
+        tabsInfo.setClosingTab(details.tabId, false);
     }
 };
 
@@ -186,10 +206,32 @@ const handleObservedTab = (details) => {
     if (!retainedTab) {
         if (isTabComplete(observedTab)) retainedTabs.set(matchingKey, observedTab);
         if (matchingTabTitle) {
-            matchingKey = matchingTabTitle;
+            matchingKey = findFuzzyTitleKey(observedTab.title, retainedTabs) || matchingTabTitle;
             retainedTab = retainedTabs.get(matchingKey);
             if (!retainedTab) {
-                retainedTabs.set(matchingKey, observedTab);
+                retainedTabs.set(matchingTabTitle, observedTab);
+            }
+        }
+        if (!retainedTab && options.urlRegexRules.length > 0) {
+            let urlPatSource = null;
+            for (const { source, regex } of options.urlRegexRules) {
+                if (regex.test(observedTab.url)) { urlPatSource = source; break; }
+            }
+            if (urlPatSource) {
+                matchingKey = `urlpattern=${urlPatSource}`;
+                retainedTab = retainedTabs.get(matchingKey);
+                if (!retainedTab) retainedTabs.set(matchingKey, observedTab);
+            }
+        }
+        if (!retainedTab && isTabComplete(observedTab) && options.titleRegexRules.length > 0) {
+            let titlePatSource = null;
+            for (const { source, regex } of options.titleRegexRules) {
+                if (regex.test(observedTab.title)) { titlePatSource = source; break; }
+            }
+            if (titlePatSource) {
+                matchingKey = `titlepattern=${titlePatSource}`;
+                retainedTab = retainedTabs.get(matchingKey);
+                if (!retainedTab) retainedTabs.set(matchingKey, observedTab);
             }
         }
     }
@@ -197,10 +239,10 @@ const handleObservedTab = (details) => {
         if (details.closeTab) {
             const [tabToCloseId] = getCloseInfo({ observedTab: observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
             if (tabToCloseId === observedTab.id) {
-                chrome.tabs.remove(observedTab.id);
+                details.tabsToClose.add(observedTab.id);
             }
             else {
-                chrome.tabs.remove(retainedTab.id);
+                details.tabsToClose.add(retainedTab.id);
                 retainedTabs.set(matchingKey, observedTab);
             }
         } else {
@@ -211,30 +253,56 @@ const handleObservedTab = (details) => {
     }
 };
 
+const findFuzzyTitleKey = (title, retainedTabs) => {
+    if (options.titleSimilarityThreshold >= 100) return null;
+    const t = options.titleSimilarityThreshold;
+    const titleLen = title.length;
+    for (const [key] of retainedTabs) {
+        if (!key.startsWith("title=")) continue;
+        const candidate = key.slice(6);
+        const maxLen = Math.max(titleLen, candidate.length);
+        if (maxLen > 0 && Math.abs(titleLen - candidate.length) > maxLen * (1 - t / 100)) continue;
+        if (titleSimilarity(title, candidate) >= t) return key;
+    }
+    return null;
+};
+
 // eslint-disable-next-line no-unused-vars
 const searchForDuplicateTabs = async (windowId, closeTabs) => {
     const queryInfo = { windowType: "normal" };
     if (!options.searchInAllWindows) queryInfo.windowId = windowId;
     const [activeWindowId, openedTabs] = await Promise.all([getActiveWindowId(), getTabs(queryInfo)]);
+    if (!openedTabs) return;
     const duplicateTabsGroups = new Map();
     const retainedTabs = new Map();
+    const tabsToClose = new Set();
     for (const openedTab of openedTabs) {
-        if ((isBlankURL(openedTab.url) && !isTabComplete(openedTab)) || tabsInfo.isIgnoredTab(openedTab.id)) continue;
+        if ((isBlankURL(openedTab.url) && !isTabComplete(openedTab)) || tabsInfo.isClosingTab(openedTab.id)) continue;
+        if (isUrlWhiteListed(openedTab.url)) continue;
+        if (tabsInfo.isIntentionalDuplicate(openedTab.id)) continue;
         const details = {
             tab: openedTab,
             retainedTabs: retainedTabs,
             activeWindowId: activeWindowId,
             closeTab: closeTabs,
-            duplicateTabsGroups: duplicateTabsGroups
+            duplicateTabsGroups: duplicateTabsGroups,
+            tabsToClose: tabsToClose
         };
         handleObservedTab(details);
     }
-    if (!closeTabs) {
-        return {
-            duplicateTabsGroups: duplicateTabsGroups,
-            activeWindowId: activeWindowId
-        };
+    if (closeTabs) {
+        if (tabsToClose.size > 0) {
+            tabsToClose.forEach(tabId => tabsInfo.setClosingTab(tabId, true));
+            chrome.tabs.remove(Array.from(tabsToClose)).catch(() => {
+                tabsToClose.forEach(tabId => tabsInfo.setClosingTab(tabId, false));
+            });
+        }
+        return;
     }
+    return {
+        duplicateTabsGroups: duplicateTabsGroups,
+        activeWindowId: activeWindowId
+    };
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -243,8 +311,10 @@ const closeDuplicateTabs = (windowId) => searchForDuplicateTabs(windowId, true);
 const setDuplicateTabPanel = async (duplicateTab, duplicateTabs) => {
     let containerColor = "";
     if (environment.isFirefox && (!duplicateTab.incognito && duplicateTab.cookieStoreId !== "firefox-default")) {
-        const getContext = await browser.contextualIdentities.get(duplicateTab.cookieStoreId);
-        if (getContext) containerColor = getContext.color;
+        try {
+            const getContext = await browser.contextualIdentities.get(duplicateTab.cookieStoreId);
+            if (getContext) containerColor = getContext.color;
+        } catch { /* container deleted or unavailable */ }
     }
     duplicateTabs.add({
         id: duplicateTab.id,
@@ -283,12 +353,12 @@ const sendDuplicateTabs = async (duplicateTabsGroups) => {
 const _refreshDuplicateTabsInfo = async (windowId) => {
     const searchResult = await searchForDuplicateTabs(windowId, false);
     updateBadgesValue(searchResult.duplicateTabsGroups, windowId);
-    if (isPanelOptionOpen() && (options.searchInAllWindows || (windowId === searchResult.activeWindowId))) {
+    if ((await isPanelOptionOpen()) && (options.searchInAllWindows || (windowId === searchResult.activeWindowId))) {
         sendDuplicateTabs(searchResult.duplicateTabsGroups);
     }
 };
 
-const refreshDuplicateTabsInfo = debounce(_refreshDuplicateTabsInfo, 300);
+const refreshDuplicateTabsInfo = debounce(_refreshDuplicateTabsInfo, 300, false);
 
 // eslint-disable-next-line no-unused-vars
 const refreshGlobalDuplicateTabsInfo = async () => {
@@ -296,6 +366,6 @@ const refreshGlobalDuplicateTabsInfo = async () => {
         refreshDuplicateTabsInfo();
     } else {
         const windows = await getWindows();
-        windows.forEach(window => refreshDuplicateTabsInfo(window.id));
+        if (windows) windows.forEach(window => refreshDuplicateTabsInfo(window.id));
     }
 };

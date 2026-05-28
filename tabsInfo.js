@@ -3,66 +3,67 @@
 class TabsInfo {
 
     constructor() {
-        this.tabs = new Map();
+        this.storedTabs = new Map();
         this.nbDuplicateTabs = new Map();
+        this.knownSessionIds = new Set();
+        this.intentionalDuplicates = new Set();
+        this.pendingChecks = new Map();
         this.initialize();
     }
 
     async initialize() {
         const openedTabs = await getTabs({ windowType: "normal" });
+        if (!openedTabs) return;
         for (const openedTab of openedTabs) {
-            this.setOpenedTab(openedTab);
+            this.setTab(openedTab.id, { url: openedTab.url, complete: true });
         }
+        const result = await chrome.storage.session.get('intentionalDuplicates');
+        const ids = result.intentionalDuplicates || [];
+        ids.forEach(id => this.intentionalDuplicates.add(id));
     }
 
-    setNewTab(tabId) {
-        const tab = { url: null, lastComplete: null, ignored: false };
-        this.tabs.set(tabId, tab);
+    setTab(tabId, details) {
+        const storedTab = this.storedTabs.get(tabId)
+            || { url: null, lastComplete: null, closing: false };
+        if (Object.prototype.hasOwnProperty.call(details, "url"))
+            storedTab.url = details.url;
+        if (Object.prototype.hasOwnProperty.call(details, "complete"))
+            storedTab.lastComplete = details.complete ? Date.now() : null;
+        if (Object.prototype.hasOwnProperty.call(details, "closing"))
+            storedTab.closing = details.closing;
+        this.storedTabs.set(tabId, storedTab);
     }
 
-    setOpenedTab(openedTab) {
-        const tab = { url: openedTab.url, lastComplete: Date.now(), ignored: false };
-        this.tabs.set(openedTab.id, tab);
+    setClosingTab(tabId, state) {
+        this.setTab(tabId, { closing: state });
     }
 
-    ignoreTab(tabId, state) {
-        const tab = this.tabs.get(tabId);
-        tab.ignored = state;
-        this.tabs.set(tabId, tab);
-    }
-
-    isIgnoredTab(tabId) {
-        const tab = this.tabs.get(tabId);
-        return (!tab || tab.ignored) ? true : false;
+    isClosingTab(tabId) {
+        const storedTab = this.storedTabs.get(tabId);
+        return (!storedTab || storedTab.closing) ? true : false;
     }
 
     getLastComplete(tabId) {
-        const tab = this.tabs.get(tabId);
-        return tab.lastComplete;
-    }
-
-    updateTab(openedTab) {
-        const tab = this.tabs.get(openedTab.id);
-        tab.url = openedTab.url;
-        tab.lastComplete = Date.now();
-        this.tabs.set(openedTab.id, tab);
-    }
-
-    resetTab(tabId) {
-        this.setNewTab(tabId);
+        const storedTab = this.storedTabs.get(tabId);
+        return storedTab ? storedTab.lastComplete : null;
     }
 
     hasUrlChanged(openedTab) {
-        const tab = this.tabs.get(openedTab.id);
-        return tab.url !== openedTab.url;
+        const storedTab = this.storedTabs.get(openedTab.id);
+        return storedTab ? storedTab.url !== openedTab.url : true;
     }
 
     removeTab(tabId) {
-        this.tabs.delete(tabId);
+        this.storedTabs.delete(tabId);
+        if (this.intentionalDuplicates.has(tabId)) {
+            this.intentionalDuplicates.delete(tabId);
+            this._persistIntentionalDuplicates();
+        }
+        this.pendingChecks.delete(tabId);
     }
 
     hasTab(tabId) {
-        return this.tabs.has(tabId);
+        return this.storedTabs.has(tabId);
     }
 
     hasDuplicateTabs(windowId) {
@@ -74,12 +75,47 @@ class TabsInfo {
         return this.nbDuplicateTabs.get(windowId) || "0";
     }
 
+    hasNbDuplicateTabs(windowId) {
+        return this.nbDuplicateTabs.has(windowId);
+    }
+
     setNbDuplicateTabs(windowId, nbDuplicateTabs) {
         this.nbDuplicateTabs.set(windowId, nbDuplicateTabs.toString());
     }
 
     clearDuplicateTabsInfo(windowId) {
         if (this.nbDuplicateTabs.has(windowId)) this.nbDuplicateTabs.delete(windowId);
+    }
+
+    registerSessionId(sessionId) {
+        this.knownSessionIds.add(sessionId);
+    }
+
+    isKnownSessionId(sessionId) {
+        return this.knownSessionIds.has(sessionId);
+    }
+
+    setIntentionalDuplicate(tabId) {
+        this.intentionalDuplicates.add(tabId);
+        this._persistIntentionalDuplicates();
+    }
+
+    _persistIntentionalDuplicates() {
+        chrome.storage.session.set({ intentionalDuplicates: Array.from(this.intentionalDuplicates) });
+    }
+
+    isIntentionalDuplicate(tabId) {
+        return this.intentionalDuplicates.has(tabId);
+    }
+
+    setPendingCheck(tabId, promise) {
+        this.pendingChecks.set(tabId, promise);
+        promise.finally(() => this.pendingChecks.delete(tabId));
+    }
+
+    awaitPendingCheck(tabId) {
+        const p = this.pendingChecks.get(tabId);
+        return p ? p.catch(() => {}) : Promise.resolve();
     }
 
 }

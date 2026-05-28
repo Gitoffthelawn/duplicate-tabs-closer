@@ -1,12 +1,12 @@
 "use strict";
 
 // eslint-disable-next-line no-unused-vars
-const isBlankURL = (url) => url === "about:blank";
+const isBlankURL = (url) => url === "about:blank" || url === "about:newtab";
 
 // eslint-disable-next-line no-unused-vars
-const isChromeURL = (url) => url.startsWith("chrome://") || url.startsWith("view-source:chrome-search");
+const isChromeURL = (url) => url.startsWith("chrome://") || url.startsWith("edge://") || url.startsWith("opera://") || url.startsWith("vivaldi://") || url.startsWith("brave://") || url.startsWith("view-source:chrome-search");
 
-const isBrowserURL = (url) => url.startsWith("about:") || url.startsWith("chrome://");
+const isBrowserURL = (url) => url.startsWith("about:") || url.startsWith("chrome://") || url.startsWith("edge://") || url.startsWith("opera://") || url.startsWith("vivaldi://") || url.startsWith("brave://");
 
 const isValidURL = (url) => {
 	const regex = /^(f|ht)tps?:\/\//i;
@@ -26,18 +26,19 @@ const getMatchingURL = (url) => {
 	if (options.ignorePathPart) {
 		const uri = new URL(matchingURL);
 		matchingURL = uri.origin;
-	}
-	else if (options.ignoreSearchPart) {
-		matchingURL = matchingURL.split("?")[0];
-	}
-	else if (options.ignoreHashPart) {
-		matchingURL = matchingURL.split("#")[0];
+	} else {
+		if (options.ignoreSearchPart) {
+			matchingURL = matchingURL.split("?")[0];
+		}
+		if (options.ignoreHashPart) {
+			matchingURL = matchingURL.split("#")[0];
+		}
 	}
 	if (options.keepTabWithHttps) {
 		matchingURL = matchingURL.replace(/^http:\/\//i, "https://");
 	}
 	if (options.ignore3w) {
-		matchingURL = matchingURL.replace("://www.", "://");
+		matchingURL = matchingURL.replace(/(:\/\/)www\./i, "$1");
 	}
 	if (options.caseInsensitive) {
 		matchingURL = matchingURL.toLowerCase();

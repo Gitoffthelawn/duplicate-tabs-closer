@@ -19,6 +19,10 @@
     "message": "パネルを表示する",
     "description": "Show panel"
   },
+  "openPopupOnDuplicateDetected": {
+    "message": "重複タブ検出時にポップアップを開く",
+    "description": "Open popup panel when a new duplicate tab is detected"
+  },
   "tabPriority": {
     "message": "優先順位",
     "description": "Priority"
@@ -34,10 +38,6 @@
   "keepReloadOlderTab": {
     "message": "古い方のタブを残して再読み込みする",
     "description": "Keep and reload older tab"
-  },
-  "keepTabWithHistory": {
-    "message": "タブの履歴を維持する",
-    "description": "Keep tab with history"
   },
   "keeptabwithHttps": {
     "message": "HTTPSのタブを残す",
@@ -60,7 +60,7 @@
     "description": "Default tab behaviour"
   },
   "matchingRules": {
-    "message": "Matching rules",
+    "message": "照合ルール",
     "description": "Matching rules"
   },
   "ignoreHashPart": {
@@ -76,16 +76,28 @@
     "description": "Ignore path part in URL"
   },
   "ignore3w": {
-    "message": "Ignore 'www' in URL domain name",
+    "message": "URLドメイン名の 'www' を無視する",
     "description": "Ignore 'www' in URL domain name"
   },
   "caseInsensitive": {
-    "message": "Ignore case in URL",
+    "message": "URLの大文字と小文字を区別しない",
     "description": "Ignore case in URL"
   },
   "compareWithTitle": {
     "message": "タブのタイトルを比較する",
     "description": "Compare with title"
+  },
+  "titleSimilarityThreshold": {
+    "message": "% タイトルの一致率",
+    "description": "Minimum title similarity to consider tabs as duplicates"
+  },
+  "urlRegexRules": {
+    "message": "URL パターンルール",
+    "description": "URL pattern rules"
+  },
+  "titleRegexRules": {
+    "message": "タイトルパターンルール",
+    "description": "Title pattern rules"
   },
   "duplicatetabs": {
     "message": "重複したタブ",
@@ -104,20 +116,12 @@
     "description": "All windows"
   },
   "containerActivewindow": {
-    "message": "Container in active window",
+    "message": "アクティブウィンドウのコンテナー",
     "description": "Container in active window"
   },
   "containerAllwindows": {
-    "message": "Container in all windows",
+    "message": "すべてのウィンドウのコンテナー",
     "description": "Container in all windows"
-  },
-  "hideWhiteListedDuplicateTabs": {
-    "message": "Hide whitelisted duplicate tabs",
-    "description": "Hide whitelisted duplicate tabs"
-  },
-  "groupDuplicateTabs": {
-    "message": "Group duplicate tabs",
-    "description": "Group duplicate tabs"
   },
   "closeAllDuplicateTabs": {
     "message": "重複したタブをすべて閉じる",
@@ -148,15 +152,63 @@
     "description": "No duplicate tabs"    
   },
   "closePopup": {
-    "message": "Close popup panel after closing duplicate tabs",
-    "description": "Close popup panel after closing duplicate tabs"    
+    "message": "重複したタブを閉じた後にポップアップパネルを閉じる",
+    "description": "Close popup panel after closing duplicate tabs"
   },
   "moreOptions": {
-    "message":  "More options...",
+    "message":  "その他のオプション...",
     "description":  "More options..."
   },
   "shrunkMode": {
-    "message":  "Shrunk mode:\nWhen activated, hide unpinned options.",
+    "message":  "コンパクトモード:\n有効にすると、固定されていないオプションを非表示にします。",
     "description":  "Shrunk mode\nWhen activated, hide unpinned options."
-  }  
+  },
+  "theme": {
+    "message": "テーマ",
+    "description": "Theme selector"
+  },
+  "themeLight": {
+    "message": "Sky",
+    "description": "Sky light theme"
+  },
+  "themeOcean": {
+    "message": "Ocean Night",
+    "description": "Ocean Night dark theme"
+  },
+  "themeCharcoal": {
+    "message": "Charcoal",
+    "description": "Charcoal dark theme"
+  },
+  "themePurple": {
+    "message": "Midnight Purple",
+    "description": "Midnight Purple dark theme"
+  },
+  "themeTeal": {
+    "message": "Dark Teal",
+    "description": "Dark Teal theme"
+  },
+  "themeOled": {
+    "message": "OLED Black",
+    "description": "OLED Black theme"
+  },
+  "themeSage": {
+    "message": "Sage",
+    "description": "Sage light theme"
+  },
+  "themeRose": {
+    "message": "Rose",
+    "description": "Rose light theme"
+  },
+  "themeAmber": {
+    "message": "Amber",
+    "description": "Amber light theme"
+  },
+  "themeSlate": {
+    "message": "Slate",
+    "description": "Slate light theme"
+  },
+  "themeViolet": {
+    "message": "Violet",
+    "description": "Violet light theme"
+  }
 }

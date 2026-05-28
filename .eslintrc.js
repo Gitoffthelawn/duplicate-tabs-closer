@@ -17,7 +17,6 @@ module.exports = {
         "getActiveWindowId": "readonly",
         "getMatchingURL": "readonly",
         "getMatchPatternURL": "readonly",
-        "getPlatformInfo": "readonly",
         "getStoredOptions": "readonly",
         "getTab": "readonly",
         "getTabs": "readonly",

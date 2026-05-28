@@ -19,6 +19,10 @@
     "message": "Показать панель",
     "description": "Show panel"
   },
+  "openPopupOnDuplicateDetected": {
+    "message": "Открывать панель при обнаружении дубликата",
+    "description": "Open popup panel when a new duplicate tab is detected"
+  },
   "tabPriority": {
     "message": "Приоритет",
     "description": "Priority"
@@ -34,10 +38,6 @@
   "keepReloadOlderTab": {
     "message": "Сохранить и обновить старейшую вкладку",
     "description": "Keep and reload older tab"
-  },
-  "keepTabWithHistory": {
-    "message": "Сохранить вкладку с историей",
-    "description": "Keep tab with history"
   },
   "keeptabwithHttps": {
     "message": "Сохранить вкладку с https",
@@ -60,7 +60,7 @@
     "description": "Default tab behaviour"
   },
   "matchingRules": {
-    "message": "Matching rules",
+    "message": "Правила соответствия",
     "description": "Matching rules"
   },
   "ignoreHashPart": {
@@ -76,16 +76,28 @@
     "description": "Ignore path part in URL"
   },
   "ignore3w": {
-    "message": "Ignore 'www' in URL domain name",
+    "message": "Игнорировать 'www' в доменном имени URL",
     "description": "Ignore 'www' in URL domain name"
   },
   "caseInsensitive": {
-    "message": "Ignore case in URL",
+    "message": "Игнорировать регистр букв в URL",
     "description": "Ignore case in URL"
   },
   "compareWithTitle": {
     "message": "Сравнить заголовки вкладок",
     "description": "Compare with title"
+  },
+  "titleSimilarityThreshold": {
+    "message": "% совпадение заголовков",
+    "description": "Minimum title similarity to consider tabs as duplicates"
+  },
+  "urlRegexRules": {
+    "message": "Правила URL",
+    "description": "URL pattern rules"
+  },
+  "titleRegexRules": {
+    "message": "Правила заголовков",
+    "description": "Title pattern rules"
   },
   "duplicatetabs": {
     "message": "Дубликаты вкладок",
@@ -104,27 +116,19 @@
     "description": "All windows"
   },
   "containerActivewindow": {
-    "message": "Container in active window",
+    "message": "Контейнер в активном окне",
     "description": "Container in active window"
   },
   "containerAllwindows": {
-    "message": "Container in all windows",
+    "message": "Контейнер во всех окнах",
     "description": "Container in all windows"
-  },
-  "hideWhiteListedDuplicateTabs": {
-    "message": "Hide whitelisted duplicate tabs",
-    "description": "Hide whitelisted duplicate tabs"
-  },
-  "groupDuplicateTabs": {
-    "message": "Group duplicate tabs",
-    "description": "Group duplicate tabs"
   },
   "closeAllDuplicateTabs": {
     "message": "Закрыть все дубликаты вкладок",
     "description": "Close all"
   },
   "whiteList": {
-    "message": "ホワイトリスト",
+    "message": "Разрешённые URL",
     "description": "Whitelisted URLs"
   },
   "customization": {
@@ -148,15 +152,63 @@
     "description": "No duplicate tabs"    
   },
   "closePopup": {
-    "message": "Close popup panel after closing duplicate tabs",
-    "description": "Close popup panel after closing duplicate tabs"    
+    "message": "Закрыть всплывающую панель после закрытия дубликатов вкладок",
+    "description": "Close popup panel after closing duplicate tabs"
   },
   "moreOptions": {
-    "message":  "More options...",
+    "message":  "Ещё параметры...",
     "description":  "More options..."
   },
   "shrunkMode": {
-    "message":  "Shrunk mode:\nWhen activated, hide unpinned options.",
+    "message":  "Компактный режим:\nПри активации скрывает незакреплённые параметры.",
     "description":  "Shrunk mode\nWhen activated, hide unpinned options."
-  }  
+  },
+  "theme": {
+    "message": "Тема",
+    "description": "Theme selector"
+  },
+  "themeLight": {
+    "message": "Sky",
+    "description": "Sky light theme"
+  },
+  "themeOcean": {
+    "message": "Ocean Night",
+    "description": "Ocean Night dark theme"
+  },
+  "themeCharcoal": {
+    "message": "Charcoal",
+    "description": "Charcoal dark theme"
+  },
+  "themePurple": {
+    "message": "Midnight Purple",
+    "description": "Midnight Purple dark theme"
+  },
+  "themeTeal": {
+    "message": "Dark Teal",
+    "description": "Dark Teal theme"
+  },
+  "themeOled": {
+    "message": "OLED Black",
+    "description": "OLED Black theme"
+  },
+  "themeSage": {
+    "message": "Sage",
+    "description": "Sage light theme"
+  },
+  "themeRose": {
+    "message": "Rose",
+    "description": "Rose light theme"
+  },
+  "themeAmber": {
+    "message": "Amber",
+    "description": "Amber light theme"
+  },
+  "themeSlate": {
+    "message": "Slate",
+    "description": "Slate light theme"
+  },
+  "themeViolet": {
+    "message": "Violet",
+    "description": "Violet light theme"
+  }
 }

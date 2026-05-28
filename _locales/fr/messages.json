@@ -19,6 +19,10 @@
     "message": "Afficher le panneau",
     "description": "Show panel"
   },
+  "openPopupOnDuplicateDetected": {
+    "message": "Ouvrir le panneau lors d'un doublon détecté",
+    "description": "Open popup panel when a new duplicate tab is detected"
+  },
   "tabPriority": {
     "message": "Priorité",
     "description": "Priority"
@@ -34,10 +38,6 @@
   "keepReloadOlderTab": {
     "message": "Conserver et actualiser l'ancien onglet",
     "description": "Keep and reload older tab"
-  },
-  "keepTabWithHistory": {
-    "message": "Conserver l'onglet ayant un historique",
-    "description": "Keep tab with history"
   },
   "keeptabwithHttps": {
     "message": "Conserver l'onglet avec https",
@@ -60,8 +60,8 @@
     "description": "Default tab behaviour"
   },
   "matchingRules": {
-    "message": "Règle de correspondance",
-    "description": "Règle de correspondance"
+    "message": "Règles de correspondance",
+    "description": "Règles de correspondance"
   },
   "ignoreHashPart": {
     "message": "Ignorer la partie « hachage » de l'URL",
@@ -87,6 +87,18 @@
     "message": "Comparer avec le titre",
     "description": "Compare with title"
   },
+  "titleSimilarityThreshold": {
+    "message": "% similitude du titre",
+    "description": "Minimum title similarity to consider tabs as duplicates"
+  },
+  "urlRegexRules": {
+    "message": "Règles de correspondance URL",
+    "description": "URL pattern rules"
+  },
+  "titleRegexRules": {
+    "message": "Règles de correspondance titre",
+    "description": "Title pattern rules"
+  },
   "duplicatetabs": {
     "message": "Onglets en doublon",
     "description": "Duplicate tabs"
@@ -104,20 +116,12 @@
     "description": "All windows"
   },
   "containerActivewindow": {
-    "message": "Container dans la fenêtres active",
-    "description": "Container dans la fenêtres active"
+    "message": "Conteneur dans la fenêtre active",
+    "description": "Conteneur dans la fenêtre active"
   },
   "containerAllwindows": {
-    "message": "Container dans toutes les fenêtres",
-    "description": "Container dans toutes les fenêtres"
-  },
-  "hideWhiteListedDuplicateTabs": {
-    "message": "Hide whitelisted duplicate tabs",
-    "description": "Hide whitelisted duplicate tabs"
-  },
-  "groupDuplicateTabs": {
-    "message": "Group duplicate tabs",
-    "description": "Group duplicate tabs"
+    "message": "Conteneur dans toutes les fenêtres",
+    "description": "Conteneur dans toutes les fenêtres"
   },
   "closeAllDuplicateTabs": {
     "message": "Fermer tous",
@@ -132,11 +136,11 @@
     "description": "Customization"
   },
   "badgeColorDuplicateTabs": {
-    "message": "Couleur du bouton pour les onglets en doublon",
+    "message": "Couleur du badge pour les onglets en doublon",
     "description": "Badge color for duplicate tabs"
   },
   "badgeColorNoDuplicateTabs": {
-    "message": "Couleur du bouton pour aucun onglet en doublon",
+    "message": "Couleur du badge en l'absence d'onglets en doublon",
     "description": "Badge color for no duplicate tabs"
   },
   "showBadgeIfNoDuplicateTabs": {
@@ -156,7 +160,55 @@
     "description":  "Plus d'options..."
   },
   "shrunkMode": {
-    "message":  "Shrunk mode:\nQuand il est activé, cache les options qui ne sont pas épinglées.",
-    "description":  "Shrunk mode\nQuand il est activé, cache les options qui ne sont pas épinglées."
-  }  
+    "message":  "Mode compact :\nQuand il est activé, cache les options non épinglées.",
+    "description":  "Mode compact\nQuand il est activé, cache les options non épinglées."
+  },
+  "theme": {
+    "message": "Thème",
+    "description": "Theme selector"
+  },
+  "themeLight": {
+    "message": "Sky",
+    "description": "Sky light theme"
+  },
+  "themeOcean": {
+    "message": "Ocean Night",
+    "description": "Ocean Night dark theme"
+  },
+  "themeCharcoal": {
+    "message": "Charcoal",
+    "description": "Charcoal dark theme"
+  },
+  "themePurple": {
+    "message": "Midnight Purple",
+    "description": "Midnight Purple dark theme"
+  },
+  "themeTeal": {
+    "message": "Dark Teal",
+    "description": "Dark Teal theme"
+  },
+  "themeOled": {
+    "message": "OLED Black",
+    "description": "OLED Black theme"
+  },
+  "themeSage": {
+    "message": "Sage",
+    "description": "Sage light theme"
+  },
+  "themeRose": {
+    "message": "Rose",
+    "description": "Rose light theme"
+  },
+  "themeAmber": {
+    "message": "Amber",
+    "description": "Amber light theme"
+  },
+  "themeSlate": {
+    "message": "Slate",
+    "description": "Slate light theme"
+  },
+  "themeViolet": {
+    "message": "Violet",
+    "description": "Violet light theme"
+  }
 }

@@ -19,6 +19,10 @@
     "message": "Show panel",
     "description": "Show panel"
   },
+  "openPopupOnDuplicateDetected": {
+    "message": "Open popup on duplicate detected",
+    "description": "Open popup panel when a new duplicate tab is detected"
+  },
   "tabPriority": {
     "message": "Priority",
     "description": "Priority"
@@ -35,13 +39,9 @@
     "message": "Keep and reload older tab",
     "description": "Keep and reload older tab"
   },
-  "keepTabWithHistory": {
-    "message": "Keep tab with history",
-    "description": "Keep tab with history"
-  },
   "keeptabwithHttps": {
-    "message": "Keep tab with https",
-    "description": "Keep tab with https"
+    "message": "Keep tab with HTTPS",
+    "description": "Keep tab with HTTPS"
   },
   "keepPinnedTab": {
     "message": "Keep pinned tab",
@@ -87,6 +87,18 @@
     "message": "Compare with title",
     "description": "Compare with title"
   },
+  "titleSimilarityThreshold": {
+    "message": "% title similarity",
+    "description": "Minimum title similarity to consider tabs as duplicates"
+  },
+  "urlRegexRules": {
+    "message": "URL pattern rules",
+    "description": "URL pattern rules"
+  },
+  "titleRegexRules": {
+    "message": "Title pattern rules",
+    "description": "Title pattern rules"
+  },
   "duplicatetabs": {
     "message": "Duplicate tabs",
     "description": "Duplicate tabs"
@@ -111,14 +123,6 @@
     "message": "Container in all windows",
     "description": "Container in all windows"
   },
-  "hideWhiteListedDuplicateTabs": {
-    "message": "Hide whitelisted duplicate tabs",
-    "description": "Hide whitelisted duplicate tabs"
-  },
-  "groupDuplicateTabs": {
-    "message": "Group duplicate tabs",
-    "description": "Group duplicate tabs"
-  },
   "closeAllDuplicateTabs": {
     "message": "Close all",
     "description": "Close all"
@@ -140,8 +144,8 @@
     "description": "Badge color for no duplicate tab"
   },
   "showBadgeIfNoDuplicateTabs": {
-    "message": "Show badge if no duplicate tab",
-    "description": "Show badge if no duplicate tab"
+    "message": "Show badge if no duplicate tabs",
+    "description": "Show badge if no duplicate tabs"
   },
   "noDuplicateTabs": {
     "message": "No duplicate tabs",
@@ -158,5 +162,53 @@
   "shrunkMode": {
     "message":  "Shrunk mode:\nWhen activated, hide unpinned options.",
     "description":  "Shrunk mode\nWhen activated, hide unpinned options."
-  }  
+  },
+  "theme": {
+    "message": "Theme",
+    "description": "Theme selector"
+  },
+  "themeLight": {
+    "message": "Sky",
+    "description": "Sky light theme"
+  },
+  "themeOcean": {
+    "message": "Ocean Night",
+    "description": "Ocean Night dark theme"
+  },
+  "themeCharcoal": {
+    "message": "Charcoal",
+    "description": "Charcoal dark theme"
+  },
+  "themePurple": {
+    "message": "Midnight Purple",
+    "description": "Midnight Purple dark theme"
+  },
+  "themeTeal": {
+    "message": "Dark Teal",
+    "description": "Dark Teal theme"
+  },
+  "themeOled": {
+    "message": "OLED Black",
+    "description": "OLED Black theme"
+  },
+  "themeSage": {
+    "message": "Sage",
+    "description": "Sage light theme"
+  },
+  "themeRose": {
+    "message": "Rose",
+    "description": "Rose light theme"
+  },
+  "themeAmber": {
+    "message": "Amber",
+    "description": "Amber light theme"
+  },
+  "themeSlate": {
+    "message": "Slate",
+    "description": "Slate light theme"
+  },
+  "themeViolet": {
+    "message": "Violet",
+    "description": "Violet light theme"
+  }
 }

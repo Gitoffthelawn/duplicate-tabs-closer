@@ -1,0 +1,110 @@
+param(
+    [ValidateSet("firefox", "chrome", "all")]
+    [string]$Target = "all"
+)
+
+$Root = Split-Path $PSScriptRoot -Parent
+
+$SingleFiles = @(
+    "background.js",
+    "badge.js",
+    "helper.js",
+    "messageListener.js",
+    "options.js",
+    "tabsInfo.js",
+    "urlUtils.js",
+    "worker.js",
+    "LICENSE",
+    "README.md"
+)
+
+$Directories = @(
+    "_locales",
+    "images",
+    "popup",
+    "optionPage",
+    "ext_lib\bootstrap-5.3.3-dist",
+    "ext_lib\font-awesome-6.7"
+)
+
+$SingleLibFiles = @(
+    "ext_lib\jquery\jquery-3.7.1.slim.min.js"
+)
+
+function Build-Package {
+    param([string]$ManifestSrc, [string]$OutputFile)
+
+    $ManifestDst = Join-Path $Root "manifest.json"
+    $TempDir = Join-Path $env:TEMP "dtc-build-$(Get-Random)"
+    $OutputPath = Join-Path $Root $OutputFile
+
+    try {
+        Copy-Item (Join-Path $Root $ManifestSrc) $ManifestDst
+        New-Item -ItemType Directory -Path $TempDir | Out-Null
+
+        foreach ($file in $SingleFiles) {
+            $src = Join-Path $Root $file
+            if (Test-Path $src) {
+                Copy-Item $src (Join-Path $TempDir $file)
+            } else {
+                Write-Warning "Missing: $file"
+            }
+        }
+
+        Copy-Item $ManifestDst (Join-Path $TempDir "manifest.json")
+
+        foreach ($dir in $Directories) {
+            $src = Join-Path $Root $dir
+            $dst = Join-Path $TempDir $dir
+            if (Test-Path $src) {
+                $parent = Split-Path $dst -Parent
+                if (!(Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+                Copy-Item $src $dst -Recurse
+            } else {
+                Write-Warning "Missing directory: $dir"
+            }
+        }
+
+        foreach ($file in $SingleLibFiles) {
+            $src = Join-Path $Root $file
+            $dst = Join-Path $TempDir $file
+            if (Test-Path $src) {
+                $parent = Split-Path $dst -Parent
+                if (!(Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+                Copy-Item $src $dst
+            } else {
+                Write-Warning "Missing: $file"
+            }
+        }
+
+        if (Test-Path $OutputPath) { Remove-Item $OutputPath }
+        Add-Type -AssemblyName System.IO.Compression
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        $zip = [System.IO.Compression.ZipFile]::Open($OutputPath, [System.IO.Compression.ZipArchiveMode]::Create)
+        try {
+            Get-ChildItem $TempDir -Recurse -File | ForEach-Object {
+                $entryName = $_.FullName.Substring($TempDir.Length + 1).Replace('\', '/')
+                [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $_.FullName, $entryName) | Out-Null
+            }
+        } finally {
+            $zip.Dispose()
+        }
+
+        Write-Host "Built: $OutputPath" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "ERROR building $OutputFile`: $_" -ForegroundColor Red
+        exit 1
+    }
+    finally {
+        if (Test-Path $ManifestDst) { Remove-Item $ManifestDst }
+        if (Test-Path $TempDir) { Remove-Item $TempDir -Recurse -Force }
+    }
+}
+
+if ($Target -eq "firefox" -or $Target -eq "all") {
+    Build-Package "manifest-f.json" "duplicate-tabs-closer-firefox.xpi"
+}
+if ($Target -eq "chrome" -or $Target -eq "all") {
+    Build-Package "manifest-c.json" "duplicate-tabs-closer-chrome.zip"
+}
