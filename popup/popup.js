@@ -6,8 +6,6 @@ let panelInitialized = false;
 let closePopup = false;
 let environment = "";
 
-const escapeHTML = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
-
 const applyTheme = (value) => {
     const darkThemes = ["ocean", "charcoal", "purple", "teal", "oled"];
     const lightThemes = ["sage", "rose", "amber", "slate", "violet"];
@@ -59,17 +57,7 @@ const setDuplicateTabsTable = (duplicateTabs) => {
     lastDuplicateTabs = duplicateTabs ? Array.from(duplicateTabs) : null;
     $("#duplicateTabsTableBody").empty();
     if (duplicateTabs) {
-        let tableRows = "";
-        duplicateTabs.forEach(duplicateTab => {
-            const containerStyle = duplicateTab.containerColor ? `style='text-decoration:underline; text-decoration-color: ${escapeHTML(duplicateTab.containerColor)};'` : "";
-            const title = (duplicateTab.windowId === activeWindowId) ? escapeHTML(duplicateTab.title) : `<em>${escapeHTML(duplicateTab.title)}</em>`;
-            const tdTabIcon = `<td class='td-tab-icon'><img src='${escapeHTML(duplicateTab.icon)}' alt=''></td>`;
-            const whitelistBadge = duplicateTab.whitelisted ? `<span class='whitelist-badge fa-solid fa-list-check' title='${chrome.i18n.getMessage("whitelistedTab")}'></span> ` : "";
-            const tdTabTitle = `<td class='td-tab-title' ${containerStyle} title='${escapeHTML(duplicateTab.url)}'>${whitelistBadge}${title}</td>`;
-            const tdCloseButton = "<td class='td-close-button'><button type='button' class='btn-tab-close' aria-label='Close'>&times;</button></td>";
-            tableRows += `<tr tabId='${parseInt(duplicateTab.id, 10)}' windowId='${parseInt(duplicateTab.windowId, 10)}'>${tdTabIcon}${tdTabTitle}${tdCloseButton}</tr>`;
-        });
-        $("#duplicateTabsTableBody").append(tableRows);
+        $("#duplicateTabsTableBody").append(buildDuplicateTabRows(duplicateTabs, activeWindowId));
         $("#closeDuplicateTabsBtn").removeClass("disabled").attr("aria-disabled", "false");
     }
     else {

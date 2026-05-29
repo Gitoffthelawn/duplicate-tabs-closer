@@ -305,3 +305,27 @@ const areSameArrays = (array1, array2) => {
     }
     return JSON.stringify(array1) === JSON.stringify(array2);
 };
+
+// eslint-disable-next-line no-unused-vars
+const escapeHTML = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+
+// eslint-disable-next-line no-unused-vars
+const buildDuplicateTabRows = (duplicateTabs, activeWindowId) => {
+    let tableRows = "";
+    duplicateTabs.forEach(duplicateTab => {
+        const containerStyle = duplicateTab.containerColor
+            ? `style='text-decoration:underline; text-decoration-color: ${escapeHTML(duplicateTab.containerColor)};'`
+            : "";
+        const title = (duplicateTab.windowId === activeWindowId)
+            ? escapeHTML(duplicateTab.title)
+            : `<em>${escapeHTML(duplicateTab.title)}</em>`;
+        const tdTabIcon = `<td class='td-tab-icon'><img src='${escapeHTML(duplicateTab.icon)}' alt=''></td>`;
+        const whitelistBadge = duplicateTab.whitelisted
+            ? `<span class='whitelist-badge fa-solid fa-list-check' title='${chrome.i18n.getMessage("whitelistedTab")}'></span> `
+            : "";
+        const tdTabTitle = `<td class='td-tab-title' ${containerStyle} title='${escapeHTML(duplicateTab.url)}'>${whitelistBadge}${title}</td>`;
+        const tdCloseButton = "<td class='td-close-button'><button type='button' class='btn-tab-close' aria-label='Close'>&times;</button></td>";
+        tableRows += `<tr tabId='${parseInt(duplicateTab.id, 10)}' windowId='${parseInt(duplicateTab.windowId, 10)}'>${tdTabIcon}${tdTabTitle}${tdCloseButton}</tr>`;
+    });
+    return tableRows;
+};
