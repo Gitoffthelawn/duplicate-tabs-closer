@@ -165,6 +165,7 @@ const onReplacedTab = async (addedTabId, removedTabId) => {
 const onCommand = async (command) => {
 	await ensureInitialized();
 	if (command == "close-duplicate-tabs") closeDuplicateTabs();
+	else if (command == "toggle-close-mode") setStoredOption("onDuplicateTabDetected", options.autoCloseTab ? "N" : "A", false);
 };
 
 // MV3: event listeners must be registered synchronously at top level (no await before this point),

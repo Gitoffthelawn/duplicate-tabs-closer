@@ -43,10 +43,10 @@
   ],
   "commands": {
     "close-duplicate-tabs": {
-      "suggested_key": {
-        "default": "Ctrl+Alt+W"
-      },
       "description": "Close all duplicate tabs"
+    },
+    "toggle-close-mode": {
+      "description": "Toggle between auto-close and manual mode"
     }
   },
   "options_ui": {

@@ -174,14 +174,17 @@ Available in the **Options page** only.
 | URL pattern rules | Yes |
 | Title pattern rules | No |
 
-### Hotkey
+### Hotkeys
 
-* **Chrome / Edge / Opera / Vivaldi / Brave:** **Ctrl+Shift+W** to close all duplicate tabs
-* **Firefox:** **Ctrl+Alt+W** to close all duplicate tabs
+No default keyboard shortcuts are set to avoid conflicts with browser built-ins.
+You can assign custom shortcuts in your browser settings:
 
-Both shortcuts can be reconfigured in the browser's keyboard shortcuts settings.
+| Command | Description |
+| --- | --- |
+| Close all duplicate tabs | Closes all currently detected duplicate tabs |
+| Toggle auto-close / manual mode | Switches between auto-close and manual mode |
 
-To change the shortcut:
+To configure shortcuts:
 
 * **Chrome / Edge / Brave / Vivaldi:** open `chrome://extensions/shortcuts`
 * **Opera:** open `opera://extensions/shortcuts`
