@@ -2,6 +2,11 @@
 "use strict";
 
 // eslint-disable-next-line no-unused-vars
+const getElement = (sel, ctx = document) => ctx.querySelector(sel);
+// eslint-disable-next-line no-unused-vars
+const getElements = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
+// eslint-disable-next-line no-unused-vars
 const wait = timeout => new Promise(resolve => setTimeout(resolve, timeout));
 
 // eslint-disable-next-line no-unused-vars

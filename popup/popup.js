@@ -6,9 +6,6 @@ let panelInitialized = false;
 let closePopup = false;
 let environment = "";
 
-const qs = (sel, ctx = document) => ctx.querySelector(sel);
-const qsa = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
-
 const applyTheme = (value) => {
     const darkThemes = ["ocean", "charcoal", "purple", "teal", "oled"];
     const lightThemes = ["sage", "rose", "amber", "slate", "violet"];
@@ -30,7 +27,7 @@ const updateIgnorePathPartDependents = (checked) => {
 };
 
 const toggleShrunkMode = (checked) => {
-    qsa(".list-group-form").forEach(el => el.classList.toggle("shrunk", checked));
+    getElements(".list-group-form").forEach(el => el.classList.toggle("shrunk", checked));
 };
 
 const toggleExpendOptions = (resize) => {
@@ -46,13 +43,13 @@ const toggleExpendGroup = (eventId, isTitleClickEvent, pinned, resize) => {
     }
     else {
         const groupId = eventId.replace("Pinned", "Group");
-        const pinnedEls = qsa(".pinned");
+        const pinnedEls = getElements(".pinned");
         if (pinnedEls.length) pinnedEls.at(-1).classList.remove("last-list-group");
         const group = document.getElementById(groupId);
         group.classList.toggle("collapsed", !pinned);
         group.classList.toggle("pinned", pinned);
         if (resize) resizeDuplicateTabsPanel();
-        const pinnedElsAfter = qsa(".pinned");
+        const pinnedElsAfter = getElements(".pinned");
         if (pinnedElsAfter.length) pinnedElsAfter.at(-1).classList.add("last-list-group");
     }
 };
@@ -109,7 +106,7 @@ const setPanelOptions = async () => {
         const isLockedKey = lockedKeys.includes(storedOption);
         if (storedOption === "environment") {
             environment = value;
-            if (value === "chrome") qsa(".containerItem").forEach(el => el.classList.toggle("hidden", true));
+            if (value === "chrome") getElements(".containerItem").forEach(el => el.classList.toggle("hidden", true));
         }
         else {
             const el = document.getElementById(storedOption);
@@ -138,7 +135,7 @@ const setPanelOptions = async () => {
             }
             // combobox
             else {
-                const opt = qs(`#${storedOption} option[value='${value}']`);
+                const opt = getElement(`#${storedOption} option[value='${value}']`);
                 if (opt) opt.selected = true;
                 if (storedOption === "onDuplicateTabDetected") changeAutoCloseOptionState(value, false);
                 else if (storedOption === "theme") applyTheme(value);
@@ -232,7 +229,7 @@ const getHighlightBounds = (textarea) => {
 const loadListenerEvents = () => {
 
     /* Save checkbox settings */
-    qsa("input[type='checkbox']").forEach(el => el.addEventListener("change", function () {
+    getElements("input[type='checkbox']").forEach(el => el.addEventListener("change", function () {
         if (this.id.endsWith("Pinned")) toggleExpendGroup(this.id, false, this.checked, true);
         else if (this.id === "shrunkMode") toggleShrunkMode(this.checked);
         else if (this.id === "compareWithTitle") {
@@ -248,7 +245,7 @@ const loadListenerEvents = () => {
     }));
 
     /* Save combobox settings */
-    qsa(".list-group select").forEach(el => el.addEventListener("change", function (event) {
+    getElements(".list-group select").forEach(el => el.addEventListener("change", function (event) {
         event.stopPropagation();
         const refresh = this.id === "scope";
         saveOption(this.id, this.value, refresh);
@@ -284,7 +281,7 @@ const loadListenerEvents = () => {
     });
 
     /* Open Option tab */
-    const gearBtn = qs(".fa-gear");
+    const gearBtn = getElement(".fa-gear");
     if (gearBtn) gearBtn.addEventListener("click", (event) => {
         event.stopPropagation();
         chrome.runtime.openOptionsPage();
@@ -325,7 +322,7 @@ const loadListenerEvents = () => {
     });
 
     /* Toggle subitem panels */
-    qsa(".list-group-item-title").forEach(el => el.addEventListener("click", function () {
+    getElements(".list-group-item-title").forEach(el => el.addEventListener("click", function () {
         toggleExpendGroup(this.id, true);
     }));
 

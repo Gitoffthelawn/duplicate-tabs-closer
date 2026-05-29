@@ -4,9 +4,6 @@ let activeWindowId = chrome.windows.WINDOW_ID_NONE;
 let lastDuplicateTabs = {};
 let panelInitialized = false;
 
-const qs = (sel, ctx = document) => ctx.querySelector(sel);
-const qsa = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
-
 const applyTheme = (value) => {
   const darkThemes = ["ocean", "charcoal", "purple", "teal", "oled"];
   const lightThemes = ["sage", "rose", "amber", "slate", "violet"];
@@ -54,7 +51,7 @@ const getHighlightBounds = (textarea) => {
 const loadPopupEvents = () => {
 
   /* Save checkbox settings */
-  qsa(".list-group input[type='checkbox']").forEach(el => el.addEventListener("change", function () {
+  getElements(".list-group input[type='checkbox']").forEach(el => el.addEventListener("change", function () {
     if (this.id.endsWith("_popup")) {
       saveOption(this.id, this.checked, false);
       return;
@@ -69,7 +66,7 @@ const loadPopupEvents = () => {
   }));
 
   /* Save combobox settings */
-  qsa(".list-group select").forEach(el => el.addEventListener("change", function (event) {
+  getElements(".list-group select").forEach(el => el.addEventListener("change", function (event) {
     event.stopPropagation();
     const refresh = this.id === "scope";
     saveOption(this.id, this.value, refresh);
@@ -78,12 +75,12 @@ const loadPopupEvents = () => {
   }));
 
   /* Save badge color settings */
-  qsa(".list-group input[type='color']").forEach(el => el.addEventListener("change", function () {
+  getElements(".list-group input[type='color']").forEach(el => el.addEventListener("change", function () {
     saveOption(this.id, this.value);
   }));
 
   /* Save title similarity threshold */
-  const threshEl = qs(".list-group #titleSimilarityThreshold");
+  const threshEl = getElement(".list-group #titleSimilarityThreshold");
   if (threshEl) threshEl.addEventListener("change", function () {
     const val = Math.min(100, Math.max(1, parseInt(this.value) || 100));
     this.value = val;
@@ -230,7 +227,7 @@ const setPanelOption = (details) => {
   const resize = details.resize || false;
   const isLockedKey = details.isLockedKey || false;
   if (storedOption === "environment" && value === "chrome") {
-    qsa(".containerItem").forEach(el => el.classList.toggle("hidden", true));
+    getElements(".containerItem").forEach(el => el.classList.toggle("hidden", true));
   }
   else if (storedOption === "whiteList") {
     const el = document.getElementById("whiteList");
@@ -257,7 +254,7 @@ const setPanelOption = (details) => {
       if (el) el.value = value;
     }
     else {
-      const opt = qs(`#${storedOption} option[value='${value}']`);
+      const opt = getElement(`#${storedOption} option[value='${value}']`);
       if (opt) opt.selected = true;
       if (storedOption === "onDuplicateTabDetected") changeAutoCloseOptionState(value, resize);
       else if (storedOption === "theme") applyTheme(value);

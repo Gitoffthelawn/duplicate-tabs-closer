@@ -8,6 +8,10 @@ module.exports = {
     "globals": {
         "activateTab": "readonly",
         "areSameArrays": "readonly",
+        "buildDuplicateTabRows": "readonly",
+        "escapeHTML": "readonly",
+        "getElement": "readonly",
+        "getElements": "readonly",
         "closeDuplicateTabs": "readonly",
         "debounce": "readonly",
         "environment": "readonly",
