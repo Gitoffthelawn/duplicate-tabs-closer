@@ -6,6 +6,9 @@ let panelInitialized = false;
 let closePopup = false;
 let environment = "";
 
+const qs = (sel, ctx = document) => ctx.querySelector(sel);
+const qsa = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
 const applyTheme = (value) => {
     const darkThemes = ["ocean", "charcoal", "purple", "teal", "oled"];
     const lightThemes = ["sage", "rose", "amber", "slate", "violet"];
@@ -17,36 +20,40 @@ const applyTheme = (value) => {
 
 /* Show/Hide the AutoClose option */
 const changeAutoCloseOptionState = (state, resize) => {
-    $("#onRemainingTabGroup").toggleClass("hidden", state !== "A");
+    document.getElementById("onRemainingTabGroup").classList.toggle("hidden", state !== "A");
     if (resize) resizeDuplicateTabsPanel();
 };
 
 const updateIgnorePathPartDependents = (checked) => {
-    $("#ignoreSearchPart").prop("disabled", checked);
-    $("#ignoreHashPart").prop("disabled", checked);
+    document.getElementById("ignoreSearchPart").disabled = checked;
+    document.getElementById("ignoreHashPart").disabled = checked;
 };
 
 const toggleShrunkMode = (checked) => {
-    $(".list-group-form").toggleClass("shrunk", checked);
+    qsa(".list-group-form").forEach(el => el.classList.toggle("shrunk", checked));
 };
 
 const toggleExpendOptions = (resize) => {
-    $("#optionHeader").toggleClass("collapsed");
+    document.getElementById("optionHeader").classList.toggle("collapsed");
     if (resize) resizeDuplicateTabsPanel();
 };
 
 const toggleExpendGroup = (eventId, isTitleClickEvent, pinned, resize) => {
     if (isTitleClickEvent) {
         const groupId = eventId.replace("Title", "Group");
-        $(`#${groupId}`).toggleClass("collapsed");
+        document.getElementById(groupId).classList.toggle("collapsed");
         resizeDuplicateTabsPanel();
     }
     else {
         const groupId = eventId.replace("Pinned", "Group");
-        $(".pinned").last().removeClass("last-list-group");
-        $(`#${groupId}`).toggleClass("collapsed", !pinned).toggleClass("pinned", pinned);
+        const pinnedEls = qsa(".pinned");
+        if (pinnedEls.length) pinnedEls.at(-1).classList.remove("last-list-group");
+        const group = document.getElementById(groupId);
+        group.classList.toggle("collapsed", !pinned);
+        group.classList.toggle("pinned", pinned);
         if (resize) resizeDuplicateTabsPanel();
-        $(".pinned").last().addClass("last-list-group");
+        const pinnedElsAfter = qsa(".pinned");
+        if (pinnedElsAfter.length) pinnedElsAfter.at(-1).classList.add("last-list-group");
     }
 };
 
@@ -55,14 +62,18 @@ const setDuplicateTabsTable = (duplicateTabs) => {
     const isUpdate = panelInitialized;
     panelInitialized = true;
     lastDuplicateTabs = duplicateTabs ? Array.from(duplicateTabs) : null;
-    $("#duplicateTabsTableBody").empty();
+    const tbody = document.getElementById("duplicateTabsTableBody");
+    tbody.innerHTML = "";
+    const closeBtn = document.getElementById("closeDuplicateTabsBtn");
     if (duplicateTabs) {
-        $("#duplicateTabsTableBody").append(buildDuplicateTabRows(duplicateTabs, activeWindowId));
-        $("#closeDuplicateTabsBtn").removeClass("disabled").attr("aria-disabled", "false");
+        tbody.insertAdjacentHTML("beforeend", buildDuplicateTabRows(duplicateTabs, activeWindowId));
+        closeBtn.classList.remove("disabled");
+        closeBtn.setAttribute("aria-disabled", "false");
     }
     else {
-        $("#duplicateTabsTableBody").append(`<tr><td class='td-tab-text' colspan='3'><em>${chrome.i18n.getMessage("noDuplicateTabs")}.</em></td></tr>`);
-        $("#closeDuplicateTabsBtn").addClass("disabled").attr("aria-disabled", "true");
+        tbody.insertAdjacentHTML("beforeend", `<tr><td class='td-tab-text' colspan='3'><em>${chrome.i18n.getMessage("noDuplicateTabs")}.</em></td></tr>`);
+        closeBtn.classList.add("disabled");
+        closeBtn.setAttribute("aria-disabled", "true");
     }
     resizeDuplicateTabsPanel(isUpdate);
 };
@@ -72,10 +83,12 @@ const resizeDuplicateTabsPanel = (refresh) => {
     const rowHeight = 26;
     const minRow = 2;
     const nbRows = lastDuplicateTabs ? lastDuplicateTabs.length : 1;
-    const maxRows = Math.min(nbRows, Math.floor((maxOptionsCardHeight - $("#optionsCard").height() + (minRow * rowHeight)) / rowHeight));
-    $("#duplicateTabsTableContainer").toggleClass("table-scrollable-overflow", nbRows > maxRows);
+    const maxRows = Math.min(nbRows, Math.floor((maxOptionsCardHeight - document.getElementById("optionsCard").offsetHeight + (minRow * rowHeight)) / rowHeight));
+    const container = document.getElementById("duplicateTabsTableContainer");
+    container.classList.toggle("table-scrollable-overflow", nbRows > maxRows);
     if (refresh && (nbRows > maxRows)) highlightBottomScrollShadow();
-    $("#duplicateTabsTableContainer").css("height", maxRows * rowHeight);
+    if (maxRows > 0) container.style.height = `${maxRows * rowHeight}px`;
+    else container.style.height = "";
 };
 
 const saveActiveWindowId = async () => {
@@ -96,12 +109,13 @@ const setPanelOptions = async () => {
         const isLockedKey = lockedKeys.includes(storedOption);
         if (storedOption === "environment") {
             environment = value;
-            if (value === "chrome") $(".containerItem").toggleClass("hidden", true);
+            if (value === "chrome") qsa(".containerItem").forEach(el => el.classList.toggle("hidden", true));
         }
         else {
+            const el = document.getElementById(storedOption);
             // checkbox
             if (typeof (value) === "boolean") {
-                $(`#${storedOption}`).prop("checked", value);
+                if (el) el.checked = value;
                 if (storedOption.endsWith("Pinned") && storedOption !== "customizationPinned") {
                     toggleExpendGroup(storedOption, false, value, false);
                     // eslint-disable-next-line max-depth
@@ -109,23 +123,27 @@ const setPanelOptions = async () => {
                 }
                 else if (storedOption === "shrunkMode") toggleShrunkMode(value);
                 else if (storedOption === "closePopup") closePopup = value;
-                else if (storedOption === "compareWithTitle") $("#titleSimilarityThreshold").prop("disabled", !value);
+                else if (storedOption === "compareWithTitle") {
+                    const thresh = document.getElementById("titleSimilarityThreshold");
+                    if (thresh) thresh.disabled = !value;
+                }
             }
             // number input
             else if (typeof (value) === "number") {
-                $(`#${storedOption}`).val(value);
+                if (el) el.value = value;
             }
             // textarea (pattern rules)
             else if (storedOption === "urlRegexRules" || storedOption === "titleRegexRules") {
-                $(`#${storedOption}`).val(value);
+                if (el) el.value = value;
             }
             // combobox
             else {
-                $(`#${storedOption} option[value='${value}']`).prop("selected", true);
+                const opt = qs(`#${storedOption} option[value='${value}']`);
+                if (opt) opt.selected = true;
                 if (storedOption === "onDuplicateTabDetected") changeAutoCloseOptionState(value, false);
                 else if (storedOption === "theme") applyTheme(value);
             }
-            if (isLockedKey) $(`#${storedOption}`).prop("disabled", true);
+            if (isLockedKey && el) el.disabled = true;
         }
     }
     if (collapseOptions) toggleExpendOptions(false);
@@ -134,7 +152,7 @@ const setPanelOptions = async () => {
     const sessionData = await chrome.storage.session.get('autoOpenedPopup');
     if (sessionData.autoOpenedPopup) {
         chrome.storage.session.remove('autoOpenedPopup');
-        $("#optionHeader").addClass("collapsed");
+        document.getElementById("optionHeader").classList.add("collapsed");
         resizeDuplicateTabsPanel();
     }
 };
@@ -144,13 +162,15 @@ const applyPopupRuleVisibility = (storedOptions) => {
         "ignorePathPart", "compareWithTitle", "urlRegexRules", "titleRegexRules"];
     rules.forEach(rule => {
         const visible = storedOptions[rule + "_popup"] ? storedOptions[rule + "_popup"].value : true;
-        $(`#${rule}`).closest(".checkboxes").toggleClass("hidden", !visible);
+        const el = document.getElementById(rule);
+        if (el) el.closest(".checkboxes").classList.toggle("hidden", !visible);
     });
     const compareTitleVisible = (storedOptions["compareWithTitle_popup"]
         ? storedOptions["compareWithTitle_popup"].value : true)
         && (storedOptions["compareWithTitle"]
         ? storedOptions["compareWithTitle"].value : true);
-    $("#titleSimilarityThreshold").closest(".checkboxes").toggleClass("hidden", !compareTitleVisible);
+    const thresh = document.getElementById("titleSimilarityThreshold");
+    if (thresh) thresh.closest(".checkboxes").classList.toggle("hidden", !compareTitleVisible);
 };
 
 const handleMessage = (message) => {
@@ -158,10 +178,13 @@ const handleMessage = (message) => {
     if (message.action === "setStoredOption" && message.data.name.endsWith("_popup")) {
         const rule = message.data.name.replace("_popup", "");
         const visible = message.data.value;
-        $(`#${rule}`).closest(".checkboxes").toggleClass("hidden", !visible);
+        const el = document.getElementById(rule);
+        if (el) el.closest(".checkboxes").classList.toggle("hidden", !visible);
         if (rule === "compareWithTitle") {
-            const thresholdVisible = visible && $("#compareWithTitle").prop("checked");
-            $("#titleSimilarityThreshold").closest(".checkboxes").toggleClass("hidden", !thresholdVisible);
+            const compareWithTitleEl = document.getElementById("compareWithTitle");
+            const thresholdVisible = visible && compareWithTitleEl && compareWithTitleEl.checked;
+            const thresh = document.getElementById("titleSimilarityThreshold");
+            if (thresh) thresh.closest(".checkboxes").classList.toggle("hidden", !thresholdVisible);
         }
         resizeDuplicateTabsPanel();
     }
@@ -172,8 +195,9 @@ chrome.runtime.onMessage.addListener(handleMessage);
 let highlightBottomScrollShadowTimer = null;
 const highlightBottomScrollShadow = () => {
     clearTimeout(highlightBottomScrollShadowTimer);
-    $("#duplicateTabsTableContainer").toggleClass("highlight-scroll-bottom", true);
-    highlightBottomScrollShadowTimer = setTimeout(() => $("#duplicateTabsTableContainer").toggleClass("highlight-scroll-bottom", false), 400);
+    const container = document.getElementById("duplicateTabsTableContainer");
+    container.classList.toggle("highlight-scroll-bottom", true);
+    highlightBottomScrollShadowTimer = setTimeout(() => container.classList.toggle("highlight-scroll-bottom", false), 400);
 };
 
 const getHighlightBounds = (textarea) => {
@@ -208,89 +232,102 @@ const getHighlightBounds = (textarea) => {
 const loadListenerEvents = () => {
 
     /* Save checkbox settings */
-    $("input[type='checkbox']").on("change", function () {
+    qsa("input[type='checkbox']").forEach(el => el.addEventListener("change", function () {
         if (this.id.endsWith("Pinned")) toggleExpendGroup(this.id, false, this.checked, true);
         else if (this.id === "shrunkMode") toggleShrunkMode(this.checked);
         else if (this.id === "compareWithTitle") {
-            $("#titleSimilarityThreshold").prop("disabled", !this.checked);
-            $("#titleSimilarityThreshold").closest(".checkboxes").toggleClass("hidden", !this.checked);
+            const thresh = document.getElementById("titleSimilarityThreshold");
+            thresh.disabled = !this.checked;
+            thresh.closest(".checkboxes").classList.toggle("hidden", !this.checked);
         }
         else if (this.id === "ignorePathPart") {
             updateIgnorePathPartDependents(this.checked);
         }
         const refresh = this.className.includes("checkbox-filter");
         saveOption(this.id, this.checked, refresh);
-    });
+    }));
 
     /* Save combobox settings */
-    $(".list-group select").on("change", function (event) {
+    qsa(".list-group select").forEach(el => el.addEventListener("change", function (event) {
         event.stopPropagation();
         const refresh = this.id === "scope";
         saveOption(this.id, this.value, refresh);
         if (this.id === "onDuplicateTabDetected") changeAutoCloseOptionState(this.value, true);
-    });
+    }));
 
     /* Save title similarity threshold */
-    $("#titleSimilarityThreshold").on("change", function () {
+    const threshEl = document.getElementById("titleSimilarityThreshold");
+    if (threshEl) threshEl.addEventListener("change", function () {
         const val = Math.min(100, Math.max(1, parseInt(this.value) || 100));
         this.value = val;
         saveOption("titleSimilarityThreshold", val, true);
     });
 
     /* Save URL/title pattern rules */
-    $("#urlRegexRules, #titleRegexRules").on("change", function () {
-        const cleaned = this.value.split("\n").map(l => l.trim()).filter(l => l.length > 0).join("\n");
-        this.value = cleaned;
-        saveOption(this.id, cleaned, true);
-    });
-
-    /* Current line highlight for pattern rule textareas */
-    const applyLineHighlight = (textarea) => {
-        const { top, bottom } = getHighlightBounds(textarea);
-        const s = textarea.scrollTop;
-        textarea.style.backgroundImage = `linear-gradient(transparent ${top - s}px, rgba(0, 0, 0, 0.075) ${top - s}px, rgba(0, 0, 0, 0.075) ${bottom - s}px, transparent ${bottom - s}px)`;
-    };
-    $("#urlRegexRules, #titleRegexRules").on("keyup click select focus scroll", function () {
-        applyLineHighlight(this);
-    }).on("blur", function () {
-        this.style.backgroundImage = "";
+    ["urlRegexRules", "titleRegexRules"].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("change", function () {
+            const cleaned = this.value.split("\n").map(l => l.trim()).filter(l => l.length > 0).join("\n");
+            this.value = cleaned;
+            saveOption(this.id, cleaned, true);
+        });
+        const applyLineHighlight = (textarea) => {
+            const { top, bottom } = getHighlightBounds(textarea);
+            const s = textarea.scrollTop;
+            textarea.style.backgroundImage = `linear-gradient(transparent ${top - s}px, rgba(0, 0, 0, 0.075) ${top - s}px, rgba(0, 0, 0, 0.075) ${bottom - s}px, transparent ${bottom - s}px)`;
+        };
+        ["keyup", "click", "select", "focus", "scroll"].forEach(ev =>
+            el.addEventListener(ev, function () { applyLineHighlight(this); })
+        );
+        el.addEventListener("blur", function () { this.style.backgroundImage = ""; });
     });
 
     /* Open Option tab */
-    $(".fa-gear").on("click", (event) => {
+    const gearBtn = qs(".fa-gear");
+    if (gearBtn) gearBtn.addEventListener("click", (event) => {
         event.stopPropagation();
         chrome.runtime.openOptionsPage();
         window.close();
     });
 
-    /* Active selected tab */
-    $("#duplicateTabsTable").on("click", ".td-tab-title", function () {
-        const tabId = parseInt($(this).parent().attr("tabId"), 10);
-        const windowId = parseInt($(this).parent().attr("windowId"), 10);
-        focusTab(tabId, windowId);
-    });
-
-    /* Close selected tab */
-    $("#duplicateTabsTable").on("click", ".td-close-button", function () {
-        const tabId = parseInt($(this).parent().attr("tabId"), 10);
-        removeTab(tabId);
-    });
+    /* Active selected tab (delegated) */
+    const table = document.getElementById("duplicateTabsTable");
+    if (table) {
+        table.addEventListener("click", function (e) {
+            const titleCell = e.target.closest(".td-tab-title");
+            if (titleCell) {
+                const row = titleCell.parentElement;
+                const tabId = parseInt(row.getAttribute("tabId"), 10);
+                const windowId = parseInt(row.getAttribute("windowId"), 10);
+                focusTab(tabId, windowId);
+            }
+            const closeCell = e.target.closest(".td-close-button");
+            if (closeCell) {
+                const row = closeCell.parentElement;
+                const tabId = parseInt(row.getAttribute("tabId"), 10);
+                removeTab(tabId);
+            }
+        });
+    }
 
     /* Close all */
-    $("#closeDuplicateTabsBtn").on("click", function () {
-        if (!$(this).hasClass("disabled")) requestCloseDuplicateTabs();
+    const closeBtn = document.getElementById("closeDuplicateTabsBtn");
+    if (closeBtn) closeBtn.addEventListener("click", function () {
+        if (!this.classList.contains("disabled")) requestCloseDuplicateTabs();
         if (closePopup) window.close();
     });
 
     /* Toggle options panel */
-    $("#optionsTitle").on("click", () => {
+    const optionsTitle = document.getElementById("optionsTitle");
+    if (optionsTitle) optionsTitle.addEventListener("click", () => {
         toggleExpendOptions(true);
     });
 
     /* Toggle subitem panels */
-    $(".list-group-item-title").on("click", function () {
+    qsa(".list-group-item-title").forEach(el => el.addEventListener("click", function () {
         toggleExpendGroup(this.id, true);
-    });
+    }));
 
 };
 
@@ -315,12 +352,13 @@ const startObserver = () => {
     const firefoxOverflowClass = "list-group-item-overflow-firefox";
     const chromeOverflowClass = "list-group-item-overflow-chrome";
     const overflowClass = environment == "firefox" ? firefoxOverflowClass : chromeOverflowClass;
-        const observer = new ResizeObserver(entries => {
-            for (const entry of entries) {
-                const overflow = entry.contentRect.bottom + 1 >= parseFloat($("#optionsBody").css("max-height"));
-                $("#optionsBody").toggleClass(overflowClass, overflow);
-            }
-        });
+    const observer = new ResizeObserver(entries => {
+        for (const entry of entries) {
+            const optionsBody = document.getElementById("optionsBody");
+            const overflow = entry.contentRect.bottom + 1 >= parseFloat(getComputedStyle(optionsBody).maxHeight);
+            optionsBody.classList.toggle(overflowClass, overflow);
+        }
+    });
     const optionsBody = document.querySelector("#optionsBody");
     if (optionsBody) observer.observe(optionsBody);
 };

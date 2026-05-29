@@ -213,7 +213,11 @@ const setEnvironment = (storedOptions) => {
 // eslint-disable-next-line no-unused-vars
 const isPanelOptionOpen = async () => {
     const contexts = await chrome.runtime.getContexts({});
-    return contexts.some(ctx => ctx.contextType === "POPUP" || ctx.contextType === "TAB");
+    const popupUrl = chrome.runtime.getURL("popup/popup.html");
+    return contexts.some(ctx =>
+        ctx.contextType === "POPUP" ||
+        (ctx.contextType === "TAB" && ctx.documentUrl && ctx.documentUrl.startsWith(popupUrl))
+    );
 };
 
 const escapeRegexChar = (ch) => ch.replace(/[.+?^${}()|[\]\\]/g, '\\$&');

@@ -27,10 +27,6 @@ $Directories = @(
     "ext_lib\font-awesome-6.7"
 )
 
-$SingleLibFiles = @(
-    "ext_lib\jquery\jquery-3.7.1.slim.min.js"
-)
-
 function Build-Package {
     param([string]$ManifestSrc, [string]$OutputFile)
 
@@ -62,18 +58,6 @@ function Build-Package {
                 Copy-Item $src $dst -Recurse
             } else {
                 Write-Warning "Missing directory: $dir"
-            }
-        }
-
-        foreach ($file in $SingleLibFiles) {
-            $src = Join-Path $Root $file
-            $dst = Join-Path $TempDir $file
-            if (Test-Path $src) {
-                $parent = Split-Path $dst -Parent
-                if (!(Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
-                Copy-Item $src $dst
-            } else {
-                Write-Warning "Missing: $file"
             }
         }
 

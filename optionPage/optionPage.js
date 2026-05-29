@@ -4,6 +4,9 @@ let activeWindowId = chrome.windows.WINDOW_ID_NONE;
 let lastDuplicateTabs = {};
 let panelInitialized = false;
 
+const qs = (sel, ctx = document) => ctx.querySelector(sel);
+const qsa = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
 const applyTheme = (value) => {
   const darkThemes = ["ocean", "charcoal", "purple", "teal", "oled"];
   const lightThemes = ["sage", "rose", "amber", "slate", "violet"];
@@ -51,87 +54,109 @@ const getHighlightBounds = (textarea) => {
 const loadPopupEvents = () => {
 
   /* Save checkbox settings */
-  $(".list-group input[type='checkbox']").on("change", function () {
+  qsa(".list-group input[type='checkbox']").forEach(el => el.addEventListener("change", function () {
     if (this.id.endsWith("_popup")) {
       saveOption(this.id, this.checked, false);
       return;
     }
-    if (this.id === "compareWithTitle") $("#titleSimilarityThreshold").prop("disabled", !this.checked);
+    if (this.id === "compareWithTitle") {
+      const thresh = document.getElementById("titleSimilarityThreshold");
+      if (thresh) thresh.disabled = !this.checked;
+    }
     else if (this.id === "ignorePathPart") updateIgnorePathPartDependents(this.checked);
     const refresh = this.className.includes("checkbox-filter");
     saveOption(this.id, this.checked, refresh);
-  });
+  }));
 
   /* Save combobox settings */
-  $(".list-group select").on("change", function (event) {
+  qsa(".list-group select").forEach(el => el.addEventListener("change", function (event) {
     event.stopPropagation();
     const refresh = this.id === "scope";
     saveOption(this.id, this.value, refresh);
     if (this.id === "onDuplicateTabDetected") changeAutoCloseOptionState(this.value, true);
     else if (this.id === "theme") applyTheme(this.value);
-  });
+  }));
 
   /* Save badge color settings */
-  $(".list-group input[type='color']").on("change", function () {
+  qsa(".list-group input[type='color']").forEach(el => el.addEventListener("change", function () {
     saveOption(this.id, this.value);
-  });
+  }));
 
   /* Save title similarity threshold */
-  $(".list-group #titleSimilarityThreshold").on("change", function () {
+  const threshEl = qs(".list-group #titleSimilarityThreshold");
+  if (threshEl) threshEl.addEventListener("change", function () {
     const val = Math.min(100, Math.max(1, parseInt(this.value) || 100));
     this.value = val;
     saveOption("titleSimilarityThreshold", val, true);
   });
 
   /* Save whiteList settings */
-  $("#whiteList").on("change", function () {
-    let whiteList = $(this).val();
-    whiteList = cleanUpWhiteList(whiteList);
+  const whiteListEl = document.getElementById("whiteList");
+  if (whiteListEl) whiteListEl.addEventListener("change", function () {
+    const whiteList = cleanUpWhiteList(this.value);
     setWhiteList(whiteList);
     saveOption(this.id, whiteList, false);
   });
 
   /* Save URL/title pattern rules */
-  $("#urlRegexRules, #titleRegexRules").on("change", function () {
-    const cleaned = cleanUpWhiteList($(this).val());
-    $(`#${this.id}`).val(cleaned);
-    saveOption(this.id, cleaned, true);
-  });
-
-  /* Current line highlight for pattern rule textareas */
   const applyLineHighlight = (textarea) => {
     const { top, bottom } = getHighlightBounds(textarea);
     const s = textarea.scrollTop;
     textarea.style.backgroundImage = `linear-gradient(transparent ${top - s}px, rgba(0, 0, 0, 0.075) ${top - s}px, rgba(0, 0, 0, 0.075) ${bottom - s}px, transparent ${bottom - s}px)`;
   };
-  $("#urlRegexRules, #titleRegexRules, #whiteList").on("keyup click select focus scroll", function () {
-    applyLineHighlight(this);
-  }).on("blur", function () {
-    this.style.backgroundImage = "";
+
+  ["urlRegexRules", "titleRegexRules"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("change", function () {
+      const cleaned = cleanUpWhiteList(this.value);
+      this.value = cleaned;
+      saveOption(this.id, cleaned, true);
+    });
+    ["keyup", "click", "select", "focus", "scroll"].forEach(ev =>
+      el.addEventListener(ev, function () { applyLineHighlight(this); })
+    );
+    el.addEventListener("blur", function () { this.style.backgroundImage = ""; });
   });
 
-  /* Active selected tab */
-  $("#duplicateTabsTable").on("click", ".td-tab-title", function () {
-    const tabId = parseInt($(this).parent().attr("tabId"), 10);
-    const windowId = parseInt($(this).parent().attr("windowId"), 10);
-    focusTab(tabId, windowId);
-  });
+  if (whiteListEl) {
+    ["keyup", "click", "select", "focus", "scroll"].forEach(ev =>
+      whiteListEl.addEventListener(ev, function () { applyLineHighlight(this); })
+    );
+    whiteListEl.addEventListener("blur", function () { this.style.backgroundImage = ""; });
+  }
 
-  /* Close selected tab */
-  $("#duplicateTabsTable").on("click", ".td-close-button", function () {
-    const tabId = parseInt($(this).parent().attr("tabId"), 10);
-    removeTab(tabId);
-  });
+  /* Active selected tab (delegated) */
+  const table = document.getElementById("duplicateTabsTable");
+  if (table) {
+    table.addEventListener("click", function (e) {
+      const titleCell = e.target.closest(".td-tab-title");
+      if (titleCell) {
+        const row = titleCell.parentElement;
+        const tabId = parseInt(row.getAttribute("tabId"), 10);
+        const windowId = parseInt(row.getAttribute("windowId"), 10);
+        focusTab(tabId, windowId);
+      }
+      const closeCell = e.target.closest(".td-close-button");
+      if (closeCell) {
+        const row = closeCell.parentElement;
+        const tabId = parseInt(row.getAttribute("tabId"), 10);
+        removeTab(tabId);
+      }
+    });
+  }
 
   /* Close all */
-  $("#closeDuplicateTabsBtn").on("click", function () {
-    if (!$(this).hasClass("disabled")) requestCloseDuplicateTabs();
+  const closeBtn = document.getElementById("closeDuplicateTabsBtn");
+  if (closeBtn) closeBtn.addEventListener("click", function () {
+    if (!this.classList.contains("disabled")) requestCloseDuplicateTabs();
   });
 
 };
 
 const setWhiteList = (whiteList) => {
-  $("#whiteList").val(whiteList);
+  const el = document.getElementById("whiteList");
+  if (el) el.value = whiteList;
 };
 
 const cleanUpWhiteList = (whiteList) => {
@@ -146,14 +171,14 @@ const cleanUpWhiteList = (whiteList) => {
 
 /* Show/Hide the AutoClose option */
 const changeAutoCloseOptionState = (state, resize) => {
-  $("#onRemainingTabGroup").toggleClass("hidden", state !== "A");
-  $("#whiteListGroup").toggleClass("hidden", state !== "A");
+  document.getElementById("onRemainingTabGroup").classList.toggle("hidden", state !== "A");
+  document.getElementById("whiteListGroup").classList.toggle("hidden", state !== "A");
   if (resize) resizeDuplicateTabsPanel();
 };
 
 const updateIgnorePathPartDependents = (checked) => {
-  $("#ignoreSearchPart").prop("disabled", checked);
-  $("#ignoreHashPart").prop("disabled", checked);
+  document.getElementById("ignoreSearchPart").disabled = checked;
+  document.getElementById("ignoreHashPart").disabled = checked;
 };
 
 const setDuplicateTabsTable = (duplicateTabs) => {
@@ -161,14 +186,18 @@ const setDuplicateTabsTable = (duplicateTabs) => {
   const isUpdate = panelInitialized;
   panelInitialized = true;
   lastDuplicateTabs = duplicateTabs ? Array.from(duplicateTabs) : null;
-  $("#duplicateTabsTableBody").empty();
+  const tbody = document.getElementById("duplicateTabsTableBody");
+  tbody.innerHTML = "";
+  const closeBtn = document.getElementById("closeDuplicateTabsBtn");
   if (duplicateTabs) {
-    $("#duplicateTabsTableBody").append(buildDuplicateTabRows(duplicateTabs, activeWindowId));
-    $("#closeDuplicateTabsBtn").toggleClass("disabled", false).attr("aria-disabled", "false");
+    tbody.insertAdjacentHTML("beforeend", buildDuplicateTabRows(duplicateTabs, activeWindowId));
+    closeBtn.classList.toggle("disabled", false);
+    closeBtn.setAttribute("aria-disabled", "false");
   }
   else {
-    $("#duplicateTabsTableBody").append(`<tr><td class='td-tab-text' colspan='3'><em>${chrome.i18n.getMessage("noDuplicateTabs")}.</em></td></tr>`);
-    $("#closeDuplicateTabsBtn").toggleClass("disabled", true).attr("aria-disabled", "true");
+    tbody.insertAdjacentHTML("beforeend", `<tr><td class='td-tab-text' colspan='3'><em>${chrome.i18n.getMessage("noDuplicateTabs")}.</em></td></tr>`);
+    closeBtn.classList.toggle("disabled", true);
+    closeBtn.setAttribute("aria-disabled", "true");
   }
   resizeDuplicateTabsPanel(isUpdate);
 };
@@ -178,10 +207,11 @@ const resizeDuplicateTabsPanel = (refresh) => {
   const minRow = 3;
   const rowHeight = 26;
   const nbRows = lastDuplicateTabs ? lastDuplicateTabs.length : 1;
-  const maxRows = Math.min(nbRows, Math.floor((maxOptionsCardHeight - $("#optionsCard").height() + (minRow * rowHeight)) / rowHeight));
-  $("#duplicateTabsTableContainer").toggleClass("table-scrollable-overflow", nbRows > maxRows);
-
-  $("#duplicateTabsTableContainer").css("height", maxRows * rowHeight);
+  const maxRows = Math.min(nbRows, Math.floor((maxOptionsCardHeight - document.getElementById("optionsCard").offsetHeight + (minRow * rowHeight)) / rowHeight));
+  const container = document.getElementById("duplicateTabsTableContainer");
+  container.classList.toggle("table-scrollable-overflow", nbRows > maxRows);
+  if (maxRows > 0) container.style.height = `${maxRows * rowHeight}px`;
+  else container.style.height = "";
 };
 
 const saveActiveWindowId = async () => {
@@ -200,35 +230,39 @@ const setPanelOption = (details) => {
   const resize = details.resize || false;
   const isLockedKey = details.isLockedKey || false;
   if (storedOption === "environment" && value === "chrome") {
-    $(".containerItem").toggleClass("hidden", true);
+    qsa(".containerItem").forEach(el => el.classList.toggle("hidden", true));
   }
   else if (storedOption === "whiteList") {
-    $("#whiteList").val(value);
-    if (isLockedKey) $("#whiteList").prop("disabled", true);
+    const el = document.getElementById("whiteList");
+    if (el) { el.value = value; if (isLockedKey) el.disabled = true; }
   }
   else if (storedOption === "urlRegexRules" || storedOption === "titleRegexRules") {
-    $(`#${storedOption}`).val(value);
-    if (isLockedKey) $(`#${storedOption}`).prop("disabled", true);
+    const el = document.getElementById(storedOption);
+    if (el) { el.value = value; if (isLockedKey) el.disabled = true; }
   }
   else {
+    const el = document.getElementById(storedOption);
     if (typeof (value) === "boolean") {
-      $(`#${storedOption}`).prop("checked", value);
-      if (storedOption === "compareWithTitle") $("#titleSimilarityThreshold").prop("disabled", !value);
+      if (el) el.checked = value;
+      if (storedOption === "compareWithTitle") {
+        const thresh = document.getElementById("titleSimilarityThreshold");
+        if (thresh) thresh.disabled = !value;
+      }
       else if (storedOption === "ignorePathPart") updateIgnorePathPartDependents(value);
     }
     else if (typeof (value) === "number") {
-      $(`#${storedOption}`).val(value);
+      if (el) el.value = value;
     }
-    else if (value.startsWith("#")) {
-      // badge color value
-      $(`#${storedOption}`).prop("value", value);
+    else if (typeof value === "string" && value.startsWith("#")) {
+      if (el) el.value = value;
     }
     else {
-      $(`#${storedOption} option[value='${value}']`).prop("selected", true);
+      const opt = qs(`#${storedOption} option[value='${value}']`);
+      if (opt) opt.selected = true;
       if (storedOption === "onDuplicateTabDetected") changeAutoCloseOptionState(value, resize);
       else if (storedOption === "theme") applyTheme(value);
     }
-    if (isLockedKey) $(`#${storedOption}`).prop("disabled", true);
+    if (isLockedKey && el) el.disabled = true;
   }
 };
 
@@ -268,6 +302,7 @@ const localizePopup = (node) => {
 let highlightBottomScrollShadowTimer = null;
 const highlightBottomScrollShadow = () => {
   clearTimeout(highlightBottomScrollShadowTimer);
-  $("#duplicateTabsTableContainer").toggleClass("highlight-scroll-bottom", true);
-  highlightBottomScrollShadowTimer = setTimeout(() => $("#duplicateTabsTableContainer").toggleClass("highlight-scroll-bottom", false), 400);
+  const container = document.getElementById("duplicateTabsTableContainer");
+  container.classList.toggle("highlight-scroll-bottom", true);
+  highlightBottomScrollShadowTimer = setTimeout(() => container.classList.toggle("highlight-scroll-bottom", false), 400);
 };
