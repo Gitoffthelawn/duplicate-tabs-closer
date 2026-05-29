@@ -385,6 +385,11 @@ body {
   cursor: pointer;
 }
 
+.whitelist-badge {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
 .td-close-button {
   width: 5px;
   padding: 1px 5px 1px 1px !important;

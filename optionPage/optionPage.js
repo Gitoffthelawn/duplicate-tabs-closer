@@ -167,19 +167,20 @@ const setDuplicateTabsTable = (duplicateTabs) => {
   if (duplicateTabs) {
     let tableRows = "";
     duplicateTabs.forEach(duplicateTab => {
-      const containerStyle = duplicateTab.containerColor ? `style='text-decoration:underline; text-decoration-color: ${duplicateTab.containerColor};'` : "";
+      const containerStyle = duplicateTab.containerColor ? `style='text-decoration:underline; text-decoration-color: ${escapeHTML(duplicateTab.containerColor)};'` : "";
       const title = (duplicateTab.windowId === activeWindowId) ? escapeHTML(duplicateTab.title) : `<em>${escapeHTML(duplicateTab.title)}</em>`;
       const tdTabIcon = `<td class='td-tab-icon'><img src='${escapeHTML(duplicateTab.icon)}' alt=''></td>`;
-      const tdTabTitle = `<td class='td-tab-title' ${containerStyle} title='${escapeHTML(duplicateTab.url)}'>${title}</td>`;
+      const whitelistBadge = duplicateTab.whitelisted ? `<span class='whitelist-badge fa-solid fa-list-check' title='${chrome.i18n.getMessage("whitelistedTab")}'></span> ` : "";
+      const tdTabTitle = `<td class='td-tab-title' ${containerStyle} title='${escapeHTML(duplicateTab.url)}'>${whitelistBadge}${title}</td>`;
       const tdCloseButton = "<td class='td-close-button'><button type='button' class='btn-tab-close' aria-label='Close'>&times;</button></td>";
-      tableRows += `<tr tabId='${duplicateTab.id}' windowId='${duplicateTab.windowId}'>${tdTabIcon}${tdTabTitle}${tdCloseButton}</tr>`;
+      tableRows += `<tr tabId='${parseInt(duplicateTab.id, 10)}' windowId='${parseInt(duplicateTab.windowId, 10)}'>${tdTabIcon}${tdTabTitle}${tdCloseButton}</tr>`;
     });
     $("#duplicateTabsTableBody").append(tableRows);
-    $("#closeDuplicateTabsBtn").toggleClass("disabled", false);
+    $("#closeDuplicateTabsBtn").toggleClass("disabled", false).attr("aria-disabled", "false");
   }
   else {
     $("#duplicateTabsTableBody").append(`<tr><td class='td-tab-text' colspan='3'><em>${chrome.i18n.getMessage("noDuplicateTabs")}.</em></td></tr>`);
-    $("#closeDuplicateTabsBtn").toggleClass("disabled", true);
+    $("#closeDuplicateTabsBtn").toggleClass("disabled", true).attr("aria-disabled", "true");
   }
   resizeDuplicateTabsPanel(isUpdate);
 };

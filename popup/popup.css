@@ -228,6 +228,15 @@ body {
     display: none;
 }
 
+.icon-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: inherit;
+    line-height: 1;
+}
+
 .fa-gear:hover {
     cursor: pointer;
     transform: scale(1.2);
@@ -447,6 +456,11 @@ body {
     padding: 0px !important;
     vertical-align: middle !important;
     cursor: pointer;
+}
+
+.whitelist-badge {
+    font-size: 11px;
+    opacity: 0.7;
 }
 
 .td-close-button {

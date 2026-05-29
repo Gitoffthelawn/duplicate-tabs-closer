@@ -133,8 +133,8 @@ const initializeOptions = async () => {
     const options = await getStoredOptions();
     let storedOptions = options.storedOptions;
     if (Object.keys(storedOptions).length === 0) {
-        const intialOptions = setupDefaultOptions();
-        storedOptions = await saveStoredOptions(intialOptions);
+        const initialOptions = setupDefaultOptions();
+        storedOptions = await saveStoredOptions(initialOptions);
     } else {
         const storedKeys = Object.keys(storedOptions).sort();
         const defaultKeys = Object.keys(defaultOptions).sort();
@@ -219,13 +219,13 @@ const isPanelOptionOpen = async () => {
 const escapeRegexChar = (ch) => ch.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
 
 const whiteListToPattern = (whiteList) => {    const whiteListPatterns = new Set();
-    const whiteListLines = whiteList.split("\n").map(line => line.trim());
+    const whiteListLines = whiteList.split("\n").map(line => line.trim()).filter(line => line.length > 0);
     whiteListLines.forEach(whiteListLine => {
         const length = whiteListLine.length;
         let pattern = "^";
         for (let index = 0; index < length; index += 1) {
             const character = whiteListLine.charAt(index);
-            pattern = (character === "*") ? `${pattern}.*` : pattern + escapeRegexChar(character);
+            pattern = (character === "*") ? `${pattern}.*?` : pattern + escapeRegexChar(character);
         }
         whiteListPatterns.add(new RegExp(`${pattern}$`));
     });
@@ -233,12 +233,13 @@ const whiteListToPattern = (whiteList) => {    const whiteListPatterns = new Set
 };
 
 const parsePatternRules = (text) => {
+    const MAX_LINE_LENGTH = 200;
     return text.split("\n")
-        .map(line => line.trim())
+        .map(line => line.trim().slice(0, MAX_LINE_LENGTH))
         .filter(line => line.length > 0)
         .map(line => {
             let pattern = "^";
-            for (const ch of line) pattern = ch === "*" ? `${pattern}.*` : pattern + escapeRegexChar(ch);
+            for (const ch of line) pattern = ch === "*" ? `${pattern}.*?` : pattern + escapeRegexChar(ch);
             return { source: line, regex: new RegExp(`${pattern}$`) };
         });
 };

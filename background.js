@@ -170,6 +170,20 @@ const onCommand = async (command) => {
 // MV3: event listeners must be registered synchronously at top level (no await before this point),
 // so the service worker can receive events immediately on restart.
 chrome.runtime.onStartup.addListener(() => ensureInitialized());
+// Sync in-memory options when storage is written externally (e.g. from the dtc-test
+// companion extension, or when multiple option pages are open simultaneously)
+chrome.storage.onChanged.addListener((changes, area) => {
+	if (area !== "local") return;
+	let hasOptionChange = false;
+	for (const key of Object.keys(changes)) {
+		if (key in defaultOptions) { hasOptionChange = true; break; }
+	}
+	if (!hasOptionChange) return;
+	getStoredOptions().then(current => {
+		setOptions(current.storedOptions);
+		refreshGlobalDuplicateTabsInfo();
+	});
+});
 chrome.tabs.onCreated.addListener(onCreatedTab);
 chrome.webNavigation.onBeforeNavigate.addListener(onBeforeNavigate);
 chrome.tabs.onAttached.addListener(onAttached);

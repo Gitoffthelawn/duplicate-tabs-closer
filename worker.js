@@ -278,7 +278,6 @@ const searchForDuplicateTabs = async (windowId, closeTabs) => {
     const tabsToClose = new Set();
     for (const openedTab of openedTabs) {
         if ((isBlankURL(openedTab.url) && !isTabComplete(openedTab)) || tabsInfo.isClosingTab(openedTab.id)) continue;
-        if (isUrlWhiteListed(openedTab.url)) continue;
         if (tabsInfo.isIntentionalDuplicate(openedTab.id)) continue;
         const details = {
             tab: openedTab,
@@ -322,7 +321,8 @@ const setDuplicateTabPanel = async (duplicateTab, duplicateTabs) => {
         title: duplicateTab.title || duplicateTab.url,
         windowId: duplicateTab.windowId,
         containerColor: containerColor,
-        icon: duplicateTab.favIconUrl || "../images/default-favicon.png"
+        icon: duplicateTab.favIconUrl || "../images/default-favicon.png",
+        whitelisted: isUrlWhiteListed(duplicateTab.url)
     });
 };
 
