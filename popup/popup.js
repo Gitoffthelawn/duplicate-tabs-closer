@@ -60,15 +60,23 @@ const setDuplicateTabsTable = (duplicateTabs) => {
     panelInitialized = true;
     lastDuplicateTabs = duplicateTabs ? Array.from(duplicateTabs) : null;
     const tbody = document.getElementById("duplicateTabsTableBody");
-    tbody.innerHTML = "";
+    tbody.replaceChildren();
     const closeBtn = document.getElementById("closeDuplicateTabsBtn");
     if (duplicateTabs) {
-        tbody.insertAdjacentHTML("beforeend", buildDuplicateTabRows(duplicateTabs, activeWindowId));
+        tbody.appendChild(buildDuplicateTabRows(duplicateTabs, activeWindowId));
         closeBtn.classList.remove("disabled");
         closeBtn.setAttribute("aria-disabled", "false");
     }
     else {
-        tbody.insertAdjacentHTML("beforeend", `<tr><td class='td-tab-text' colspan='3'><em>${chrome.i18n.getMessage("noDuplicateTabs")}.</em></td></tr>`);
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.className = "td-tab-text";
+        td.colSpan = 3;
+        const em = document.createElement("em");
+        em.textContent = chrome.i18n.getMessage("noDuplicateTabs") + ".";
+        td.appendChild(em);
+        tr.appendChild(td);
+        tbody.appendChild(tr);
         closeBtn.classList.add("disabled");
         closeBtn.setAttribute("aria-disabled", "true");
     }

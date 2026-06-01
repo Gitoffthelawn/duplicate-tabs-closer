@@ -316,21 +316,54 @@ const escapeHTML = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace
 
 // eslint-disable-next-line no-unused-vars
 const buildDuplicateTabRows = (duplicateTabs, activeWindowId) => {
-    let tableRows = "";
+    const fragment = document.createDocumentFragment();
     duplicateTabs.forEach(duplicateTab => {
-        const containerStyle = duplicateTab.containerColor
-            ? `style='text-decoration:underline; text-decoration-color: ${escapeHTML(duplicateTab.containerColor)};'`
-            : "";
-        const title = (duplicateTab.windowId === activeWindowId)
-            ? escapeHTML(duplicateTab.title)
-            : `<em>${escapeHTML(duplicateTab.title)}</em>`;
-        const tdTabIcon = `<td class='td-tab-icon'><img src='${escapeHTML(duplicateTab.icon)}' alt=''></td>`;
-        const whitelistBadge = duplicateTab.whitelisted
-            ? `<span class='whitelist-badge fa-solid fa-list-check' title='${chrome.i18n.getMessage("whitelistedTab")}'></span> `
-            : "";
-        const tdTabTitle = `<td class='td-tab-title' ${containerStyle} title='${escapeHTML(duplicateTab.url)}'>${whitelistBadge}${title}</td>`;
-        const tdCloseButton = "<td class='td-close-button'><button type='button' class='btn-tab-close' aria-label='Close'>&times;</button></td>";
-        tableRows += `<tr tabId='${parseInt(duplicateTab.id, 10)}' windowId='${parseInt(duplicateTab.windowId, 10)}'>${tdTabIcon}${tdTabTitle}${tdCloseButton}</tr>`;
+        const tr = document.createElement("tr");
+        tr.setAttribute("tabId", parseInt(duplicateTab.id, 10));
+        tr.setAttribute("windowId", parseInt(duplicateTab.windowId, 10));
+
+        const tdIcon = document.createElement("td");
+        tdIcon.className = "td-tab-icon";
+        const img = document.createElement("img");
+        img.src = duplicateTab.icon || "../images/default-favicon.png";
+        img.alt = "";
+        tdIcon.appendChild(img);
+
+        const tdTitle = document.createElement("td");
+        tdTitle.className = "td-tab-title";
+        tdTitle.title = duplicateTab.url;
+        if (duplicateTab.containerColor) {
+            tdTitle.style.textDecoration = "underline";
+            tdTitle.style.textDecorationColor = duplicateTab.containerColor;
+        }
+        if (duplicateTab.whitelisted) {
+            const badge = document.createElement("span");
+            badge.className = "whitelist-badge fa-solid fa-list-check";
+            badge.title = chrome.i18n.getMessage("whitelistedTab");
+            tdTitle.appendChild(badge);
+            tdTitle.appendChild(document.createTextNode(" "));
+        }
+        if (duplicateTab.windowId === activeWindowId) {
+            tdTitle.appendChild(document.createTextNode(duplicateTab.title));
+        } else {
+            const em = document.createElement("em");
+            em.textContent = duplicateTab.title;
+            tdTitle.appendChild(em);
+        }
+
+        const tdClose = document.createElement("td");
+        tdClose.className = "td-close-button";
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-tab-close";
+        btn.setAttribute("aria-label", "Close");
+        btn.textContent = "×";
+        tdClose.appendChild(btn);
+
+        tr.appendChild(tdIcon);
+        tr.appendChild(tdTitle);
+        tr.appendChild(tdClose);
+        fragment.appendChild(tr);
     });
-    return tableRows;
+    return fragment;
 };
