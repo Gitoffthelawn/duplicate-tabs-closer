@@ -65,6 +65,14 @@ https://docs.google.com/*
 *://github.com/*/issues
 ```
 
+#### Intentional Duplicate Protection
+
+> Only active when **On duplicate tab detected** is set to *Close tab automatically*.
+
+Tabs opened on purpose using the browser's built-in **Duplicate Tab** command are never auto-closed.
+
+> **Note:** This protection is only available on Firefox. On Chrome, Edge, Opera, Vivaldi, and Brave, tabs opened via "Duplicate Tab" will still be auto-closed because the required browser API is not available on those browsers.
+
 ### Priority
 
 Determines which of two duplicate tabs is kept when one must be closed. Rules are applied in this order:
