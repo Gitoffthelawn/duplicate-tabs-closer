@@ -137,8 +137,8 @@ const setPanelOptions = async () => {
             else if (typeof (value) === "number") {
                 if (el) el.value = value;
             }
-            // textarea (pattern rules)
-            else if (storedOption === "urlRegexRules" || storedOption === "titleRegexRules") {
+            // textarea (pattern rules and whitelist — whiteList not shown in popup, el will be null)
+            else if (storedOption === "urlRegexRules" || storedOption === "titleRegexRules" || storedOption === "whiteList") {
                 if (el) el.value = value;
             }
             // combobox
