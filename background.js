@@ -80,7 +80,7 @@ const onCreatedTab = async (tab) => {
 	tabsInfo.setTab(tab.id, {});
 	if (tab.status === "complete") {
 		tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
-		if (options.autoCloseTab) {
+		if (options.autoCloseTab && tab.url !== "about:blank") {
 			postStartupBurst ? debouncedBatchClose(tab.windowId) : searchForDuplicateTabsToClose(tab, true);
 		} else {
 			refreshDuplicateTabsInfo(tab.windowId);
@@ -136,7 +136,7 @@ const onUpdatedTab = async (tabId, changeInfo, tab) => {
 		}
 		else if (isChromeURL(tab.url) || isBlankURL(tab.url)) {
 			tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
-			if (options.autoCloseTab) {
+			if (options.autoCloseTab && isChromeURL(tab.url)) {
 				postStartupBurst ? debouncedBatchClose(tab.windowId) : searchForDuplicateTabsToClose(tab);
 			} else {
 				refreshDuplicateTabsInfo(tab.windowId);

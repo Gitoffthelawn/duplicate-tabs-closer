@@ -137,6 +137,7 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
     let match = false;
     for (const openedTab of openedTabs) {
         if ((openedTab.id === observedTab.id) || tabsInfo.isClosingTab(openedTab.id)) continue;
+        if (isBlankURL(openedTab.url) && !isTabComplete(openedTab)) continue;
         if (queryComplete && !isTabComplete(openedTab)) continue;
         if ((getMatchingURL(openedTab.url) === matchingObservedTabUrl)
             || matchTitle(openedTab, observedTab)
