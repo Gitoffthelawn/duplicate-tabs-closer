@@ -65,3 +65,22 @@ const updateBadgeStyle = async () => {
 	const windows = await getWindows();
 	windows.forEach(window => setBadge(window.id));
 };
+
+// eslint-disable-next-line no-unused-vars
+const setPausedBadge = async () => {
+	const PAUSED_COLOR = "#888888";
+	const PAUSED_TEXT = "‖";
+	if (environment.isFirefox) {
+		const windows = await getWindows();
+		if (windows) windows.forEach(w => {
+			setWindowBadgeText(w.id, PAUSED_TEXT);
+			setWindowBadgeBackgroundColor(w.id, PAUSED_COLOR);
+		});
+	} else {
+		const tabs = await getTabs({});
+		if (tabs) tabs.forEach(tab => {
+			setTabBadgeText(tab.id, PAUSED_TEXT);
+			setTabBadgeBackgroundColor(tab.id, PAUSED_COLOR);
+		});
+	}
+};

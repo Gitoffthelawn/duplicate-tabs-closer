@@ -15,7 +15,11 @@ const handleMessage = (message, sender, response) => {
         }
         case "getDuplicateTabs": {
             if (!message.data) return response({});
-            requestDuplicateTabsFromPanel(message.data.windowId);
+            if (monitoringPaused) {
+                chrome.runtime.sendMessage({ action: "updateDuplicateTabsTable", data: { duplicateTabs: null } }).catch(() => {});
+            } else {
+                requestDuplicateTabsFromPanel(message.data.windowId);
+            }
             response({});
             break;
         }
@@ -35,6 +39,14 @@ const handleMessage = (message, sender, response) => {
             closeDuplicateTabs(message.data.windowId);
             response({});
             break;
+        }
+        case "toggleMonitorPause": {
+            toggleMonitorPause().then(() => response({ paused: monitoringPaused }));
+            return true;
+        }
+        case "getMonitorPauseState": {
+            response({ paused: monitoringPaused });
+            return true;
         }
     }
 };

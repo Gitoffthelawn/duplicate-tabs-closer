@@ -214,9 +214,13 @@ const setEnvironment = (storedOptions) => {
 const isPanelOptionOpen = async () => {
     const contexts = await chrome.runtime.getContexts({});
     const popupUrl = chrome.runtime.getURL("popup/popup.html");
+    const optionPageUrl = chrome.runtime.getURL("optionPage/optionPage.html");
     return contexts.some(ctx =>
         ctx.contextType === "POPUP" ||
-        (ctx.contextType === "TAB" && ctx.documentUrl && ctx.documentUrl.startsWith(popupUrl))
+        (ctx.contextType === "TAB" && ctx.documentUrl && (
+            ctx.documentUrl.startsWith(popupUrl) ||
+            ctx.documentUrl.startsWith(optionPageUrl)
+        ))
     );
 };
 

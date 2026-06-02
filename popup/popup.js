@@ -55,7 +55,7 @@ const toggleExpendGroup = (eventId, isTitleClickEvent, pinned, resize) => {
 };
 
 const setDuplicateTabsTable = (duplicateTabs) => {
-    if (areSameArrays(duplicateTabs, lastDuplicateTabs)) return;
+    if (duplicateTabs !== null && areSameArrays(duplicateTabs, lastDuplicateTabs)) return;
     const isUpdate = panelInitialized;
     panelInitialized = true;
     lastDuplicateTabs = duplicateTabs ? Array.from(duplicateTabs) : null;
@@ -68,19 +68,24 @@ const setDuplicateTabsTable = (duplicateTabs) => {
         closeBtn.setAttribute("aria-disabled", "false");
     }
     else {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.className = "td-tab-text";
-        td.colSpan = 3;
-        const em = document.createElement("em");
-        em.textContent = chrome.i18n.getMessage("noDuplicateTabs") + ".";
-        td.appendChild(em);
-        tr.appendChild(td);
-        tbody.appendChild(tr);
+        chrome.storage.session.get('monitoringPaused').then(data => {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.className = "td-tab-text";
+            td.colSpan = 3;
+            const em = document.createElement("em");
+            em.textContent = data.monitoringPaused
+                ? chrome.i18n.getMessage("monitoringPaused")
+                : chrome.i18n.getMessage("noDuplicateTabs") + ".";
+            td.appendChild(em);
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            resizeDuplicateTabsPanel(isUpdate);
+        });
         closeBtn.classList.add("disabled");
         closeBtn.setAttribute("aria-disabled", "true");
     }
-    resizeDuplicateTabsPanel(isUpdate);
+    if (duplicateTabs) resizeDuplicateTabsPanel(isUpdate);
 };
 
 const resizeDuplicateTabsPanel = (refresh) => {
@@ -154,11 +159,31 @@ const setPanelOptions = async () => {
     if (collapseOptions) toggleExpendOptions(false);
     applyPopupRuleVisibility(storedOptions);
     updateIgnorePathPartDependents(storedOptions.ignorePathPart ? storedOptions.ignorePathPart.value : false);
-    const sessionData = await chrome.storage.session.get('autoOpenedPopup');
+    const sessionData = await chrome.storage.session.get(['autoOpenedPopup', 'monitoringPaused']);
     if (sessionData.autoOpenedPopup) {
         chrome.storage.session.remove('autoOpenedPopup');
         document.getElementById("optionHeader").classList.add("collapsed");
         resizeDuplicateTabsPanel();
+    }
+    applyPausedState(sessionData.monitoringPaused || false);
+};
+
+const applyPausedState = (paused) => {
+    const sel = document.getElementById("onDuplicateTabDetected");
+    if (sel) sel.disabled = paused;
+    updatePauseButton(paused);
+};
+
+const updatePauseButton = (paused) => {
+    const btn = document.getElementById("pauseMonitorBtn");
+    if (!btn) return;
+    const icon = btn.querySelector("span");
+    if (paused) {
+        icon.className = "fa-solid fa-play fa-lg";
+        btn.setAttribute("aria-label", chrome.i18n.getMessage("resumeMonitoring"));
+    } else {
+        icon.className = "fa-solid fa-pause fa-lg";
+        btn.setAttribute("aria-label", chrome.i18n.getMessage("pauseMonitoring"));
     }
 };
 
@@ -192,6 +217,11 @@ const handleMessage = (message) => {
             if (thresh) thresh.closest(".checkboxes").classList.toggle("hidden", !thresholdVisible);
         }
         resizeDuplicateTabsPanel();
+    }
+    if (message.action === "setStoredOption" && message.data.name === "onDuplicateTabDetected") {
+        const opt = getElement(`#onDuplicateTabDetected option[value='${message.data.value}']`);
+        if (opt) opt.selected = true;
+        changeAutoCloseOptionState(message.data.value, true);
     }
 };
 
@@ -286,6 +316,14 @@ const loadListenerEvents = () => {
             el.addEventListener(ev, function () { applyLineHighlight(this); })
         );
         el.addEventListener("blur", function () { this.style.backgroundImage = ""; });
+    });
+
+    /* Pause/resume monitoring */
+    const pauseBtn = document.getElementById("pauseMonitorBtn");
+    if (pauseBtn) pauseBtn.addEventListener("click", () => {
+        sendMessage("toggleMonitorPause").then(resp => {
+            if (resp) applyPausedState(resp.paused);
+        });
     });
 
     /* Open Option tab */

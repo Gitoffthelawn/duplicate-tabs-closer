@@ -52,6 +52,9 @@
     },
     "toggle-close-mode": {
       "description": "Toggle between auto-close and manual mode"
+    },
+    "toggle-monitor-pause": {
+      "description": "Pause or resume duplicate tab monitoring"
     }
   },
   "options_ui": {

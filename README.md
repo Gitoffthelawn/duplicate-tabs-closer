@@ -169,6 +169,13 @@ Available in the **Options page** only.
 
 * **Shrunk mode** — toggle the compress icon in the popup to hide all unpinned sections, keeping the panel compact. Sections can be pinned with the pin icon (📌) in the popup panel so they stay visible when shrunk mode is active.
 
+* **Pause monitoring** — click the pause icon in the popup or options page header to temporarily stop duplicate tab detection. While paused:
+  * The extension icon badge shows "‖" on a grey background
+  * The mode is automatically set to "Do nothing"
+  * The "On duplicate tab detected" setting is disabled
+  * No new duplicate tabs are detected or closed
+  * Click the play icon or use the keyboard shortcut to resume
+
 * **Popup visibility (eye icon)** — in the Options page, each option in the **Matching Rules** section has an eye icon (👁). Enabling it makes the option visible in the popup panel; disabling it hides it.
 
 | Matching Rules option | Visible in popup by default |
@@ -191,6 +198,7 @@ You can assign custom shortcuts in your browser settings:
 | --- | --- |
 | Close all duplicate tabs | Closes all currently detected duplicate tabs |
 | Toggle auto-close / manual mode | Switches between auto-close and manual mode |
+| Pause or resume duplicate tab monitoring | Temporarily stops and restarts detection |
 
 To configure shortcuts:
 

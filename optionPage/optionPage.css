@@ -385,6 +385,23 @@ body {
   cursor: pointer;
 }
 
+#pauseMonitorBtn {
+  margin-left: 6px;
+}
+
+#pauseMonitorBtn:hover {
+  transform: scale(1.2);
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  line-height: 1;
+}
+
 .whitelist-badge {
   font-size: 11px;
   opacity: 0.7;

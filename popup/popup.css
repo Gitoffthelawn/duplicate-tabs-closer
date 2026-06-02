@@ -237,6 +237,14 @@ body {
     line-height: 1;
 }
 
+#pauseMonitorBtn {
+    margin-right: 8px;
+}
+
+#pauseMonitorBtn:hover {
+    transform: scale(1.2);
+}
+
 .fa-gear:hover {
     cursor: pointer;
     transform: scale(1.2);
