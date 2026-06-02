@@ -120,6 +120,7 @@ const getCloseInfo = (details) => {
 // eslint-disable-next-line no-unused-vars
 const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loadingUrl) => {
     const observedTabUrl = loadingUrl || observedTab.url;
+    dtcLog("worker", "search-start", { tabId: observedTab.id, windowId: observedTab.windowId, url: observedTabUrl, queryComplete: !!queryComplete });
     const observedWindowsId = observedTab.windowId;
     await tabsInfo.awaitPendingCheck(observedTab.id);
     if (tabsInfo.isIntentionalDuplicate(observedTab.id)) return;
@@ -136,15 +137,16 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
     const matchingObservedTabUrl = getMatchingURL(observedTabUrl);
     let match = false;
     for (const openedTab of openedTabs) {
-        if ((openedTab.id === observedTab.id) || tabsInfo.isClosingTab(openedTab.id)) continue;
-        if (isBlankURL(openedTab.url) && !isTabComplete(openedTab)) continue;
-        if (queryComplete && !isTabComplete(openedTab)) continue;
+        if ((openedTab.id === observedTab.id) || tabsInfo.isClosingTab(openedTab.id)) { dtcLog("worker", "search-skip", { tabId: openedTab.id, reason: openedTab.id === observedTab.id ? "self" : "closing" }); continue; }
+        if (isBlankURL(openedTab.url) && !isTabComplete(openedTab)) { dtcLog("worker", "search-skip", { tabId: openedTab.id, url: openedTab.url, reason: "blank-loading" }); continue; }
+        if (queryComplete && !isTabComplete(openedTab)) { dtcLog("worker", "search-skip", { tabId: openedTab.id, url: openedTab.url, reason: "loading" }); continue; }
         if ((getMatchingURL(openedTab.url) === matchingObservedTabUrl)
             || matchTitle(openedTab, observedTab)
             || matchByUrlPattern(openedTab.url, observedTabUrl)
             || (isTabComplete(openedTab) && isTabComplete(observedTab) && matchByTitlePattern(openedTab.title, observedTab.title))) {
             match = true;
             const [tabToCloseId, remainingTabInfo] = getCloseInfo({ observedTab: observedTab, observedTabUrl: observedTabUrl, openedTab: openedTab });
+            dtcLog("worker", "search-match", { tabId: tabToCloseId, windowId: observedTab.windowId, url: observedTabUrl, matchedWith: openedTab.id, complete: isTabComplete(openedTab) });
             closeDuplicateTab(tabToCloseId, remainingTabInfo);
             if (remainingTabInfo.observedTabClosed) break;
         }
@@ -161,10 +163,12 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
 
 const closeDuplicateTab = async (tabToCloseId, remainingTabInfo) => {
     try {
+        dtcLog("worker", "close-tab", { tabId: tabToCloseId });
         tabsInfo.setClosingTab(tabToCloseId, true);
         await removeTab(tabToCloseId);
     }
     catch (ex) {
+        dtcLog("worker", "close-tab-failed", { tabId: tabToCloseId });
         tabsInfo.setClosingTab(tabToCloseId, false);
         return;
     }
@@ -352,6 +356,7 @@ const requestDuplicateTabsFromPanel = async (windowId) => {
 
 const sendDuplicateTabs = async (duplicateTabsGroups) => {
     const duplicateTabs = await getDuplicateTabsForPanel(duplicateTabsGroups);
+    dtcLog("worker", "send-duplicates", { count: duplicateTabs ? duplicateTabs.length : 0 });
     chrome.runtime.sendMessage({
         action: "updateDuplicateTabsTable",
         data: { "duplicateTabs": duplicateTabs }
@@ -360,6 +365,7 @@ const sendDuplicateTabs = async (duplicateTabsGroups) => {
 
 const _refreshDuplicateTabsInfo = async (windowId) => {
     if (monitoringPaused) return;
+    dtcLog("worker", "refresh-start", { windowId });
     const searchResult = await searchForDuplicateTabs(windowId, false);
     updateBadgesValue(searchResult.duplicateTabsGroups, windowId);
     if ((await isPanelOptionOpen()) && (options.searchInAllWindows || (windowId === searchResult.activeWindowId))) {
