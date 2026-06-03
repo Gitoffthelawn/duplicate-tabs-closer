@@ -98,13 +98,13 @@ const onBeforeNavigate = async (details) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
 	if (details.frameId != 0 || details.tabId === -1) return;
-	if (details.frameId == 0) dtcLog("bg", "before-navigate", { tabId: details.tabId, url: details.url, autoClose: options.autoCloseTab, burst: postStartupBurst });
 	// Firefox fires onBeforeNavigate twice for the same URL (~10-30ms apart). Skip the duplicate.
 	const prev = _lastNavigate.get(details.tabId);
 	if (prev && prev.url === details.url && (Date.now() - prev.ts) < 1000) return;
 	_lastNavigate.set(details.tabId, { url: details.url, ts: Date.now() });
+	dtcLog("bg", "before-navigate", { tabId: details.tabId, url: details.url, autoClose: options.autoCloseTab, burst: postStartupBurst });
 	if (options.autoCloseTab && !postStartupBurst && !isBlankURL(details.url)) {
-		if (!tabsInfo.hasTab(details.tabId)) return;
+		if (!tabsInfo.hasTab(details.tabId)) { dtcLog("bg", "before-navigate-skip", { tabId: details.tabId, reason: "unregistered" }); return; }
 		if (tabsInfo.isClosingTab(details.tabId)) { dtcLog("bg", "before-navigate-skip", { tabId: details.tabId, reason: "closing" }); return; }
 		const tab = await getTab(details.tabId);
 		if (tab) {
@@ -123,7 +123,7 @@ const onCompletedTab = async (details) => {
 		if (tab) {
 			const alreadyComplete = tabsInfo.getLastComplete(tab.id) !== null && !tabsInfo.hasUrlChanged(tab);
 			if (!alreadyComplete) tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
-			dtcLog("bg", "nav-completed", { tabId: tab.id, windowId: tab.windowId, url: tab.url, autoClose: options.autoCloseTab, burst: postStartupBurst });
+			dtcLog("bg", "nav-completed", { tabId: tab.id, windowId: tab.windowId, url: tab.url, autoClose: options.autoCloseTab, burst: postStartupBurst, redundant: alreadyComplete });
 			dispatchTabCompletion(tab, tab.id, { alreadyComplete });
 		}
 	}

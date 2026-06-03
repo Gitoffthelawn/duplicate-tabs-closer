@@ -45,7 +45,7 @@ class TabsInfo {
 
     setClosingTab(tabId, state) {
         this.setTab(tabId, { closing: state });
-        dtcLog("tabsInfo", "tab-closing", { tabId, state });
+        if (state) dtcLog("tabsInfo", "tab-closing", { tabId });
     }
 
     isClosingTab(tabId) {

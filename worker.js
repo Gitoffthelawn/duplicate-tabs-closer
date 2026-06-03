@@ -120,8 +120,8 @@ const getCloseInfo = (details) => {
 // eslint-disable-next-line no-unused-vars
 const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loadingUrl) => {
     const observedTabUrl = loadingUrl || observedTab.url;
-    dtcLog("worker", "search-start", { tabId: observedTab.id, windowId: observedTab.windowId, url: observedTabUrl, queryComplete: !!queryComplete });
     const observedWindowsId = observedTab.windowId;
+    dtcLog("worker", "search-start", { tabId: observedTab.id, windowId: observedWindowsId, url: observedTabUrl, queryComplete: !!queryComplete });
     await tabsInfo.awaitPendingCheck(observedTab.id);
     if (tabsInfo.isIntentionalDuplicate(observedTab.id)) return;
     if (isUrlWhiteListed(observedTabUrl)) {
