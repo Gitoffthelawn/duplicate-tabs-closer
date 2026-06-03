@@ -28,7 +28,7 @@ $Directories = @(
 )
 
 function Build-Package {
-    param([string]$ManifestSrc, [string]$OutputFile)
+    param([string]$ManifestSrc, [string]$OutputFile, [string[]]$StripKeys = @())
 
     $ManifestDst = Join-Path $Root "manifest.json"
     $TempDir = Join-Path $env:TEMP "dtc-build-$(Get-Random)"
@@ -47,7 +47,15 @@ function Build-Package {
             }
         }
 
-        Copy-Item $ManifestDst (Join-Path $TempDir "manifest.json")
+        $manifestInTmp = Join-Path $TempDir "manifest.json"
+        Copy-Item $ManifestDst $manifestInTmp
+        if ($StripKeys.Count -gt 0) {
+            $json = Get-Content $manifestInTmp -Raw | ConvertFrom-Json
+            foreach ($key in $StripKeys) {
+                $json.PSObject.Properties.Remove($key)
+            }
+            $json | ConvertTo-Json -Depth 10 | Set-Content $manifestInTmp -Encoding UTF8
+        }
 
         foreach ($dir in $Directories) {
             $src = Join-Path $Root $dir
@@ -90,5 +98,5 @@ if ($Target -eq "firefox" -or $Target -eq "all") {
     Build-Package "manifest-f.json" "duplicate-tabs-closer-firefox.xpi"
 }
 if ($Target -eq "chrome" -or $Target -eq "all") {
-    Build-Package "manifest-c.json" "duplicate-tabs-closer-chrome.zip"
+    Build-Package "manifest-c.json" "duplicate-tabs-closer-chrome.zip" -StripKeys @("externally_connectable")
 }
