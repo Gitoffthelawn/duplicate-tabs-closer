@@ -25,9 +25,10 @@ class TabsInfo {
     setTab(tabId, details) {
         const storedTab = this.storedTabs.get(tabId)
             || { url: null, lastComplete: null, closing: false };
+        const completeChanged = Object.prototype.hasOwnProperty.call(details, "complete");
         if (Object.prototype.hasOwnProperty.call(details, "url"))
             storedTab.url = details.url;
-        if (Object.prototype.hasOwnProperty.call(details, "complete"))
+        if (completeChanged)
             storedTab.lastComplete = details.complete ? Date.now() : null;
         if (Object.prototype.hasOwnProperty.call(details, "closing"))
             storedTab.closing = details.closing;
