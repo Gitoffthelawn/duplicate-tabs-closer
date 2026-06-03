@@ -178,6 +178,7 @@ const updatePauseButton = (paused) => {
     const btn = document.getElementById("pauseMonitorBtn");
     if (!btn) return;
     const icon = btn.querySelector("span");
+    btn.classList.toggle("paused", paused);
     if (paused) {
         icon.className = "fa-solid fa-play fa-lg";
         btn.setAttribute("aria-label", chrome.i18n.getMessage("resumeMonitoring"));

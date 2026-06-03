@@ -393,6 +393,15 @@ body {
   transform: scale(1.2);
 }
 
+#pauseMonitorBtn.paused {
+  color: #f59e0b;
+}
+
+#pauseMonitorBtn.paused:hover {
+  color: #fbbf24;
+  transform: scale(1.2);
+}
+
 .icon-btn {
   background: none;
   border: none;

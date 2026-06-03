@@ -7,6 +7,7 @@ const setBadgeIcon = () => {
 };
 
 const setBadge = async (windowId, activeTabId) => {
+	if (monitoringPaused) return;
 	let nbDuplicateTabs = tabsInfo.getNbDuplicateTabs(windowId);
 	if (nbDuplicateTabs === "0" && !options.showBadgeIfNoDuplicateTabs) nbDuplicateTabs = "";
 	const backgroundColor = (nbDuplicateTabs !== "0") ? options.badgeColorDuplicateTabs : options.badgeColorNoDuplicateTabs;
@@ -69,7 +70,7 @@ const updateBadgeStyle = async () => {
 // eslint-disable-next-line no-unused-vars
 const setPausedBadge = async () => {
 	const PAUSED_COLOR = "#888888";
-	const PAUSED_TEXT = "‖";
+	const PAUSED_TEXT = "⏸";
 	if (environment.isFirefox) {
 		const windows = await getWindows();
 		if (windows) windows.forEach(w => {
