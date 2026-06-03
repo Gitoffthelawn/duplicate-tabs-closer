@@ -128,19 +128,19 @@
     "description": "Whitelisted URLs"
   },
   "pauseMonitoring": {
-    "message": "Pause monitoring",
+    "message": "監視を一時停止する",
     "description": "Pause duplicate tab monitoring"
   },
   "resumeMonitoring": {
-    "message": "Resume monitoring",
+    "message": "監視を再開する",
     "description": "Resume duplicate tab monitoring"
   },
   "monitoringPaused": {
-    "message": "Monitoring is paused",
+    "message": "監視は一時停止中です",
     "description": "Shown in the duplicate tabs list when monitoring is paused"
   },
   "whitelistedTab": {
-    "message": "Whitelisted - not auto-closed",
+    "message": "ホワイトリスト登録済み - 自動的に閉じません",
     "description": "Tooltip shown on duplicate tabs that match the whitelist"
   },
   "customization": {

@@ -128,19 +128,19 @@
     "description": "Whitelisted URLs"
   },
   "pauseMonitoring": {
-    "message": "Pause monitoring",
+    "message": "暂停监控",
     "description": "Pause duplicate tab monitoring"
   },
   "resumeMonitoring": {
-    "message": "Resume monitoring",
+    "message": "恢复监控",
     "description": "Resume duplicate tab monitoring"
   },
   "monitoringPaused": {
-    "message": "Monitoring is paused",
+    "message": "监控已暂停",
     "description": "Shown in the duplicate tabs list when monitoring is paused"
   },
   "whitelistedTab": {
-    "message": "Whitelisted - not auto-closed",
+    "message": "已加入白名单 - 不会自动关闭",
     "description": "Tooltip shown on duplicate tabs that match the whitelist"
   },
   "customization": {
