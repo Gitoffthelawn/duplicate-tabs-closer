@@ -1,0 +1,226 @@
+{
+  "options": {
+    "message": "Opções",
+    "description": "Options"
+  },
+  "onDuplicateTabDetected": {
+    "message": "Na aba duplicada detectada",
+    "description": "On duplicate tab detected"
+  },
+  "doNothing": {
+    "message": "Não fazer nada",
+    "description": "Do nothing"
+  },
+  "autoCloseTab": {
+    "message": "Fechar aba automaticamente",
+    "description": "Close tab automatically"
+  },
+  "openPopupOnDuplicateDetected": {
+    "message": "Abrir popup ao detectar aba duplicada",
+    "description": "Open popup panel when a new duplicate tab is detected"
+  },
+  "tabPriority": {
+    "message": "Prioridade",
+    "description": "Priority"
+  },
+  "keepNewerTab": {
+    "message": "Manter a aba mais recente",
+    "description": "Keep newer tab"
+  },
+  "keepOlderTab": {
+    "message": "Manter a aba mais antiga",
+    "description": "Keep older tab"
+  },
+  "keepReloadOlderTab": {
+    "message": "Manter e recarregar a aba mais antiga",
+    "description": "Keep and reload older tab"
+  },
+  "keeptabwithHttps": {
+    "message": "Mantenha a aba com https",
+    "description": "Keep tab with https"
+  },
+  "keepPinnedTab": {
+    "message": "Manter a aba fixada",
+    "description": "Keep pinned tab"
+  },
+  "onRemainingTab": {
+    "message": "Na aba restante",
+    "description": "On remaining tab"
+  },
+  "activateKeptTab": {
+    "message": "Ativar",
+    "description": "Activate"
+  },
+  "defaultTabBehavior": {
+    "message": "Comportamento da aba padrão",
+    "description": "Default tab behaviour"
+  },
+  "matchingRules": {
+    "message": "Regras de correspondência",
+    "description": "Matching rules"
+  },
+  "ignoreHashPart": {
+    "message": "Ignorar a parte hash no URL",
+    "description": "Ignore hash part in URL"
+  },
+  "ignoreSearchPart": {
+    "message": "Ignorar a parte da pesquisa no URL",
+    "description": "Ignore search part in URL"
+  },
+  "ignorePathPart": {
+    "message": "Ignorar parte do caminho no URL",
+    "description": "Ignore path part in URL"
+  },
+  "ignore3w": {
+    "message": "Ignorar 'www' no nome de domínio do URL",
+    "description": "Ignore 'www' in URL domain name"
+  },
+  "caseInsensitive": {
+    "message": "Ignorar maiúsculas e minúsculas no URL",
+    "description": "Ignore case in URL"
+  },
+  "compareWithTitle": {
+    "message": "Comparar com o título",
+    "description": "Compare with title"
+  },
+  "titleSimilarityThreshold": {
+    "message": "% similaridade de título",
+    "description": "Minimum title similarity to consider tabs as duplicates"
+  },
+  "urlRegexRules": {
+    "message": "Regras de padrão de URL",
+    "description": "URL pattern rules"
+  },
+  "titleRegexRules": {
+    "message": "Regras de padrão de título",
+    "description": "Title pattern rules"
+  },
+  "duplicatetabs": {
+    "message": "Abas duplicadas",
+    "description": "Duplicate tabs"
+  },
+  "scope": {
+    "message": "Escopo",
+    "description": "Scope"
+  },
+  "activewindow": {
+    "message": "Janela ativa",
+    "description": "Active window"
+  },
+  "allwindows": {
+    "message": "Todas as janelas",
+    "description": "All windows"
+  },
+  "containerActivewindow": {
+    "message": "Contêiner na janela ativa",
+    "description": "Container in active window"
+  },
+  "containerAllwindows": {
+    "message": "Contêiner em todas as janelas",
+    "description": "Container in all windows"
+  },
+  "closeAllDuplicateTabs": {
+    "message": "Fechar todas",
+    "description": "Close all"
+  },
+  "whiteList": {
+    "message": "URLs na lista de permissões",
+    "description": "Whitelisted URLs"
+  },
+  "pauseMonitoring": {
+    "message": "Pausar monitoramento",
+    "description": "Pause duplicate tab monitoring"
+  },
+  "resumeMonitoring": {
+    "message": "Retomar monitoramento",
+    "description": "Resume duplicate tab monitoring"
+  },
+  "monitoringPaused": {
+    "message": "Monitoramento pausado",
+    "description": "Shown in the duplicate tabs list when monitoring is paused"
+  },
+  "whitelistedTab": {
+    "message": "Na lista de permissões - não fechada automaticamente",
+    "description": "Tooltip shown on duplicate tabs that match the whitelist"
+  },
+  "customization": {
+    "message": "Customização",
+    "description": "Customization"
+  },
+  "badgeColorDuplicateTabs": {
+    "message": "Cor do emblema para abas duplicadas",
+    "description": "Badge color for duplicate tabs"
+  },
+  "badgeColorNoDuplicateTabs": {
+    "message": "Cor do emblema para abas não duplicadas",
+    "description": "Badge color for no duplicate tab"
+  },
+  "showBadgeIfNoDuplicateTabs": {
+    "message": "Exibir emblema se não houver abas duplicadas",
+    "description": "Show badge if no duplicate tab"
+  },
+  "noDuplicateTabs": {
+    "message": "Sem abas duplicadas",
+    "description": "No duplicate tabs"
+  },
+  "closePopup": {
+    "message": "Fechar o painel pop-up após fechar as abas duplicadas",
+    "description": "Close popup panel after closing duplicate tabs"
+  },
+  "moreOptions": {
+    "message": "Mais opções...",
+    "description": "More options..."
+  },
+  "shrunkMode": {
+    "message": "Shrunk mode:\nQuando ativado, oculta as opções não fixadas.",
+    "description": "Shrunk mode\nWhen activated, hide unpinned options."
+  },
+  "theme": {
+    "message": "Tema",
+    "description": "Theme selector"
+  },
+  "themeLight": {
+    "message": "Sky",
+    "description": "Sky light theme"
+  },
+  "themeOcean": {
+    "message": "Ocean Night",
+    "description": "Ocean Night dark theme"
+  },
+  "themeCharcoal": {
+    "message": "Charcoal",
+    "description": "Charcoal dark theme"
+  },
+  "themePurple": {
+    "message": "Midnight Purple",
+    "description": "Midnight Purple dark theme"
+  },
+  "themeTeal": {
+    "message": "Dark Teal",
+    "description": "Dark Teal theme"
+  },
+  "themeOled": {
+    "message": "OLED Black",
+    "description": "OLED Black theme"
+  },
+  "themeSage": {
+    "message": "Sage",
+    "description": "Sage light theme"
+  },
+  "themeRose": {
+    "message": "Rose",
+    "description": "Rose light theme"
+  },
+  "themeAmber": {
+    "message": "Amber",
+    "description": "Amber light theme"
+  },
+  "themeSlate": {
+    "message": "Slate",
+    "description": "Slate light theme"
+  },
+  "themeViolet": {
+    "message": "Violet",
+    "description": "Violet light theme"
+  }
+}
