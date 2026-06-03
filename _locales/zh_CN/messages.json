@@ -15,10 +15,6 @@
     "message": "自动关闭标签页",
     "description": "Close tab automatically"
   },
-  "showPanel": {
-    "message": "显示面板",
-    "description": "Show panel"
-  },
   "openPopupOnDuplicateDetected": {
     "message": "检测到重复标签页时打开弹出面板",
     "description": "Open popup panel when a new duplicate tab is detected"
@@ -130,6 +126,22 @@
   "whiteList": {
     "message": "白名单 URL",
     "description": "Whitelisted URLs"
+  },
+  "pauseMonitoring": {
+    "message": "Pause monitoring",
+    "description": "Pause duplicate tab monitoring"
+  },
+  "resumeMonitoring": {
+    "message": "Resume monitoring",
+    "description": "Resume duplicate tab monitoring"
+  },
+  "monitoringPaused": {
+    "message": "Monitoring is paused",
+    "description": "Shown in the duplicate tabs list when monitoring is paused"
+  },
+  "whitelistedTab": {
+    "message": "Whitelisted - not auto-closed",
+    "description": "Tooltip shown on duplicate tabs that match the whitelist"
   },
   "customization": {
     "message": "定制",
