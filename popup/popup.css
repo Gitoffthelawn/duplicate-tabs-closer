@@ -262,8 +262,9 @@ body {
 .card-body {
     padding: 1px 0px;
     max-height: 400px;
-    overflow: auto;
+    overflow: scroll;
     scrollbar-width: thin;
+    margin-right: -8px;
 }
 
 #duplicateTabsCard .card-body {
