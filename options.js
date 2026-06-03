@@ -224,6 +224,18 @@ const isPanelOptionOpen = async () => {
     );
 };
 
+// Returns true only if the popup itself is already open, not the options page.
+// Used to avoid opening a second popup when duplicates are detected.
+// eslint-disable-next-line no-unused-vars
+const isPopupOpen = async () => {
+    const contexts = await chrome.runtime.getContexts({});
+    const popupUrl = chrome.runtime.getURL("popup/popup.html");
+    return contexts.some(ctx =>
+        ctx.contextType === "POPUP" ||
+        (ctx.contextType === "TAB" && ctx.documentUrl && ctx.documentUrl.startsWith(popupUrl))
+    );
+};
+
 const escapeRegexChar = (ch) => ch.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
 
 const whiteListToPattern = (whiteList) => {    const whiteListPatterns = new Set();

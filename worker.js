@@ -111,7 +111,7 @@ const getCloseInfo = (details) => {
             tabIndex: observedTab.index,
             tabId: openedTab.id,
             windowId: openedTab.windowId,
-            reloadTab: options.keepReloadOlderTab ? true : false
+            reloadTab: !!options.keepReloadOlderTab
         };
         return [observedTab.id, keepInfo];
     }
@@ -150,8 +150,12 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
         }
     }
     if (!match) {
-        if (tabsInfo.hasDuplicateTabs(observedWindowsId)) refreshDuplicateTabsInfo(observedWindowsId);
-        else if (environment.isChrome && observedTab.active) setBadge(observedTab.windowId, observedTab.id);
+        if (loadingUrl) {
+            if (tabsInfo.hasDuplicateTabs(observedWindowsId)) refreshDuplicateTabsInfo(observedWindowsId);
+            else if (environment.isChrome && observedTab.active) setBadge(observedTab.windowId, observedTab.id);
+        } else {
+            refreshDuplicateTabsInfo(observedWindowsId);
+        }
     }
 };
 
@@ -322,7 +326,7 @@ const setDuplicateTabPanel = async (duplicateTab, duplicateTabs) => {
         title: duplicateTab.title || duplicateTab.url,
         windowId: duplicateTab.windowId,
         containerColor: containerColor,
-        icon: duplicateTab.favIconUrl || "../images/default-favicon.png",
+        icon: (duplicateTab.favIconUrl && !isChromeURL(duplicateTab.favIconUrl)) ? duplicateTab.favIconUrl : "../images/default-favicon.png",
         whitelisted: isUrlWhiteListed(duplicateTab.url)
     });
 };
@@ -361,6 +365,28 @@ const _refreshDuplicateTabsInfo = async (windowId) => {
 };
 
 const refreshDuplicateTabsInfo = debounce(_refreshDuplicateTabsInfo, 300, false);
+
+// eslint-disable-next-line no-unused-vars
+let postStartupBurst = false;
+
+// eslint-disable-next-line no-unused-vars
+const debouncedBatchClose = debounce(closeDuplicateTabs, 300, false);
+
+// Dispatch the appropriate action after a tab completes or navigates.
+// alreadyComplete: onUpdatedTab already stamped this completion — skip search in autoClose mode
+//                 but still refresh in manual mode (reload detected via onCompletedTab).
+// queryComplete:  require matched tabs to be complete before matching (pre-navigation scan).
+// eslint-disable-next-line no-unused-vars
+const dispatchTabCompletion = (tab, activeTabId, { queryComplete = false, alreadyComplete = false } = {}) => {
+    if (options.autoCloseTab) {
+        if (!alreadyComplete) {
+            postStartupBurst ? debouncedBatchClose(tab.windowId) : searchForDuplicateTabsToClose(tab, queryComplete);
+        }
+        if (environment.isChrome) setBadge(tab.windowId, activeTabId || null);
+    } else {
+        refreshDuplicateTabsInfo(tab.windowId);
+    }
+};
 
 // eslint-disable-next-line no-unused-vars
 const refreshGlobalDuplicateTabsInfo = async () => {

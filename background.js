@@ -6,10 +6,12 @@ if (typeof importScripts === "function") {
 }
 
 let initPromise = null;
-let postStartupBurst = false;
 let monitoringPaused = false;
-const debouncedBatchClose = debounce(closeDuplicateTabs, 300, false);
 const generateTabSessionId = () => `dtc-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+
+// Firefox fires onBeforeNavigate twice per navigation (once on URL resolve, once on request start).
+// Track last dispatched URL+timestamp per tab to skip the redundant second call.
+const _lastNavigate = new Map(); // tabId -> { url, ts }
 
 // eslint-disable-next-line no-unused-vars
 const ensureInitialized = () => {
@@ -80,9 +82,9 @@ const onCreatedTab = async (tab) => {
 	tabsInfo.setTab(tab.id, {});
 	if (tab.status === "complete") {
 		tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
-		if (options.autoCloseTab && tab.url !== "about:blank") {
-			postStartupBurst ? debouncedBatchClose(tab.windowId) : searchForDuplicateTabsToClose(tab, true);
-		} else {
+		if (tab.url !== "about:blank") {
+			dispatchTabCompletion(tab, null, { queryComplete: true });
+		} else if (!options.autoCloseTab) {
 			refreshDuplicateTabsInfo(tab.windowId);
 		}
 	}
@@ -91,7 +93,13 @@ const onCreatedTab = async (tab) => {
 const onBeforeNavigate = async (details) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
-	if (options.autoCloseTab && !postStartupBurst && (details.frameId == 0) && (details.tabId !== -1) && !isBlankURL(details.url)) {
+	if (details.frameId != 0 || details.tabId === -1) return;
+	// Firefox fires onBeforeNavigate twice for the same URL (~10-30ms apart). Skip the duplicate.
+	const prev = _lastNavigate.get(details.tabId);
+	if (prev && prev.url === details.url && (Date.now() - prev.ts) < 1000) return;
+	_lastNavigate.set(details.tabId, { url: details.url, ts: Date.now() });
+	if (options.autoCloseTab && !postStartupBurst && !isBlankURL(details.url)) {
+		if (!tabsInfo.hasTab(details.tabId)) return;
 		if (tabsInfo.isClosingTab(details.tabId)) return;
 		const tab = await getTab(details.tabId);
 		if (tab) {
@@ -108,13 +116,9 @@ const onCompletedTab = async (details) => {
 		if (tabsInfo.isClosingTab(details.tabId)) return;
 		const tab = await getTab(details.tabId);
 		if (tab) {
-			tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
-			if (options.autoCloseTab) {
-				postStartupBurst ? debouncedBatchClose(tab.windowId) : searchForDuplicateTabsToClose(tab);
-			} else {
-				refreshDuplicateTabsInfo(tab.windowId);
-			}
-			if (environment.isChrome) setBadge(tab.windowId, tab.id);
+			const alreadyComplete = tabsInfo.getLastComplete(tab.id) !== null && !tabsInfo.hasUrlChanged(tab);
+			if (!alreadyComplete) tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
+			dispatchTabCompletion(tab, tab.id, { alreadyComplete });
 		}
 	}
 };
@@ -127,21 +131,16 @@ const onUpdatedTab = async (tabId, changeInfo, tab) => {
 		if (Object.prototype.hasOwnProperty.call(changeInfo, "url") && (changeInfo.url !== tab.url)) {
 			if (isBlankURL(tab.url) || !tab.favIconUrl || !tabsInfo.hasUrlChanged(tab)) return;
 			tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
-			if (options.autoCloseTab) {
-				postStartupBurst ? debouncedBatchClose(tab.windowId) : searchForDuplicateTabsToClose(tab);
-			} else {
-				refreshDuplicateTabsInfo(tab.windowId);
-			}
-			if (environment.isChrome) setBadge(tab.windowId, tab.id);
+			dispatchTabCompletion(tab, tab.id);
 		}
 		else if (isChromeURL(tab.url) || isBlankURL(tab.url)) {
 			tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
-			if (options.autoCloseTab && isChromeURL(tab.url)) {
-				postStartupBurst ? debouncedBatchClose(tab.windowId) : searchForDuplicateTabsToClose(tab);
+			if (isChromeURL(tab.url)) {
+				dispatchTabCompletion(tab, tab.id);
 			} else {
 				refreshDuplicateTabsInfo(tab.windowId);
+				if (environment.isChrome) setBadge(tab.windowId, tab.id);
 			}
-			if (environment.isChrome) setBadge(tab.windowId, tab.id);
 		}
 	}
 };
@@ -150,14 +149,13 @@ const onAttached = async (tabId) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
 	const tab = await getTab(tabId);
-	if (tab) {
-		options.autoCloseTab ? searchForDuplicateTabsToClose(tab) : refreshDuplicateTabsInfo(tab.windowId);
-	}
+	if (tab) dispatchTabCompletion(tab, null);
 };
 
 const onRemovedTab = async (removedTabId, removeInfo) => {
 	await ensureInitialized();
 	tabsInfo.removeTab(removedTabId);
+	_lastNavigate.delete(removedTabId);
 	if (monitoringPaused) return;
 	if (removeInfo.isWindowClosing) {
 		if (options.searchInAllWindows && tabsInfo.hasDuplicateTabs(removeInfo.windowId)) refreshDuplicateTabsInfo();

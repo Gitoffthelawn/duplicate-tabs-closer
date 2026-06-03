@@ -188,7 +188,7 @@ const setTabBadgeText = (tabId, text) => new Promise((resolve) => {
         return;
     }
     chrome.action.setBadgeText({ tabId: tabId, text: text }, () => {
-        if (chrome.runtime.lastError) console.error("setTabBadgeText error:", chrome.runtime.lastError.message);
+        if (chrome.runtime.lastError && !chrome.runtime.lastError.message.includes("No tab with id")) console.error("setTabBadgeText error:", chrome.runtime.lastError.message);
         resolve();
     });
 });
@@ -199,7 +199,7 @@ const setWindowBadgeText = (windowId, text) => browser.action.setBadgeText({ win
 // eslint-disable-next-line no-unused-vars
 const setTabBadgeBackgroundColor = (tabId, color) => new Promise((resolve) => {
     chrome.action.setBadgeBackgroundColor({ tabId: tabId, color: color }, () => {
-        if (chrome.runtime.lastError) console.error("setTabBadgeBackgroundColor error:", chrome.runtime.lastError.message);
+        if (chrome.runtime.lastError && !chrome.runtime.lastError.message.includes("No tab with id")) console.error("setTabBadgeBackgroundColor error:", chrome.runtime.lastError.message);
         resolve();
     });
 });

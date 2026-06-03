@@ -40,7 +40,7 @@ class TabsInfo {
 
     isClosingTab(tabId) {
         const storedTab = this.storedTabs.get(tabId);
-        return (!storedTab || storedTab.closing) ? true : false;
+        return !storedTab || storedTab.closing;
     }
 
     getLastComplete(tabId) {

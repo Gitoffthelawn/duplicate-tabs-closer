@@ -41,7 +41,7 @@ const updateBadgeValue = async (nbDuplicateTabs, windowId) => {
 	const prevCount = tabsInfo.hasNbDuplicateTabs(windowId) ? parseInt(tabsInfo.getNbDuplicateTabs(windowId)) : 0;
 	tabsInfo.setNbDuplicateTabs(windowId, nbDuplicateTabs);
 	setBadge(windowId);
-	if (options.openPopupOnDuplicateDetected && nbDuplicateTabs > prevCount && !(await isPanelOptionOpen())) {
+	if (options.openPopupOnDuplicateDetected && nbDuplicateTabs > prevCount && !(await isPopupOpen())) {
 		chrome.storage.session.set({ autoOpenedPopup: true }).then(() => {
 			chrome.action.openPopup().catch(() => {});
 		});
