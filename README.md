@@ -170,7 +170,8 @@ Available in the **Options page** only.
 * **Shrunk mode** — toggle the compress icon in the popup to hide all unpinned sections, keeping the panel compact. Sections can be pinned with the pin icon (📌) in the popup panel so they stay visible when shrunk mode is active.
 
 * **Pause monitoring** — click the pause icon in the popup or options page header to temporarily stop duplicate tab detection. While paused:
-  * The extension icon badge shows "‖" on a grey background
+  * The extension icon badge shows "⏸" on a grey background
+  * The pause button turns amber so the paused state is always visible
   * The mode is automatically set to "Do nothing"
   * The "On duplicate tab detected" setting is disabled
   * No new duplicate tabs are detected or closed
