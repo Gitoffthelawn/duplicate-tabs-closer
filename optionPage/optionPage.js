@@ -216,6 +216,7 @@ const setDuplicateTabsTable = (duplicateTabs) => {
     tbody.appendChild(buildDuplicateTabRows(duplicateTabs, activeWindowId));
     closeBtn.classList.toggle("disabled", false);
     closeBtn.setAttribute("aria-disabled", "false");
+    closeBtn.removeAttribute("disabled");
   }
   else {
     chrome.storage.session.get('monitoringPaused').then(data => {
@@ -234,6 +235,7 @@ const setDuplicateTabsTable = (duplicateTabs) => {
     });
     closeBtn.classList.toggle("disabled", true);
     closeBtn.setAttribute("aria-disabled", "true");
+    closeBtn.setAttribute("disabled", "");
   }
   if (duplicateTabs) resizeDuplicateTabsPanel(isUpdate);
 };

@@ -6,11 +6,11 @@ const handleMessage = (message, sender, response) => {
         case "setStoredOption": {
             if (!message.data || !(message.data.name in defaultOptions)) return response({});
             setStoredOption(message.data.name, message.data.value, message.data.refresh)
-                .then(() => response({}));
+                .then(() => response({})).catch(() => response({}));
             return true;
         }
         case "getStoredOptions": {
-            getStoredOptions().then(storedOptions => response({ data: storedOptions }));
+            getStoredOptions().then(storedOptions => response({ data: storedOptions })).catch(() => response({}));
             return true;
         }
         case "getDuplicateTabs": {
@@ -41,7 +41,7 @@ const handleMessage = (message, sender, response) => {
             break;
         }
         case "toggleMonitorPause": {
-            toggleMonitorPause().then(() => response({ paused: monitoringPaused }));
+            toggleMonitorPause().then(() => response({ paused: monitoringPaused })).catch(() => response({}));
             return true;
         }
         case "getMonitorPauseState": {

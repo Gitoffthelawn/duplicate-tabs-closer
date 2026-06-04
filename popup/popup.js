@@ -79,6 +79,7 @@ const setDuplicateTabsTable = (duplicateTabs) => {
         tbody.appendChild(buildDuplicateTabRows(duplicateTabs, activeWindowId));
         closeBtn.classList.remove("disabled");
         closeBtn.setAttribute("aria-disabled", "false");
+        closeBtn.removeAttribute("disabled");
     }
     else {
         chrome.storage.session.get('monitoringPaused').then(data => {
@@ -97,6 +98,7 @@ const setDuplicateTabsTable = (duplicateTabs) => {
         });
         closeBtn.classList.add("disabled");
         closeBtn.setAttribute("aria-disabled", "true");
+        closeBtn.setAttribute("disabled", "");
     }
     if (duplicateTabs) resizeDuplicateTabsPanel(isUpdate);
 };
@@ -409,27 +411,10 @@ const localizePopup = () => {
     });
 };
 
-const startObserver = () => {
-    const firefoxOverflowClass = "list-group-item-overflow-firefox";
-    const chromeOverflowClass = "list-group-item-overflow-chrome";
-    const overflowClass = environment == "firefox" ? firefoxOverflowClass : chromeOverflowClass;
-    const observer = new ResizeObserver(entries => {
-        for (const entry of entries) {
-            const optionsBody = document.getElementById("optionsBody");
-            const overflow = entry.contentRect.bottom + 1 >= parseFloat(getComputedStyle(optionsBody).maxHeight);
-            optionsBody.classList.toggle(overflowClass, overflow);
-        }
-    });
-    const optionsBody = document.querySelector("#optionsBody");
-    if (optionsBody) observer.observe(optionsBody);
-};
-
-
 const initialize = async () => {
     await Promise.all([setPanelOptions(), saveActiveWindowId()]);
     requestGetDuplicateTabs();
     localizePopup();
-    startObserver();
     loadListenerEvents();
 };
 
