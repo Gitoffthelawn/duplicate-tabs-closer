@@ -167,6 +167,18 @@
     "message": "Закрити спливаюче вікно після закриття дублікатів вкладок",
     "description": "Close popup panel after closing duplicate tabs"
   },
+  "popupTwoColumns": {
+    "message": "Popup layout",
+    "description": "Label for popup layout selector"
+  },
+  "popupOneColumn": {
+    "message": "Single column",
+    "description": "Single column popup layout option"
+  },
+  "popupTwoColumnsOption": {
+    "message": "Two columns",
+    "description": "Two column popup layout option"
+  },
   "moreOptions": {
     "message":  "Більше налаштувань...",
     "description":  "More options..."

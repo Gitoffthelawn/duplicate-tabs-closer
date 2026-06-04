@@ -675,6 +675,10 @@ label>input:disabled~* {
   margin-top: 0px;
 }
 
+#customizationBody label[for="openPopupOnDuplicateDetected"] {
+  margin-top: 4px;
+}
+
 #theme {
   margin-bottom: 5px;
 }

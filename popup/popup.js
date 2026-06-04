@@ -30,6 +30,19 @@ const toggleShrunkMode = (checked) => {
     getElements(".list-group-form").forEach(el => el.classList.toggle("shrunk", checked));
 };
 
+const applyTwoColumnsMode = (enabled) => {
+    document.body.classList.toggle("two-columns", enabled);
+    const pauseBtn = document.getElementById("pauseMonitorBtn");
+    if (enabled) {
+        const dtcHeader = document.querySelector("#duplicateTabsCard .card-header");
+        if (pauseBtn && dtcHeader) dtcHeader.appendChild(pauseBtn);
+    } else {
+        const optionHeaderFlex = document.querySelector("#optionHeader .d-flex");
+        if (pauseBtn && optionHeaderFlex) optionHeaderFlex.insertBefore(pauseBtn, optionHeaderFlex.firstChild);
+    }
+    resizeDuplicateTabsPanel(false);
+};
+
 const toggleExpendOptions = (resize) => {
     document.getElementById("optionHeader").classList.toggle("collapsed");
     if (resize) resizeDuplicateTabsPanel();
@@ -152,6 +165,7 @@ const setPanelOptions = async () => {
                 if (opt) opt.selected = true;
                 if (storedOption === "onDuplicateTabDetected") changeAutoCloseOptionState(value, false);
                 else if (storedOption === "theme") applyTheme(value);
+                else if (storedOption === "popupTwoColumns") applyTwoColumnsMode(value === "2");
             }
             if (isLockedKey && el) el.disabled = true;
         }
@@ -166,6 +180,8 @@ const setPanelOptions = async () => {
         resizeDuplicateTabsPanel();
     }
     applyPausedState(sessionData.monitoringPaused || false);
+    if (document.body.classList.contains("two-columns"))
+        document.getElementById("optionHeader").classList.remove("collapsed");
 };
 
 const applyPausedState = (paused) => {
@@ -289,6 +305,7 @@ const loadListenerEvents = () => {
         const refresh = this.id === "scope";
         saveOption(this.id, this.value, refresh);
         if (this.id === "onDuplicateTabDetected") changeAutoCloseOptionState(this.value, true);
+        else if (this.id === "popupTwoColumns") applyTwoColumnsMode(this.value === "2");
     }));
 
     /* Save title similarity threshold */

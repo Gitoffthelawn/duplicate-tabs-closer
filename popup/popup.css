@@ -262,13 +262,14 @@ body {
 .card-body {
     padding: 1px 0px;
     max-height: 400px;
-    overflow: scroll;
+    overflow: auto;
     scrollbar-width: thin;
     margin-right: -8px;
 }
 
 #duplicateTabsCard .card-body {
     overflow: hidden;
+    margin-right: 0;
 }
 
 .form-group {
@@ -284,15 +285,6 @@ body {
 
 .shrunk:not(.pinned) {
     display: none;
-}
-
-#optionsBody.list-group-item-overflow-chrome .list-group-item {
-    padding-right: 9px;
-}
-
-
-#optionsBody.list-group-item-overflow-firefox .list-group-item {
-    padding-right: 7px;
 }
 
 .list-group-item-header {
@@ -421,7 +413,11 @@ body {
 .table-scrollable-overflow {
     overflow: auto;
     scrollbar-width: thin;
-    margin-right: 2px;
+    margin-right: 0;
+}
+
+.table-scrollable-overflow .table {
+    padding-right: 10px;
 }
 
 #duplicateTabsTableContainer {
@@ -483,7 +479,7 @@ body {
 
 .td-close-button {
     width: 5px;
-    padding: 1px 5px 1px 1px !important;
+    padding: 1px 7px 1px 1px !important;
     cursor: pointer;
 }
 
@@ -672,4 +668,62 @@ label>input:disabled~* {
 .highlight-scroll-bottom {
     box-shadow: inset 0px -5px 5px -5px #3BB4EC;
     transition: box-shadow 0s;
+}
+
+/* ── Two-column popup layout ── */
+body.two-columns {
+    width: 650px;
+}
+
+body.two-columns .panel-group {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: stretch;
+}
+
+body.two-columns #optionsCard,
+body.two-columns #duplicateTabsCard {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+body.two-columns #shrunkMode,
+body.two-columns .checkbox-fa-compress-label {
+    display: none;
+}
+
+body.two-columns #optionsTitle {
+    cursor: default;
+    pointer-events: none;
+}
+
+body.two-columns #optionsCard .card-body {
+    margin-right: 0;
+}
+
+body.two-columns #duplicateTabsCard .card-body {
+    flex: 1;
+    min-height: 0;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+}
+
+body.two-columns #duplicateTabsTableContainer {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+body.two-columns #scopeGroup.collapsed .list-group-item:last-child {
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--bs-list-group-border-color);
+}
+
+body.two-columns #duplicateTabsCard .card-header #pauseMonitorBtn {
+    margin-right: 0;
 }

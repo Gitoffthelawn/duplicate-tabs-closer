@@ -165,7 +165,19 @@
   },
   "closePopup": {
     "message": "Fermer le panneau de popup après la fermeture des onglets en doublon",
-    "description": "Fermer le panneau de popup après la fermeture des onglets en doublon"    
+    "description": "Fermer le panneau de popup après la fermeture des onglets en doublon"
+  },
+  "popupTwoColumns": {
+    "message": "Popup layout",
+    "description": "Label for popup layout selector"
+  },
+  "popupOneColumn": {
+    "message": "Single column",
+    "description": "Single column popup layout option"
+  },
+  "popupTwoColumnsOption": {
+    "message": "Two columns",
+    "description": "Two column popup layout option"
   },
   "moreOptions": {
     "message":  "Plus d'options...",

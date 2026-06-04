@@ -167,6 +167,18 @@
     "message": "Fechar o painel pop-up após fechar as abas duplicadas",
     "description": "Close popup panel after closing duplicate tabs"
   },
+  "popupTwoColumns": {
+    "message": "Popup layout",
+    "description": "Label for popup layout selector"
+  },
+  "popupOneColumn": {
+    "message": "Single column",
+    "description": "Single column popup layout option"
+  },
+  "popupTwoColumnsOption": {
+    "message": "Two columns",
+    "description": "Two column popup layout option"
+  },
   "moreOptions": {
     "message": "Mais opções...",
     "description": "More options..."

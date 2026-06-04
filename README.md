@@ -151,6 +151,7 @@ Available in the **Options page** only.
 | Option | Default | Description |
 | --- | --- | --- |
 | **Theme** | Sky *(default)* | Visual theme for the extension panel. See [Themes](#themes) below. |
+| **Popup layout** | Two columns | Layout of the popup panel. *Single column* shows options above the duplicate tabs list. *Two columns* shows them side by side. |
 | **Duplicate tabs badge color** | `#f22121` (red) | Color of the extension icon badge when duplicate tabs are detected. |
 | **No duplicate tabs badge color** | `#1e90ff` (blue) | Color of the badge when no duplicates exist. Only relevant when *Show badge if no duplicate tabs* is enabled. |
 | **Show badge if no duplicate tabs** | on | Always displays the badge. When off, the badge is hidden entirely when there are no duplicates. |

@@ -106,6 +106,9 @@ const defaultOptions = {
     closePopup: {
         value: false
     },
+    popupTwoColumns: {
+        value: "2"
+    },
     environment: {
         value: "firefox"
     },
