@@ -394,6 +394,7 @@ const dispatchTabCompletion = (tab, activeTabId, { queryComplete = false, alread
         if (environment.isChrome) setBadge(tab.windowId, activeTabId || null);
     } else {
         refreshDuplicateTabsInfo(tab.windowId);
+        if (environment.isChrome) setBadge(tab.windowId, activeTabId || null);
     }
 };
 
