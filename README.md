@@ -23,8 +23,8 @@ Duplicate Tabs Closer detects and closes duplicate tabs automatically or display
 
 The extension offers two configuration interfaces:
 
-* **Popup panel** — click the extension icon in the toolbar. Provides quick access to a configurable subset of options and the list of current duplicate tabs.
-* **Options page** — click the gear icon (⚙) at the top-right of the popup, or open your browser's Extensions settings and choose *Options* for Duplicate Tabs Closer. Provides access to all settings.
+* **Popup panel:** click the extension icon in the toolbar. Provides quick access to a configurable subset of options and the list of current duplicate tabs.
+* **Options page:** click the gear icon (⚙) at the top-right of the popup, or open your browser's Extensions settings and choose *Options* for Duplicate Tabs Closer. Provides access to all settings.
 
 In the Options page, each option in the **Matching rules** section has an eye icon (👁) that controls whether that option is visible in the popup panel.
 
@@ -36,7 +36,7 @@ Controls what the extension does when a duplicate tab is opened.
 
 | Value | Description |
 | --- | --- |
-| **Do nothing** *(default)* | Monitors tabs and updates the badge counter — no automatic action is taken. |
+| **Do nothing** *(default)* | Monitors tabs and updates the badge counter. No automatic action is taken. |
 | **Close tab automatically** | Immediately closes the duplicate tab when it is detected. |
 
 #### On Remaining Tab
@@ -83,13 +83,13 @@ Determines which of two duplicate tabs is kept when one must be closed. Rules ar
 
 | Option | Default | Description |
 | --- | --- | --- |
-| **Keep older tab** | ✓ | Keeps the tab that was opened first. |
-| **Keep newer tab** | — | Keeps the most recently opened tab. |
-| **Keep and reload older tab** | — | Keeps the older tab but reloads it with the newer tab's URL. Useful when the newer URL contains updated content such as a redirect destination. |
-| **Keep tab with HTTPS** | ✓ on | When one tab uses HTTP and the other HTTPS for the same URL, the HTTPS tab is kept. Also normalises `http://` to `https://` during URL comparison so the two are treated as duplicates. |
-| **Keep pinned tab** | ✓ on | A pinned tab is always kept; the unpinned duplicate is closed instead. |
+| **Keep older tab** | on | Keeps the tab that was opened first. |
+| **Keep newer tab** | off | Keeps the most recently opened tab. |
+| **Keep and reload older tab** | off | Keeps the older tab but reloads it with the newer tab's URL. Useful when the newer URL contains updated content such as a redirect destination. |
+| **Keep tab with HTTPS** | on | When one tab uses HTTP and the other HTTPS for the same URL, the HTTPS tab is kept. Also normalises `http://` to `https://` during URL comparison so the two are treated as duplicates. |
+| **Keep pinned tab** | on | A pinned tab is always kept; the unpinned duplicate is closed instead. |
 
-> The first three options (Keep older tab / Keep newer tab / Keep and reload older tab) are mutually exclusive — only one is active at a time.
+> The first three options (Keep older tab / Keep newer tab / Keep and reload older tab) are mutually exclusive. Only one is active at a time.
 
 ### Matching Rules
 
@@ -100,14 +100,14 @@ Controls how two tabs are compared to determine whether they are duplicates.
 | **Ignore case in URL** | off | Treats uppercase and lowercase as equal (`Example.com` = `example.com`). |
 | **Ignore 'www' in URL domain name** | off | Treats `www.example.com` and `example.com` as identical. |
 | **Ignore hash part in URL** | off | Ignores everything after `#` (`page.html#intro` = `page.html#setup`). Has no effect when *Ignore path part* is enabled. |
-| **Ignore search part in URL** | off | Ignores the query string — everything after `?`. Has no effect when *Ignore path part* is enabled. |
+| **Ignore search part in URL** | off | Ignores the query string (everything after `?`). Has no effect when *Ignore path part* is enabled. |
 | **Ignore path part in URL** | off | Compares only the origin (scheme + domain), ignoring path, query string, and hash. When this is enabled, *Ignore hash part* and *Ignore search part* are redundant. |
 | **Compare with title** | off | Two tabs are also considered duplicates when their page titles match (see *% title similarity* below). Useful for pages that display the same title across different URLs. |
 | **% title similarity** | 100 | Minimum similarity percentage (1–100) for two titles to be considered a match. `100` requires an exact match (case-insensitive). Only active when *Compare with title* is enabled. |
 
 #### URL Pattern Rules
 
-A list of URL patterns, one per line. Any two open tabs whose URLs both match the same pattern are treated as duplicates — even if their full URLs differ.
+A list of URL patterns, one per line. Any two open tabs whose URLs both match the same pattern are treated as duplicates, even if their full URLs differ.
 
 Useful for grouping all tabs from a single service as duplicates of each other regardless of the specific path.
 
@@ -129,7 +129,7 @@ Works identically to URL Pattern Rules but is applied to the page title instead 
 GitHub - *
 ```
 
-> **Pattern syntax note:** The Whitelist, URL Pattern Rules, and Title Pattern Rules all use the same simple wildcard syntax. The only special character is `*`, which matches any sequence of characters (including none). This is **not** full regular expression syntax — characters such as `.`, `+`, `?`, `(`, `)` etc. are matched literally, not as regex metacharacters.
+> **Pattern syntax note:** The Whitelist, URL Pattern Rules, and Title Pattern Rules all use the same simple wildcard syntax. The only special character is `*`, which matches any sequence of characters (including none). This is **not** full regular expression syntax. Characters such as `.`, `+`, `?`, `(`, `)` etc. are matched literally, not as regex metacharacters.
 
 ### Scope
 
@@ -137,10 +137,10 @@ Defines which tabs are included when searching for duplicates.
 
 | Value | Default | Browser | Description |
 | --- | --- | --- | --- |
-| **Active window** | ✓ | All | Searches for duplicates only within the currently focused browser window. |
-| **All windows** | — | All | Searches for duplicates across all open browser windows. |
-| **Container in active window** | — | **Firefox only** | Duplicates are detected only among tabs that share the same [container](https://support.mozilla.org/en-US/kb/containers) within the active window. Tabs in different containers are never treated as duplicates of each other. |
-| **Container in all windows** | — | **Firefox only** | Same as above but searches across all open windows. |
+| **Active window** | on | All | Searches for duplicates only within the currently focused browser window. |
+| **All windows** | off | All | Searches for duplicates across all open browser windows. |
+| **Container in active window** | off | **Firefox only** | Duplicates are detected only among tabs that share the same [container](https://support.mozilla.org/en-US/kb/containers) within the active window. Tabs in different containers are never treated as duplicates of each other. |
+| **Container in all windows** | off | **Firefox only** | Same as above but searches across all open windows. |
 
 > The **Container** options require Firefox with the [Multi-Account Containers](https://support.mozilla.org/en-US/kb/containers) feature enabled.
 
@@ -168,11 +168,11 @@ Available in the **Options page** only.
 
 ### Popup Panel
 
-* **Grouped view** — click the group icon in the duplicate tabs footer to switch between flat and grouped views. In grouped view, duplicate tabs are organised by matching rule group, collapsed by default. Each group shows a count badge and a close button to close all tabs in the group at once. The view preference is saved and shared with the options page.
+* **Grouped view:** click the group icon in the duplicate tabs footer to switch between flat and grouped views. In grouped view, duplicate tabs are organised by matching rule group, collapsed by default. Each group shows a count badge and a close button to close all tabs in the group at once. The view preference is saved and shared with the options page.
 
-* **Shrunk mode** — toggle the compress icon in the popup to hide all unpinned sections, keeping the panel compact. Sections can be pinned with the pin icon (📌) in the popup panel so they stay visible when shrunk mode is active.
+* **Shrunk mode:** toggle the compress icon in the popup to hide all unpinned sections, keeping the panel compact. Sections can be pinned with the pin icon (📌) in the popup panel so they stay visible when shrunk mode is active.
 
-* **Pause monitoring** — click the pause icon in the popup or options page header to temporarily stop duplicate tab detection. While paused:
+* **Pause monitoring:** click the pause icon in the popup or options page header to temporarily stop duplicate tab detection. While paused:
   * The extension icon badge shows "⏸" on a grey background
   * The pause button turns amber so the paused state is always visible
   * The mode is automatically set to "Do nothing"
@@ -180,7 +180,7 @@ Available in the **Options page** only.
   * No new duplicate tabs are detected or closed
   * Click the play icon or use the keyboard shortcut to resume
 
-* **Popup visibility (eye icon)** — in the Options page, each option in the **Matching Rules** section has an eye icon (👁). Enabling it makes the option visible in the popup panel; disabling it hides it.
+* **Popup visibility (eye icon):** in the Options page, each option in the **Matching Rules** section has an eye icon (👁). Enabling it makes the option visible in the popup panel; disabling it hides it.
 
 | Matching Rules option | Visible in popup by default |
 | --- | --- |
