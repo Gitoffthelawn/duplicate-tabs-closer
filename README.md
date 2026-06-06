@@ -168,6 +168,8 @@ Available in the **Options page** only.
 
 ### Popup Panel
 
+* **Grouped view** — click the group icon in the duplicate tabs footer to switch between flat and grouped views. In grouped view, duplicate tabs are organised by matching rule group, collapsed by default. Each group shows a count badge and a close button to close all tabs in the group at once. The view preference is saved and shared with the options page.
+
 * **Shrunk mode** — toggle the compress icon in the popup to hide all unpinned sections, keeping the panel compact. Sections can be pinned with the pin icon (📌) in the popup panel so they stay visible when shrunk mode is active.
 
 * **Pause monitoring** — click the pause icon in the popup or options page header to temporarily stop duplicate tab detection. While paused:

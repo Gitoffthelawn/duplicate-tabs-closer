@@ -109,6 +109,9 @@ const defaultOptions = {
     popupTwoColumns: {
         value: "2"
     },
+    popupGroupedView: {
+        value: false
+    },
     environment: {
         value: "firefox"
     },
