@@ -84,8 +84,6 @@ const onCreatedTab = async (tab) => {
 		tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
 		if (tab.url !== "about:blank") {
 			dispatchTabCompletion(tab, null, { queryComplete: true });
-		} else if (!options.autoCloseTab) {
-			refreshDuplicateTabsInfo(tab.windowId);
 		}
 	}
 };
@@ -135,12 +133,7 @@ const onUpdatedTab = async (tabId, changeInfo, tab) => {
 		}
 		else if (isChromeURL(tab.url) || isBlankURL(tab.url)) {
 			tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
-			if (isChromeURL(tab.url)) {
-				dispatchTabCompletion(tab, tab.id);
-			} else {
-				refreshDuplicateTabsInfo(tab.windowId);
-				if (environment.isChrome) setBadge(tab.windowId, tab.id);
-			}
+			dispatchTabCompletion(tab, tab.id);
 		}
 	}
 };
