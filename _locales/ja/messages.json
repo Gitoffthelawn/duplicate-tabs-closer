@@ -123,6 +123,24 @@
     "message": "重複したタブをすべて閉じる",
     "description": "Close all"
   },
+  "groupDuplicateTabs": {
+    "message": "Group by URL",
+    "description": "Toggle grouped view of duplicate tabs in the popup"
+  },
+  "closeGroup": {
+    "message": "Close group",
+    "description": "Close all duplicate tabs in a group"
+  },
+  "tabsCount": {
+    "message": "$COUNT$ tabs",
+    "description": "Badge showing how many tabs are in a group",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
   "whiteList": {
     "message": "ホワイトリスト",
     "description": "Whitelisted URLs"

@@ -312,7 +312,7 @@ const searchForDuplicateTabs = async (windowId, closeTabs) => {
 // eslint-disable-next-line no-unused-vars
 const closeDuplicateTabs = (windowId) => searchForDuplicateTabs(windowId, true);
 
-const setDuplicateTabPanel = async (duplicateTab, duplicateTabs) => {
+const setDuplicateTabPanel = async (duplicateTab, duplicateTabs, groupIndex) => {
     let containerColor = "";
     if (environment.isFirefox && (!duplicateTab.incognito && duplicateTab.cookieStoreId !== "firefox-default")) {
         try {
@@ -327,16 +327,19 @@ const setDuplicateTabPanel = async (duplicateTab, duplicateTabs) => {
         windowId: duplicateTab.windowId,
         containerColor: containerColor,
         icon: (duplicateTab.favIconUrl && !isChromeURL(duplicateTab.favIconUrl)) ? duplicateTab.favIconUrl : "../images/default-favicon.png",
-        whitelisted: isUrlWhiteListed(duplicateTab.url)
+        whitelisted: isUrlWhiteListed(duplicateTab.url),
+        groupIndex: groupIndex
     });
 };
 
 const getDuplicateTabsForPanel = async (duplicateTabsGroups) => {
     if (duplicateTabsGroups.size === 0) return null;
     const duplicateTabsPanel = new Set();
+    let groupIndex = 0;
     for (const tabsGroup of duplicateTabsGroups) {
         const duplicateTabs = tabsGroup[1];
-        await Promise.all(Array.from(duplicateTabs, duplicateTab => setDuplicateTabPanel(duplicateTab, duplicateTabsPanel)));
+        await Promise.all(Array.from(duplicateTabs, duplicateTab => setDuplicateTabPanel(duplicateTab, duplicateTabsPanel, groupIndex)));
+        groupIndex++;
     }
     return Array.from(duplicateTabsPanel);
 };

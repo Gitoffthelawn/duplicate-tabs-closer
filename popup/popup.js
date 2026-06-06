@@ -5,25 +5,13 @@ let lastDuplicateTabs = {};
 let panelInitialized = false;
 let closePopup = false;
 let environment = "";
-
-const applyTheme = (value) => {
-    const darkThemes = ["ocean", "charcoal", "purple", "teal", "oled"];
-    const lightThemes = ["sage", "rose", "amber", "slate", "violet"];
-    const isDark = darkThemes.includes(value);
-    document.documentElement.setAttribute("data-bs-theme", isDark ? "dark" : "light");
-    document.documentElement.classList.remove(...[...darkThemes, ...lightThemes].map(t => `theme-${t}`));
-    if (value !== "light") document.documentElement.classList.add(`theme-${value}`);
-};
+let groupedView = false;
+let lastNbRows = 0;
 
 /* Show/Hide the AutoClose option */
 const changeAutoCloseOptionState = (state, resize) => {
     document.getElementById("onRemainingTabGroup").classList.toggle("hidden", state !== "A");
     if (resize) resizeDuplicateTabsPanel();
-};
-
-const updateIgnorePathPartDependents = (checked) => {
-    document.getElementById("ignoreSearchPart").disabled = checked;
-    document.getElementById("ignoreHashPart").disabled = checked;
 };
 
 const toggleShrunkMode = (checked) => {
@@ -75,11 +63,17 @@ const setDuplicateTabsTable = (duplicateTabs) => {
     const tbody = document.getElementById("duplicateTabsTableBody");
     tbody.replaceChildren();
     const closeBtn = document.getElementById("closeDuplicateTabsBtn");
+    const groupBtn = document.getElementById("groupDuplicateTabsBtn");
     if (duplicateTabs) {
-        tbody.appendChild(buildDuplicateTabRows(duplicateTabs, activeWindowId));
+        tbody.appendChild(groupedView
+            ? buildGroupedDuplicateTabRows(duplicateTabs, activeWindowId)
+            : buildDuplicateTabRows(duplicateTabs, activeWindowId));
         closeBtn.classList.remove("disabled");
         closeBtn.setAttribute("aria-disabled", "false");
         closeBtn.removeAttribute("disabled");
+        groupBtn.classList.remove("disabled");
+        groupBtn.setAttribute("aria-disabled", "false");
+        groupBtn.removeAttribute("disabled");
     }
     else {
         chrome.storage.session.get('monitoringPaused').then(data => {
@@ -99,6 +93,9 @@ const setDuplicateTabsTable = (duplicateTabs) => {
         closeBtn.classList.add("disabled");
         closeBtn.setAttribute("aria-disabled", "true");
         closeBtn.setAttribute("disabled", "");
+        groupBtn.classList.add("disabled");
+        groupBtn.setAttribute("aria-disabled", "true");
+        groupBtn.setAttribute("disabled", "");
     }
     if (duplicateTabs) resizeDuplicateTabsPanel(isUpdate);
 };
@@ -107,24 +104,22 @@ const resizeDuplicateTabsPanel = (refresh) => {
     const maxOptionsCardHeight = 432;
     const rowHeight = 26;
     const minRow = 2;
-    const nbRows = lastDuplicateTabs ? lastDuplicateTabs.length : 1;
+    const tbody = document.getElementById("duplicateTabsTableBody");
+    const nbRows = lastDuplicateTabs
+        ? (tbody ? tbody.querySelectorAll("tr:not(.group-collapsed)").length : lastDuplicateTabs.length)
+        : 1;
     const maxRows = Math.min(nbRows, Math.floor((maxOptionsCardHeight - document.getElementById("optionsCard").offsetHeight + (minRow * rowHeight)) / rowHeight));
     const container = document.getElementById("duplicateTabsTableContainer");
     container.classList.toggle("table-scrollable-overflow", nbRows > maxRows);
-    if (refresh && (nbRows > maxRows)) highlightBottomScrollShadow();
+    if (nbRows <= maxRows) {
+        clearTimeout(highlightBottomScrollShadowTimer);
+        container.classList.remove("highlight-scroll-bottom");
+    }
+    if (refresh && nbRows > maxRows && nbRows > lastNbRows) highlightBottomScrollShadow();
+    lastNbRows = nbRows;
     if (maxRows > 0) container.style.height = `${maxRows * rowHeight}px`;
     else container.style.height = "";
 };
-
-const saveActiveWindowId = async () => {
-    activeWindowId = await getActiveWindowId();
-};
-
-const requestCloseDuplicateTabs = () => sendMessage("closeDuplicateTabs", { "windowId": activeWindowId });
-
-const saveOption = (name, value, refresh) => sendMessage("setStoredOption", { "name": name, "value": value, "refresh": refresh });
-
-const requestGetDuplicateTabs = () => sendMessage("getDuplicateTabs", { "windowId": activeWindowId });
 
 const setPanelOptions = async () => {
     const { storedOptions, lockedKeys } = await getStoredOptions();
@@ -148,6 +143,10 @@ const setPanelOptions = async () => {
                 }
                 else if (storedOption === "shrunkMode") toggleShrunkMode(value);
                 else if (storedOption === "closePopup") closePopup = value;
+                else if (storedOption === "popupGroupedView") {
+                    groupedView = value;
+                    updateGroupButton(value);
+                }
                 else if (storedOption === "compareWithTitle") {
                     const thresh = document.getElementById("titleSimilarityThreshold");
                     if (thresh) thresh.disabled = !value;
@@ -246,42 +245,6 @@ const handleMessage = (message) => {
 
 chrome.runtime.onMessage.addListener(handleMessage);
 
-let highlightBottomScrollShadowTimer = null;
-const highlightBottomScrollShadow = () => {
-    clearTimeout(highlightBottomScrollShadowTimer);
-    const container = document.getElementById("duplicateTabsTableContainer");
-    container.classList.toggle("highlight-scroll-bottom", true);
-    highlightBottomScrollShadowTimer = setTimeout(() => container.classList.toggle("highlight-scroll-bottom", false), 400);
-};
-
-const getHighlightBounds = (textarea) => {
-    const cs = window.getComputedStyle(textarea);
-    const pt = parseFloat(cs.paddingTop);
-    const text = textarea.value;
-    const pos = textarea.selectionStart;
-    const lineStart = text.lastIndexOf('\n', pos - 1) + 1;
-    const lineEndRaw = text.indexOf('\n', pos);
-    const lineEnd = lineEndRaw === -1 ? text.length : lineEndRaw;
-    let m = textarea._mirror;
-    if (!m) {
-        m = document.createElement('div');
-        m.setAttribute('aria-hidden', 'true');
-        m.style.cssText = 'position:fixed;top:-9999px;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;padding:0;margin:0;border:0;box-sizing:content-box;';
-        document.body.appendChild(m);
-        textarea._mirror = m;
-    }
-    m.style.width = (textarea.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)) + 'px';
-    m.style.font = cs.font;
-    m.style.lineHeight = cs.lineHeight;
-    let topOffset = 0;
-    if (lineStart > 0) {
-        m.textContent = text.substring(0, lineStart);
-        topOffset = m.scrollHeight;
-    }
-    m.textContent = text.substring(lineStart, lineEnd) || ' ';
-    return { top: pt + topOffset, bottom: pt + topOffset + m.scrollHeight };
-};
-
 // eslint-disable-next-line max-lines-per-function
 const loadListenerEvents = () => {
 
@@ -358,6 +321,24 @@ const loadListenerEvents = () => {
     const table = document.getElementById("duplicateTabsTable");
     if (table) {
         table.addEventListener("click", function (e) {
+            const groupCloseBtn = e.target.closest(".btn-group-close");
+            if (groupCloseBtn) {
+                e.stopPropagation();
+                const headerRow = groupCloseBtn.closest(".tr-group-header");
+                headerRow.dataset.groupTabIds.split(",").map(Number).forEach(id => removeTab(id));
+                return;
+            }
+            const headerRow = e.target.closest(".tr-group-header");
+            if (headerRow) {
+                const isCollapsed = headerRow.classList.toggle("collapsed");
+                let row = headerRow.nextElementSibling;
+                while (row && row.classList.contains("group-row")) {
+                    row.classList.toggle("group-collapsed", isCollapsed);
+                    row = row.nextElementSibling;
+                }
+                resizeDuplicateTabsPanel(false);
+                return;
+            }
             const titleCell = e.target.closest(".td-tab-title");
             if (titleCell) {
                 const row = titleCell.parentElement;
@@ -379,6 +360,23 @@ const loadListenerEvents = () => {
     if (closeBtn) closeBtn.addEventListener("click", function () {
         if (!this.classList.contains("disabled")) requestCloseDuplicateTabs();
         if (closePopup) window.close();
+    });
+
+    /* Toggle grouped view */
+    const groupBtn = document.getElementById("groupDuplicateTabsBtn");
+    if (groupBtn) groupBtn.addEventListener("click", function () {
+        if (this.classList.contains("disabled")) return;
+        groupedView = !groupedView;
+        updateGroupButton(groupedView);
+        saveOption("popupGroupedView", groupedView, false);
+        if (lastDuplicateTabs) {
+            document.getElementById("duplicateTabsTableBody").replaceChildren(
+                groupedView
+                    ? buildGroupedDuplicateTabRows(lastDuplicateTabs, activeWindowId)
+                    : buildDuplicateTabRows(lastDuplicateTabs, activeWindowId)
+            );
+            resizeDuplicateTabsPanel(false);
+        }
     });
 
     /* Toggle options panel */
@@ -408,6 +406,11 @@ const localizePopup = () => {
     tooltipElements.forEach(tooltipElement => {
         const value = tooltipElement.getAttribute(tooltipAttribute);
         tooltipElement.setAttribute(tooltipAttribute, chrome.i18n.getMessage(value));
+    });
+
+    const ariaLabelAttribute = "i18n-aria-label";
+    node.querySelectorAll(`[${ariaLabelAttribute}]`).forEach(el => {
+        el.setAttribute("aria-label", chrome.i18n.getMessage(el.getAttribute(ariaLabelAttribute)));
     });
 };
 

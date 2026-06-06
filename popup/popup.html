@@ -6,9 +6,11 @@
     <title>Duplicate Tabs Closer Panel</title>
     <link rel="stylesheet" href="../ext_lib/bootstrap-5.3.3-dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../ext_lib/font-awesome-6.7/css/all.min.css">
+    <link rel="stylesheet" href="../panel/common.css">
     <link rel="stylesheet" href="popup.css">
     <script src="../ext_lib/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
     <script src="../helper.js"></script>
+    <script src="../panelHelper.js"></script>
     <script src="popup.js"></script>
 </head>
 
@@ -181,12 +183,18 @@
             <div class="card-body">
                 <div class="table-scrollable" id="duplicateTabsTableContainer">
                     <table class="table table-hover table-borderless" id="duplicateTabsTable">
+                        <colgroup>
+                            <col class="col-tab-icon">
+                            <col class="col-tab-title">
+                            <col class="col-tab-close">
+                        </colgroup>
                         <tbody id="duplicateTabsTableBody">
                         </tbody>
                     </table>
                 </div>
             </div>
-            <div class="table-footer d-flex">
+            <div class="table-footer d-flex align-items-center">
+                <button type="button" class="icon-btn disabled" id="groupDuplicateTabsBtn" disabled aria-disabled="true" aria-pressed="false" i18n-aria-label="groupDuplicateTabs"><span class="fa-solid fa-layer-group fa-sm" aria-hidden="true"></span></button>
                 <button type="button" class="btn btn-xs btn-close-tabs disabled" id="closeDuplicateTabsBtn" disabled aria-disabled="true" i18n-content="closeAllDuplicateTabs"></button>
             </div>
         </div>
