@@ -125,7 +125,10 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
     await tabsInfo.awaitPendingCheck(observedTab.id);
     if (tabsInfo.isIntentionalDuplicate(observedTab.id)) return;
     if (isUrlWhiteListed(observedTabUrl)) {
-        if (isTabComplete(observedTab)) refreshDuplicateTabsInfo(observedWindowsId);
+        if (isTabComplete(observedTab)) {
+            dtcLog("worker", "refresh-queued", { windowId: observedWindowsId, reason: "whitelisted" });
+            refreshDuplicateTabsInfo(observedWindowsId);
+        }
         return;
     }
     const queryInfo = {};
@@ -153,9 +156,12 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
     }
     if (!match) {
         if (loadingUrl) {
-            if (tabsInfo.hasDuplicateTabs(observedWindowsId)) refreshDuplicateTabsInfo(observedWindowsId);
-            else if (environment.isChrome && observedTab.active) setBadge(observedTab.windowId, observedTab.id);
+            if (tabsInfo.hasDuplicateTabs(observedWindowsId)) {
+                dtcLog("worker", "refresh-queued", { windowId: observedWindowsId, reason: "no-match-loading" });
+                refreshDuplicateTabsInfo(observedWindowsId);
+            } else if (environment.isChrome && observedTab.active) setBadge(observedTab.windowId, observedTab.id);
         } else {
+            dtcLog("worker", "refresh-queued", { windowId: observedWindowsId, reason: "no-match" });
             refreshDuplicateTabsInfo(observedWindowsId);
         }
     }
@@ -176,6 +182,7 @@ const closeDuplicateTab = async (tabToCloseId, remainingTabInfo) => {
         await wait(200);
         if (await tabExists(tabToCloseId)) {
             tabsInfo.setClosingTab(tabToCloseId, false);
+            dtcLog("worker", "refresh-queued", { windowId: remainingTabInfo.windowId, reason: "close-failed-tab-still-exists" });
             refreshDuplicateTabsInfo(remainingTabInfo.windowId);
             return;
         }
@@ -367,10 +374,15 @@ const _refreshDuplicateTabsInfo = async (windowId) => {
     if (monitoringPaused) return;
     dtcLog("worker", "refresh-start", { windowId });
     const searchResult = await searchForDuplicateTabs(windowId, false);
+    const count = getNbDuplicateTabs(searchResult.duplicateTabsGroups);
     updateBadgesValue(searchResult.duplicateTabsGroups, windowId);
-    if ((await isPanelOptionOpen()) && (options.searchInAllWindows || (windowId === searchResult.activeWindowId))) {
+    const panelOpen = await isPanelOptionOpen();
+    if (panelOpen && (options.searchInAllWindows || (windowId === searchResult.activeWindowId))) {
         sendDuplicateTabs(searchResult.duplicateTabsGroups);
+    } else {
+        dtcLog("worker", "refresh-no-panel", { windowId, count, panelOpen, activeWindowId: searchResult.activeWindowId });
     }
+    dtcLog("worker", "refresh-done", { windowId, count, panelOpen, activeWindowId: searchResult.activeWindowId });
 };
 
 const refreshDuplicateTabsInfo = debounce(_refreshDuplicateTabsInfo, 300, false);
@@ -387,12 +399,14 @@ const debouncedBatchClose = debounce(closeDuplicateTabs, 300, false);
 // queryComplete:  require matched tabs to be complete before matching (pre-navigation scan).
 // eslint-disable-next-line no-unused-vars
 const dispatchTabCompletion = (tab, activeTabId, { queryComplete = false, alreadyComplete = false } = {}) => {
+    dtcLog("worker", "dispatch-completion", { tabId: tab.id, windowId: tab.windowId, autoClose: options.autoCloseTab, alreadyComplete, queryComplete, burst: postStartupBurst });
     if (options.autoCloseTab) {
         if (!alreadyComplete) {
             postStartupBurst ? debouncedBatchClose(tab.windowId) : searchForDuplicateTabsToClose(tab, queryComplete);
         }
         if (environment.isChrome) setBadge(tab.windowId, activeTabId || null);
     } else {
+        dtcLog("worker", "refresh-queued", { windowId: tab.windowId, reason: "dispatch-completion" });
         refreshDuplicateTabsInfo(tab.windowId);
         if (environment.isChrome) setBadge(tab.windowId, activeTabId || null);
     }
@@ -401,9 +415,13 @@ const dispatchTabCompletion = (tab, activeTabId, { queryComplete = false, alread
 // eslint-disable-next-line no-unused-vars
 const refreshGlobalDuplicateTabsInfo = async () => {
     if (options.searchInAllWindows) {
+        dtcLog("worker", "refresh-queued", { windowId: null, reason: "global-all-windows" });
         refreshDuplicateTabsInfo();
     } else {
         const windows = await getWindows();
-        if (windows) windows.forEach(window => refreshDuplicateTabsInfo(window.id));
+        if (windows) windows.forEach(window => {
+            dtcLog("worker", "refresh-queued", { windowId: window.id, reason: "global-per-window" });
+            refreshDuplicateTabsInfo(window.id);
+        });
     }
 };

@@ -88,8 +88,6 @@ const onCreatedTab = async (tab) => {
 		tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
 		if (tab.url !== "about:blank") {
 			dispatchTabCompletion(tab, null, { queryComplete: true });
-		} else if (!options.autoCloseTab) {
-			refreshDuplicateTabsInfo(tab.windowId);
 		}
 	}
 };
@@ -143,12 +141,7 @@ const onUpdatedTab = async (tabId, changeInfo, tab) => {
 		else if (isChromeURL(tab.url) || isBlankURL(tab.url)) {
 			dtcLog("bg", "tab-updated-blank", { tabId: tab.id, windowId: tab.windowId, url: tab.url });
 			tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
-			if (isChromeURL(tab.url)) {
-				dispatchTabCompletion(tab, tab.id);
-			} else {
-				refreshDuplicateTabsInfo(tab.windowId);
-				if (environment.isChrome) setBadge(tab.windowId, tab.id);
-			}
+			dispatchTabCompletion(tab, tab.id);
 		}
 	}
 };
@@ -168,13 +161,17 @@ const onRemovedTab = async (removedTabId, removeInfo) => {
 	dtcLog("bg", "tab-removed", { tabId: removedTabId, windowId: removeInfo.windowId, windowClosing: removeInfo.isWindowClosing });
 	if (monitoringPaused) return;
 	if (removeInfo.isWindowClosing) {
-		if (options.searchInAllWindows && tabsInfo.hasDuplicateTabs(removeInfo.windowId)) refreshDuplicateTabsInfo();
+		if (options.searchInAllWindows && tabsInfo.hasDuplicateTabs(removeInfo.windowId)) {
+			dtcLog("bg", "refresh-queued", { windowId: null, reason: "window-closing-cross-window" });
+			refreshDuplicateTabsInfo();
+		}
 		tabsInfo.clearDuplicateTabsInfo(removeInfo.windowId);
 		refreshDuplicateTabsInfo.cleanup(removeInfo.windowId);
 		handleRemainingTab.cleanup(removeInfo.windowId);
 		debouncedBatchClose.cleanup(removeInfo.windowId);
 	}
 	else if (tabsInfo.hasDuplicateTabs(removeInfo.windowId)) {
+		dtcLog("bg", "refresh-queued", { windowId: removeInfo.windowId, reason: "tab-removed" });
 		refreshDuplicateTabsInfo(removeInfo.windowId);
 	}
 };
@@ -183,7 +180,10 @@ const onDetachedTab = async (detachedTabId, detachInfo) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
 	dtcLog("bg", "tab-detached", { tabId: detachedTabId, windowId: detachInfo.oldWindowId, hasDuplicates: tabsInfo.hasDuplicateTabs(detachInfo.oldWindowId) });
-	if (tabsInfo.hasDuplicateTabs(detachInfo.oldWindowId)) refreshDuplicateTabsInfo(detachInfo.oldWindowId);
+	if (tabsInfo.hasDuplicateTabs(detachInfo.oldWindowId)) {
+		dtcLog("bg", "refresh-queued", { windowId: detachInfo.oldWindowId, reason: "tab-detached" });
+		refreshDuplicateTabsInfo(detachInfo.oldWindowId);
+	}
 };
 
 const onActivatedTab = async (activeInfo) => {
@@ -197,9 +197,21 @@ const onReplacedTab = async (addedTabId, removedTabId) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
 	dtcLog("bg", "tab-replaced", { tabId: addedTabId, removedTabId });
+	dtcLog("bg", "tab-replaced-dispatch", { tabId: addedTabId, autoClose: options.autoCloseTab });
 	tabsInfo.removeTab(removedTabId);
 	const tab = await getTab(addedTabId);
 	if (tab) await searchForDuplicateTabsToClose(tab);
+};
+
+const onCommittedTab = async (details) => {
+	if (!environment.isChrome) return;
+	if (details.frameId !== 0 || details.tabId === -1) return;
+	await ensureInitialized();
+	const tab = await getTab(details.tabId);
+	if (tab) {
+		dtcLog("bg", "nav-committed", { tabId: tab.id, windowId: tab.windowId, url: details.url });
+		setBadge(tab.windowId, tab.id);
+	}
 };
 
 const onCommand = async (command) => {
@@ -225,6 +237,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
 	if (!hasOptionChange) return;
 	getStoredOptions().then(current => {
 		setOptions(current.storedOptions);
+		dtcLog("bg", "refresh-queued", { windowId: null, reason: "options-changed" });
 		refreshGlobalDuplicateTabsInfo();
 	});
 });
@@ -234,6 +247,7 @@ chrome.tabs.onAttached.addListener(onAttached);
 chrome.tabs.onDetached.addListener(onDetachedTab);
 chrome.tabs.onUpdated.addListener(onUpdatedTab);
 chrome.webNavigation.onCompleted.addListener(onCompletedTab);
+chrome.webNavigation.onCommitted.addListener(onCommittedTab);
 chrome.tabs.onRemoved.addListener(onRemovedTab);
 chrome.tabs.onActivated.addListener(onActivatedTab);
 chrome.tabs.onReplaced.addListener(onReplacedTab);

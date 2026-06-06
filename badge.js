@@ -40,7 +40,10 @@ const getNbDuplicateTabs = (duplicateTabsGroups) => {
 };
 
 const updateBadgeValue = async (nbDuplicateTabs, windowId) => {
-	if (tabsInfo.hasNbDuplicateTabs(windowId) && tabsInfo.getNbDuplicateTabs(windowId) === nbDuplicateTabs.toString()) return;
+	if (tabsInfo.hasNbDuplicateTabs(windowId) && tabsInfo.getNbDuplicateTabs(windowId) === nbDuplicateTabs.toString()) {
+		dtcLog("badge", "badge-skip", { windowId, count: nbDuplicateTabs, reason: "unchanged" });
+		return;
+	}
 	const prevCount = tabsInfo.hasNbDuplicateTabs(windowId) ? parseInt(tabsInfo.getNbDuplicateTabs(windowId)) : 0;
 	tabsInfo.setNbDuplicateTabs(windowId, nbDuplicateTabs);
 	dtcLog("badge", "badge-updated", { windowId, prev: prevCount, count: nbDuplicateTabs });
@@ -55,6 +58,7 @@ const updateBadgeValue = async (nbDuplicateTabs, windowId) => {
 // eslint-disable-next-line no-unused-vars
 const updateBadgesValue = async (duplicateTabsGroups, windowId) => {
 	const nbDuplicateTabs = getNbDuplicateTabs(duplicateTabsGroups);
+	dtcLog("badge", "badges-update", { windowId, count: nbDuplicateTabs, searchInAllWindows: options.searchInAllWindows });
 	if (options.searchInAllWindows) {
 		const windows = await getWindows();
 		windows.forEach(window => updateBadgeValue(nbDuplicateTabs, window.id));
