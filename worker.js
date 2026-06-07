@@ -192,6 +192,8 @@ const _handleRemainingTab = async (details) => {
         await reloadTab(details.tabId);
         tabsInfo.setClosingTab(details.tabId, false);
     }
+    refreshDuplicateTabsInfo(details.windowId);
+    if (environment.isChrome) setBadge(details.windowId, details.tabId);
 };
 
 const handleRemainingTab = debounce(_handleRemainingTab, 500);

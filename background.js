@@ -80,6 +80,10 @@ const onCreatedTab = async (tab) => {
 		tabsInfo.setPendingCheck(tab.id, checkPromise);
 	}
 	tabsInfo.setTab(tab.id, {});
+	if (!tabsInfo.hasNbDuplicateTabs(tab.windowId)) {
+		tabsInfo.setNbDuplicateTabs(tab.windowId, 0);
+		updateBadgeStyle();
+	}
 	if (tab.status === "complete") {
 		tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
 		if (tab.url !== "about:blank") {
@@ -156,6 +160,7 @@ const onRemovedTab = async (removedTabId, removeInfo) => {
 		refreshDuplicateTabsInfo.cleanup(removeInfo.windowId);
 		handleRemainingTab.cleanup(removeInfo.windowId);
 		debouncedBatchClose.cleanup(removeInfo.windowId);
+		updateBadgeStyle();
 	}
 	else if (tabsInfo.hasDuplicateTabs(removeInfo.windowId)) {
 		refreshDuplicateTabsInfo(removeInfo.windowId);
@@ -165,7 +170,11 @@ const onRemovedTab = async (removedTabId, removeInfo) => {
 const onDetachedTab = async (detachedTabId, detachInfo) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
-	if (tabsInfo.hasDuplicateTabs(detachInfo.oldWindowId)) refreshDuplicateTabsInfo(detachInfo.oldWindowId);
+	if (tabsInfo.hasDuplicateTabs(detachInfo.oldWindowId)) {
+		refreshDuplicateTabsInfo(detachInfo.oldWindowId);
+	} else {
+		setBadge(detachInfo.oldWindowId);
+	}
 };
 
 const onActivatedTab = async (activeInfo) => {
