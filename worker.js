@@ -136,7 +136,10 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
     queryInfo.windowId = options.searchInAllWindows ? null : observedWindowsId;
     if (environment.isFirefox) queryInfo.cookieStoreId = options.searchPerContainer ? observedTab.cookieStoreId : null;
     const openedTabs = await getTabs(queryInfo);
-    if (!openedTabs || openedTabs.length <= 1) return;
+    if (!openedTabs || openedTabs.length <= 1) {
+        dtcLog("worker", "search-no-tabs", { tabId: observedTab.id, windowId: observedWindowsId, url: observedTabUrl, tabCount: openedTabs ? openedTabs.length : 0, queryWindowId: queryInfo.windowId || null });
+        return;
+    }
     const matchingObservedTabUrl = getMatchingURL(observedTabUrl);
     let match = false;
     for (const openedTab of openedTabs) {
@@ -155,6 +158,7 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
         }
     }
     if (!match) {
+        dtcLog("worker", "search-no-match", { tabId: observedTab.id, windowId: observedWindowsId, url: observedTabUrl, loadingUrl: !!loadingUrl, hasDups: tabsInfo.hasDuplicateTabs(observedWindowsId) });
         if (loadingUrl) {
             if (tabsInfo.hasDuplicateTabs(observedWindowsId)) {
                 dtcLog("worker", "refresh-queued", { windowId: observedWindowsId, reason: "no-match-loading" });
@@ -188,9 +192,11 @@ const closeDuplicateTab = async (tabToCloseId, remainingTabInfo) => {
         }
     }
     handleRemainingTab(remainingTabInfo.windowId, remainingTabInfo);
+    dtcLog("worker", "close-tab-done", { tabId: tabToCloseId, remainingTabId: remainingTabInfo.tabId, remainingWindowId: remainingTabInfo.windowId, observedTabClosed: remainingTabInfo.observedTabClosed });
 };
 
 const _handleRemainingTab = async (details) => {
+    dtcLog("worker", "handle-remaining-tab", { tabId: details.tabId, windowId: details.windowId, observedTabClosed: details.observedTabClosed, active: details.active });
     if (!tabsInfo.hasTab(details.tabId)) return;
     if (options.defaultTabBehavior && details.observedTabClosed) {
         if (details.tabIndex > 0) moveTab(details.tabId, { index: details.tabIndex });
@@ -203,6 +209,9 @@ const _handleRemainingTab = async (details) => {
         await reloadTab(details.tabId);
         tabsInfo.setClosingTab(details.tabId, false);
     }
+    dtcLog("worker", "refresh-queued", { windowId: details.windowId, reason: "handle-remaining-tab" });
+    refreshDuplicateTabsInfo(details.windowId);
+    if (environment.isChrome) setBadge(details.windowId, details.tabId);
 };
 
 const handleRemainingTab = debounce(_handleRemainingTab, 500);

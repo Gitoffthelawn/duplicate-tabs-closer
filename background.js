@@ -84,6 +84,10 @@ const onCreatedTab = async (tab) => {
 	}
 	tabsInfo.setTab(tab.id, {});
 	dtcLog("bg", "tab-created", { tabId: tab.id, windowId: tab.windowId, url: tab.url, status: tab.status, autoClose: options.autoCloseTab, burst: postStartupBurst });
+	if (!tabsInfo.hasNbDuplicateTabs(tab.windowId)) {
+		tabsInfo.setNbDuplicateTabs(tab.windowId, 0);
+		updateBadgeStyle();
+	}
 	if (tab.status === "complete") {
 		tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
 		if (tab.url !== "about:blank") {
@@ -158,7 +162,7 @@ const onRemovedTab = async (removedTabId, removeInfo) => {
 	await ensureInitialized();
 	tabsInfo.removeTab(removedTabId);
 	_lastNavigate.delete(removedTabId);
-	dtcLog("bg", "tab-removed", { tabId: removedTabId, windowId: removeInfo.windowId, windowClosing: removeInfo.isWindowClosing });
+	dtcLog("bg", "tab-removed", { tabId: removedTabId, windowId: removeInfo.windowId, windowClosing: removeInfo.isWindowClosing, hasDups: tabsInfo.hasDuplicateTabs(removeInfo.windowId) });
 	if (monitoringPaused) return;
 	if (removeInfo.isWindowClosing) {
 		if (options.searchInAllWindows && tabsInfo.hasDuplicateTabs(removeInfo.windowId)) {
@@ -169,6 +173,7 @@ const onRemovedTab = async (removedTabId, removeInfo) => {
 		refreshDuplicateTabsInfo.cleanup(removeInfo.windowId);
 		handleRemainingTab.cleanup(removeInfo.windowId);
 		debouncedBatchClose.cleanup(removeInfo.windowId);
+		updateBadgeStyle();
 	}
 	else if (tabsInfo.hasDuplicateTabs(removeInfo.windowId)) {
 		dtcLog("bg", "refresh-queued", { windowId: removeInfo.windowId, reason: "tab-removed" });
@@ -183,6 +188,8 @@ const onDetachedTab = async (detachedTabId, detachInfo) => {
 	if (tabsInfo.hasDuplicateTabs(detachInfo.oldWindowId)) {
 		dtcLog("bg", "refresh-queued", { windowId: detachInfo.oldWindowId, reason: "tab-detached" });
 		refreshDuplicateTabsInfo(detachInfo.oldWindowId);
+	} else {
+		setBadge(detachInfo.oldWindowId);
 	}
 };
 
