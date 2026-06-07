@@ -166,9 +166,9 @@ const setStoredOption = async (name, value, refresh) => {
     storedOptions[name].value = value;
     await saveStoredOptions(storedOptions);
     setOptions(storedOptions);
-    if (refresh) refreshGlobalDuplicateTabsInfo();
-    else if (name === "onDuplicateTabDetected") setBadgeIcon();
+    if (name === "onDuplicateTabDetected") setBadgeIcon();
     else if (name === "showBadgeIfNoDuplicateTabs" || name === "badgeColorNoDuplicateTabs" || name === "badgeColorDuplicateTabs") updateBadgeStyle();
+    if (refresh) refreshGlobalDuplicateTabsInfo();
 };
 
 const options = {};
