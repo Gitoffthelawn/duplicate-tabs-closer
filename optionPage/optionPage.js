@@ -366,6 +366,10 @@ const localizePopup = (node) => {
     element.textContent = chrome.i18n.getMessage(value);
   });
 
+  node.querySelectorAll("[Title]").forEach(el => {
+    el.setAttribute("Title", chrome.i18n.getMessage(el.getAttribute("Title")));
+  });
+
   const ariaLabelAttribute = "i18n-aria-label";
   node.querySelectorAll(`[${ariaLabelAttribute}]`).forEach(el => {
     el.setAttribute("aria-label", chrome.i18n.getMessage(el.getAttribute(ariaLabelAttribute)));
