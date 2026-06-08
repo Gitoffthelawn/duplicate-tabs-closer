@@ -272,6 +272,7 @@ const handleObservedTab = (details) => {
             }
         } else {
             const [tabToCloseId] = getCloseInfo({ observedTab: observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
+            dtcLog("worker", "panel-winner", { observedTabId: observedTab.id, retainedTabId: retainedTab.id, closeId: tabToCloseId });
             if (tabToCloseId === retainedTab.id) {
                 retainedTabs.set(matchingKey, observedTab);
             }
@@ -308,7 +309,10 @@ const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted) => {
     for (const openedTab of openedTabs) {
         if ((isBlankURL(openedTab.url) && !isTabComplete(openedTab)) || tabsInfo.isClosingTab(openedTab.id)) continue;
         if (tabsInfo.isIntentionalDuplicate(openedTab.id)) continue;
-        if (closeTabs && skipWhitelisted && isUrlWhiteListed(openedTab.url)) continue;
+        if (closeTabs && skipWhitelisted && isUrlWhiteListed(openedTab.url)) {
+            dtcLog("worker", "search-skip", { tabId: openedTab.id, reason: "whitelisted-close" });
+            continue;
+        }
         const details = {
             tab: openedTab,
             retainedTabs: retainedTabs,

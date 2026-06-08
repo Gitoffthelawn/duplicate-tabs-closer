@@ -16,6 +16,7 @@ class TabsInfo {
         if (!openedTabs) return;
         for (const openedTab of openedTabs) {
             const lastComplete = openedTab.lastAccessed ?? openedTab.index;
+            dtcLog("tabsInfo", "seed", { tabId: openedTab.id, index: openedTab.index, lastAccessed: openedTab.lastAccessed ?? null, lastComplete });
             this.setTab(openedTab.id, { url: openedTab.url, complete: true, lastComplete: lastComplete });
         }
         const result = await chrome.storage.session.get('intentionalDuplicates');
