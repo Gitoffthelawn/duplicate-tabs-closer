@@ -182,7 +182,7 @@ const getWindowBadgeText = (windowId) => browser.action.getBadgeText({ windowId:
 
 // eslint-disable-next-line no-unused-vars
 const setTabBadgeText = (tabId, text) => new Promise((resolve) => {
-    if (!tabId) {
+    if (!tabId || tabId < 0) {
         console.error("setTabBadgeText error: no tabId");
         resolve();
         return;
@@ -194,10 +194,11 @@ const setTabBadgeText = (tabId, text) => new Promise((resolve) => {
 });
 
 // eslint-disable-next-line no-unused-vars
-const setWindowBadgeText = (windowId, text) => browser.action.setBadgeText({ windowId: windowId, text: text });
+const setWindowBadgeText = (windowId, text) => browser.action.setBadgeText({ windowId: windowId, text: text }).catch(() => {});
 
 // eslint-disable-next-line no-unused-vars
 const setTabBadgeBackgroundColor = (tabId, color) => new Promise((resolve) => {
+    if (!tabId || tabId < 0) { resolve(); return; }
     chrome.action.setBadgeBackgroundColor({ tabId: tabId, color: color }, () => {
         if (chrome.runtime.lastError && !chrome.runtime.lastError.message.includes("No tab with id")) console.error("setTabBadgeBackgroundColor error:", chrome.runtime.lastError.message);
         resolve();
@@ -205,7 +206,7 @@ const setTabBadgeBackgroundColor = (tabId, color) => new Promise((resolve) => {
 });
 
 // eslint-disable-next-line no-unused-vars
-const setWindowBadgeBackgroundColor = (windowId, color) => browser.action.setBadgeBackgroundColor({ windowId: windowId, color: color });
+const setWindowBadgeBackgroundColor = (windowId, color) => browser.action.setBadgeBackgroundColor({ windowId: windowId, color: color }).catch(() => {});
 
 // eslint-disable-next-line no-unused-vars
 const getStoredOptions = () => Promise.all([
