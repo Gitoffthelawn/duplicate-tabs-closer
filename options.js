@@ -106,6 +106,9 @@ const defaultOptions = {
     closePopup: {
         value: false
     },
+    closeAllSkipWhitelisted: {
+        value: true
+    },
     popupTwoColumns: {
         value: "2"
     },

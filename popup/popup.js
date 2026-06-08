@@ -16,6 +16,9 @@ const changeAutoCloseOptionState = (state, resize) => {
 
 const toggleShrunkMode = (checked) => {
     getElements(".list-group-form").forEach(el => el.classList.toggle("shrunk", checked));
+    if (!checked && document.getElementById("optionHeader").classList.contains("collapsed")) {
+        toggleExpendOptions(true);
+    }
 };
 
 const applyTwoColumnsMode = (enabled) => {
@@ -57,6 +60,12 @@ const toggleExpendGroup = (eventId, isTitleClickEvent, pinned, resize) => {
 
 const setDuplicateTabsTable = (duplicateTabs) => {
     if (duplicateTabs !== null && areSameArrays(duplicateTabs, lastDuplicateTabs)) return;
+    const expandedGroups = new Set();
+    if (groupedView) {
+        document.querySelectorAll(".tr-group-header:not(.collapsed)").forEach(header => {
+            expandedGroups.add(header.dataset.groupTabIds.split(",")[0]);
+        });
+    }
     const isUpdate = panelInitialized;
     panelInitialized = true;
     lastDuplicateTabs = duplicateTabs ? Array.from(duplicateTabs) : null;
@@ -68,6 +77,18 @@ const setDuplicateTabsTable = (duplicateTabs) => {
         tbody.appendChild(groupedView
             ? buildGroupedDuplicateTabRows(duplicateTabs, activeWindowId)
             : buildDuplicateTabRows(duplicateTabs, activeWindowId));
+        if (groupedView && expandedGroups.size > 0) {
+            tbody.querySelectorAll(".tr-group-header").forEach(header => {
+                if (expandedGroups.has(header.dataset.groupTabIds.split(",")[0])) {
+                    header.classList.remove("collapsed");
+                    let row = header.nextElementSibling;
+                    while (row && row.classList.contains("group-row")) {
+                        row.classList.remove("group-collapsed");
+                        row = row.nextElementSibling;
+                    }
+                }
+            });
+        }
         closeBtn.classList.remove("disabled");
         closeBtn.setAttribute("aria-disabled", "false");
         closeBtn.removeAttribute("disabled");
@@ -260,14 +281,16 @@ const loadListenerEvents = () => {
         else if (this.id === "ignorePathPart") {
             updateIgnorePathPartDependents(this.checked);
         }
-        const refresh = this.className.includes("checkbox-filter");
+        const refresh = this.className.includes("checkbox-filter")
+            || this.id === "keepTabWithHttps"
+            || this.id === "keepPinnedTab";
         saveOption(this.id, this.checked, refresh);
     }));
 
     /* Save combobox settings */
     getElements(".list-group select").forEach(el => el.addEventListener("change", function (event) {
         event.stopPropagation();
-        const refresh = this.id === "scope";
+        const refresh = this.id === "scope" || this.id === "keepTabBasedOnAge";
         saveOption(this.id, this.value, refresh);
         if (this.id === "onDuplicateTabDetected") changeAutoCloseOptionState(this.value, true);
         else if (this.id === "popupTwoColumns") applyTwoColumnsMode(this.value === "2");
@@ -358,7 +381,10 @@ const loadListenerEvents = () => {
     /* Close all */
     const closeBtn = document.getElementById("closeDuplicateTabsBtn");
     if (closeBtn) closeBtn.addEventListener("click", function () {
-        if (!this.classList.contains("disabled")) requestCloseDuplicateTabs();
+        if (!this.classList.contains("disabled")) {
+            const skipWhitelisted = document.getElementById("closeAllSkipWhitelisted")?.checked ?? true;
+            requestCloseDuplicateTabs(skipWhitelisted);
+        }
         if (closePopup) window.close();
     });
 

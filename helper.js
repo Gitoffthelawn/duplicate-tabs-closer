@@ -319,6 +319,7 @@ const buildTabRow = (duplicateTab, activeWindowId) => {
     const tr = document.createElement("tr");
     tr.setAttribute("tabId", parseInt(duplicateTab.id, 10));
     tr.setAttribute("windowId", parseInt(duplicateTab.windowId, 10));
+    if (!duplicateTab.isRetained) tr.classList.add("tab-row-duplicate");
 
     const tdIcon = document.createElement("td");
     tdIcon.className = "td-tab-icon";
@@ -331,7 +332,6 @@ const buildTabRow = (duplicateTab, activeWindowId) => {
     tdTitle.className = "td-tab-title";
     tdTitle.title = duplicateTab.url;
     if (duplicateTab.containerColor) {
-        tdTitle.style.textDecoration = "underline";
         tdTitle.style.textDecorationColor = duplicateTab.containerColor;
     }
     if (duplicateTab.whitelisted) {

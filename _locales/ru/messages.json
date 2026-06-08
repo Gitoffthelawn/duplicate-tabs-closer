@@ -68,8 +68,8 @@
     "description": "Ignore search part in URL"
   },
   "ignorePathPart": {
-    "message": "Игнорировать часть пути в URL вкладки",
-    "description": "Ignore path part in URL"
+    "message": "Игнорировать часть пути в URL вкладки (только домен)",
+    "description": "Ignore path part in URL - matches all pages on the same domain"
   },
   "ignore3w": {
     "message": "Игнорировать 'www' в доменном имени URL",
@@ -120,8 +120,8 @@
     "description": "Container in all windows"
   },
   "closeAllDuplicateTabs": {
-    "message": "Закрыть все дубликаты вкладок",
-    "description": "Close all"
+    "message": "Закрыть дубликаты",
+    "description": "Close all duplicate tabs (keeps one per group)"
   },
   "groupDuplicateTabs": {
     "message": "Group by URL",
@@ -160,6 +160,10 @@
   "whitelistedTab": {
     "message": "В списке разрешённых — не закрывается автоматически",
     "description": "Tooltip shown on duplicate tabs that match the whitelist"
+  },
+  "skipWhitelistedTooltip": {
+    "message": "Пропускать разрешённые вкладки при закрытии дубликатов",
+    "description": "Tooltip for the shield icon checkbox next to the Close All button"
   },
   "customization": {
     "message": "Настройка",

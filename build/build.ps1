@@ -9,6 +9,7 @@ $SingleFiles = @(
     "background.js",
     "badge.js",
     "helper.js",
+    "panelHelper.js",
     "messageListener.js",
     "options.js",
     "tabsInfo.js",
@@ -23,6 +24,7 @@ $Directories = @(
     "images",
     "popup",
     "optionPage",
+    "panel",
     "ext_lib\bootstrap-5.3.3-dist",
     "ext_lib\font-awesome-6.7"
 )

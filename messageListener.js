@@ -40,7 +40,7 @@ const handleMessage = (message, sender, response) => {
         }
         case "closeDuplicateTabs": {
             if (!message.data) return response({});
-            closeDuplicateTabs(message.data.windowId);
+            closeDuplicateTabs(message.data.windowId, message.data.skipWhitelisted);
             response({});
             break;
         }
