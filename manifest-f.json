@@ -21,7 +21,6 @@
   },
   "background": {
     "scripts": [
-      "dtcLog.js",
       "helper.js",
       "tabsInfo.js",
       "options.js",

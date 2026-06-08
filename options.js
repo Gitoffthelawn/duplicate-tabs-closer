@@ -160,19 +160,13 @@ const initializeOptions = async () => {
     }
     setOptions(storedOptions);
     setEnvironment(storedOptions);
-    dtcLog("options", "init-done", { autoClose: options.autoCloseTab, theme: options.theme });
 };
 
 // eslint-disable-next-line no-unused-vars
-let _savingLocally = false;
-
-// eslint-disable-next-line no-unused-vars
 const setStoredOption = async (name, value, refresh) => {
-    dtcLog("options", "option-set", { name, value });
     const options = await getStoredOptions();
     const storedOptions = options.storedOptions;
     storedOptions[name].value = value;
-    _savingLocally = true;
     await saveStoredOptions(storedOptions);
     setOptions(storedOptions);
     if (name === "onDuplicateTabDetected") setBadgeIcon();
@@ -207,7 +201,6 @@ const setOptions = (storedOptions) => {
     options.showBadgeIfNoDuplicateTabs = storedOptions.showBadgeIfNoDuplicateTabs.value;
     options.openPopupOnDuplicateDetected = storedOptions.openPopupOnDuplicateDetected.value;
     options.theme = storedOptions.theme.value;
-    dtcLog("options", "options-loaded", { autoClose: options.autoCloseTab });
 };
 
 const environment = {

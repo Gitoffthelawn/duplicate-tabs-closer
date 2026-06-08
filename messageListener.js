@@ -2,10 +2,6 @@
 
 const handleMessage = (message, sender, response) => {
     if (!message || !message.action) return;
-    // Skip log-retrieval actions to avoid polluting the log buffer with polling noise
-    if (message.action !== "getLogs" && message.action !== "getDuplicateCount") {
-        dtcLog("msg", "received", { action: message.action });
-    }
     switch (message.action) {
         case "setStoredOption": {
             if (!message.data || !(message.data.name in defaultOptions)) return response({});
@@ -51,16 +47,6 @@ const handleMessage = (message, sender, response) => {
         case "getMonitorPauseState": {
             response({ paused: monitoringPaused });
             return true;
-        }
-        case "getLogs": {
-            const since = message.data ? message.data.since : 0;
-            response({ logs: getDtcLogs(since) });
-            return true;
-        }
-        case "clearLogs": {
-            clearDtcLogs();
-            response({});
-            break;
         }
     }
 };
