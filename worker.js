@@ -59,8 +59,8 @@ const getLastUpdatedTabId = (observedTab, openedTab) => {
     const observedTabLastUpdate = tabsInfo.getLastComplete(observedTab.id);
     const openedTabLastUpdate = tabsInfo.getLastComplete(openedTab.id);
     if (options.keepNewerTab) {
-        if (observedTabLastUpdate === null) return observedTab.id;
-        if (openedTabLastUpdate === null) return openedTab.id;
+        if (observedTabLastUpdate === null) return openedTab.id;
+        if (openedTabLastUpdate === null) return observedTab.id;
         return (observedTabLastUpdate > openedTabLastUpdate) ? observedTab.id : openedTab.id;
     } else {
         if (observedTabLastUpdate === null) return openedTab.id;
@@ -253,6 +253,10 @@ const handleObservedTab = (details) => {
                 retainedTabs.set(matchingKey, observedTab);
             }
         } else {
+            const [tabToCloseId] = getCloseInfo({ observedTab: observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
+            if (tabToCloseId === retainedTab.id) {
+                retainedTabs.set(matchingKey, observedTab);
+            }
             const tabs = duplicateTabsGroups.get(matchingKey) || new Set([retainedTab]);
             tabs.add(observedTab);
             duplicateTabsGroups.set(matchingKey, tabs);
@@ -275,7 +279,7 @@ const findFuzzyTitleKey = (title, retainedTabs) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const searchForDuplicateTabs = async (windowId, closeTabs) => {
+const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted) => {
     const queryInfo = { windowType: "normal" };
     if (!options.searchInAllWindows) queryInfo.windowId = windowId;
     const [activeWindowId, openedTabs] = await Promise.all([getActiveWindowId(), getTabs(queryInfo)]);
@@ -286,6 +290,7 @@ const searchForDuplicateTabs = async (windowId, closeTabs) => {
     for (const openedTab of openedTabs) {
         if ((isBlankURL(openedTab.url) && !isTabComplete(openedTab)) || tabsInfo.isClosingTab(openedTab.id)) continue;
         if (tabsInfo.isIntentionalDuplicate(openedTab.id)) continue;
+        if (closeTabs && skipWhitelisted && isUrlWhiteListed(openedTab.url)) continue;
         const details = {
             tab: openedTab,
             retainedTabs: retainedTabs,
@@ -307,14 +312,15 @@ const searchForDuplicateTabs = async (windowId, closeTabs) => {
     }
     return {
         duplicateTabsGroups: duplicateTabsGroups,
+        retainedTabs: retainedTabs,
         activeWindowId: activeWindowId
     };
 };
 
 // eslint-disable-next-line no-unused-vars
-const closeDuplicateTabs = (windowId) => searchForDuplicateTabs(windowId, true);
+const closeDuplicateTabs = (windowId, skipWhitelisted) => searchForDuplicateTabs(windowId, true, skipWhitelisted);
 
-const setDuplicateTabPanel = async (duplicateTab, duplicateTabs, groupIndex) => {
+const setDuplicateTabPanel = async (duplicateTab, duplicateTabs, groupIndex, retainedTabId) => {
     let containerColor = "";
     if (environment.isFirefox && (!duplicateTab.incognito && duplicateTab.cookieStoreId !== "firefox-default")) {
         try {
@@ -330,17 +336,19 @@ const setDuplicateTabPanel = async (duplicateTab, duplicateTabs, groupIndex) => 
         containerColor: containerColor,
         icon: (duplicateTab.favIconUrl && !isChromeURL(duplicateTab.favIconUrl)) ? duplicateTab.favIconUrl : "../images/default-favicon.png",
         whitelisted: isUrlWhiteListed(duplicateTab.url),
-        groupIndex: groupIndex
+        groupIndex: groupIndex,
+        isRetained: duplicateTab.id === retainedTabId
     });
 };
 
-const getDuplicateTabsForPanel = async (duplicateTabsGroups) => {
+const getDuplicateTabsForPanel = async (duplicateTabsGroups, retainedTabs) => {
     if (duplicateTabsGroups.size === 0) return null;
     const duplicateTabsPanel = new Set();
     let groupIndex = 0;
-    for (const tabsGroup of duplicateTabsGroups) {
-        const duplicateTabs = tabsGroup[1];
-        await Promise.all(Array.from(duplicateTabs, duplicateTab => setDuplicateTabPanel(duplicateTab, duplicateTabsPanel, groupIndex)));
+    for (const [key, duplicateTabs] of duplicateTabsGroups) {
+        const retainedTab = retainedTabs ? retainedTabs.get(key) : null;
+        const retainedTabId = retainedTab ? retainedTab.id : null;
+        await Promise.all(Array.from(duplicateTabs, duplicateTab => setDuplicateTabPanel(duplicateTab, duplicateTabsPanel, groupIndex, retainedTabId)));
         groupIndex++;
     }
     return Array.from(duplicateTabsPanel);
@@ -349,11 +357,11 @@ const getDuplicateTabsForPanel = async (duplicateTabsGroups) => {
 // eslint-disable-next-line no-unused-vars
 const requestDuplicateTabsFromPanel = async (windowId) => {
     const searchResult = await searchForDuplicateTabs(windowId, false);
-    sendDuplicateTabs(searchResult.duplicateTabsGroups);
+    sendDuplicateTabs(searchResult.duplicateTabsGroups, searchResult.retainedTabs);
 };
 
-const sendDuplicateTabs = async (duplicateTabsGroups) => {
-    const duplicateTabs = await getDuplicateTabsForPanel(duplicateTabsGroups);
+const sendDuplicateTabs = async (duplicateTabsGroups, retainedTabs) => {
+    const duplicateTabs = await getDuplicateTabsForPanel(duplicateTabsGroups, retainedTabs);
     chrome.runtime.sendMessage({
         action: "updateDuplicateTabsTable",
         data: { "duplicateTabs": duplicateTabs }
@@ -365,7 +373,7 @@ const _refreshDuplicateTabsInfo = async (windowId) => {
     const searchResult = await searchForDuplicateTabs(windowId, false);
     updateBadgesValue(searchResult.duplicateTabsGroups, windowId);
     if ((await isPanelOptionOpen()) && (options.searchInAllWindows || (windowId === searchResult.activeWindowId))) {
-        sendDuplicateTabs(searchResult.duplicateTabsGroups);
+        sendDuplicateTabs(searchResult.duplicateTabsGroups, searchResult.retainedTabs);
     }
 };
 

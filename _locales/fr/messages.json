@@ -68,8 +68,8 @@
     "description": "Ignore search part in URL"
   },
   "ignorePathPart": {
-    "message": "Ignorer la partie « chemin » de l'URL",
-    "description": "Ignore path part in URL"
+    "message": "Ignorer la partie « chemin » de l'URL (domaine uniquement)",
+    "description": "Ignore path part in URL - matches all pages on the same domain"
   },
   "ignore3w": {
     "message": "Ignorer 'www' dans le nom de domaine de l'URL",
@@ -120,8 +120,8 @@
     "description": "Conteneur dans toutes les fenêtres"
   },
   "closeAllDuplicateTabs": {
-    "message": "Fermer tous",
-    "description": "Close all"
+    "message": "Fermer les doublons",
+    "description": "Close all duplicate tabs (keeps one per group)"
   },
   "groupDuplicateTabs": {
     "message": "Group by URL",
@@ -160,6 +160,10 @@
   "whitelistedTab": {
     "message": "Whitelisted - not auto-closed",
     "description": "Tooltip shown on duplicate tabs that match the whitelist"
+  },
+  "skipWhitelistedTooltip": {
+    "message": "Ignorer les onglets de la liste blanche lors de la fermeture des doublons",
+    "description": "Tooltip for the shield icon checkbox next to the Close All button"
   },
   "customization": {
     "message": "Personnalisation",

@@ -15,7 +15,8 @@ class TabsInfo {
         const openedTabs = await getTabs({ windowType: "normal" });
         if (!openedTabs) return;
         for (const openedTab of openedTabs) {
-            this.setTab(openedTab.id, { url: openedTab.url, complete: true });
+            const lastComplete = openedTab.lastAccessed ?? openedTab.index;
+            this.setTab(openedTab.id, { url: openedTab.url, complete: true, lastComplete: lastComplete });
         }
         const result = await chrome.storage.session.get('intentionalDuplicates');
         const ids = result.intentionalDuplicates || [];
@@ -29,7 +30,7 @@ class TabsInfo {
         if (Object.prototype.hasOwnProperty.call(details, "url"))
             storedTab.url = details.url;
         if (completeChanged)
-            storedTab.lastComplete = details.complete ? Date.now() : null;
+            storedTab.lastComplete = details.complete ? (details.lastComplete ?? Date.now()) : null;
         if (Object.prototype.hasOwnProperty.call(details, "closing"))
             storedTab.closing = details.closing;
         this.storedTabs.set(tabId, storedTab);

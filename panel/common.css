@@ -307,6 +307,14 @@ html.theme-violet {
     opacity: 0.7;
 }
 
+.tab-row-duplicate td {
+    opacity: 0.6;
+}
+
+.tab-row-duplicate .td-tab-title {
+    text-decoration: line-through;
+}
+
 .td-close-button {
     width: 5px;
     padding: 1px 7px 1px 1px !important;
@@ -475,6 +483,28 @@ html.theme-violet {
     color: var(--dtc-header-text);
     background-color: var(--dtc-header-bg);
     border-color: var(--dtc-header-bg);
+}
+
+.skip-whitelisted-label {
+    display: flex;
+    align-items: center;
+    margin-left: 6px;
+    cursor: pointer;
+}
+
+.skip-whitelisted-label input[type="checkbox"] {
+    display: none;
+}
+
+.skip-whitelisted-label .fa-shield-halved {
+    font-size: 14px;
+    opacity: 0.35;
+    transition: opacity 0.15s, color 0.15s;
+}
+
+.skip-whitelisted-label:has(input:checked) .fa-shield-halved {
+    opacity: 0.85;
+    color: var(--bs-success);
 }
 
 /* ── Forms ── */

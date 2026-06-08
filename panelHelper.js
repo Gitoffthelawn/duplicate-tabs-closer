@@ -69,7 +69,7 @@ const saveActiveWindowId = async () => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const requestCloseDuplicateTabs = () => sendMessage("closeDuplicateTabs", { "windowId": activeWindowId });
+const requestCloseDuplicateTabs = (skipWhitelisted) => sendMessage("closeDuplicateTabs", { "windowId": activeWindowId, "skipWhitelisted": skipWhitelisted });
 
 // eslint-disable-next-line no-unused-vars
 const saveOption = (name, value, refresh) => sendMessage("setStoredOption", { "name": name, "value": value, "refresh": refresh });

@@ -68,8 +68,8 @@
     "description": "Ignore search part in URL"
   },
   "ignorePathPart": {
-    "message": "URLのパス部分を無視する",
-    "description": "Ignore path part in URL"
+    "message": "URLのパス部分を無視する（ドメインのみ）",
+    "description": "Ignore path part in URL - matches all pages on the same domain"
   },
   "ignore3w": {
     "message": "URLドメイン名の 'www' を無視する",
@@ -120,8 +120,8 @@
     "description": "Container in all windows"
   },
   "closeAllDuplicateTabs": {
-    "message": "重複したタブをすべて閉じる",
-    "description": "Close all"
+    "message": "重複タブを閉じる",
+    "description": "Close all duplicate tabs (keeps one per group)"
   },
   "groupDuplicateTabs": {
     "message": "Group by URL",
@@ -160,6 +160,10 @@
   "whitelistedTab": {
     "message": "ホワイトリスト登録済み - 自動的に閉じません",
     "description": "Tooltip shown on duplicate tabs that match the whitelist"
+  },
+  "skipWhitelistedTooltip": {
+    "message": "重複タブを閉じるときにホワイトリストのタブをスキップする",
+    "description": "Tooltip for the shield icon checkbox next to the Close All button"
   },
   "customization": {
     "message": "カスタマイズ",
