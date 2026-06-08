@@ -2,7 +2,7 @@
 
 // Chrome MV3 service worker only — Firefox loads scripts via manifest background.scripts
 if (typeof importScripts === "function") {
-	importScripts("helper.js", "tabsInfo.js", "options.js", "urlUtils.js", "badge.js", "worker.js", "messageListener.js");
+	importScripts("dtcLog.js", "helper.js", "tabsInfo.js", "options.js", "urlUtils.js", "badge.js", "worker.js", "messageListener.js");
 }
 
 let initPromise = null;
@@ -20,6 +20,7 @@ const ensureInitialized = () => {
 };
 
 const initialize = async () => {
+	dtcLog("bg", "init-start");
 	await initializeOptions();
 	const sessionData = await chrome.storage.session.get('monitoringPaused');
 	monitoringPaused = sessionData.monitoringPaused || false;
@@ -29,12 +30,14 @@ const initialize = async () => {
 	if (!monitoringPaused) await refreshGlobalDuplicateTabsInfo();
 	postStartupBurst = true;
 	setTimeout(() => { postStartupBurst = false; }, 3000);
+	dtcLog("bg", "init-done", { paused: monitoringPaused });
 };
 
 // eslint-disable-next-line no-unused-vars
 const toggleMonitorPause = async () => {
 	monitoringPaused = !monitoringPaused;
 	await chrome.storage.session.set({ monitoringPaused });
+	dtcLog("bg", "monitor-toggled", { paused: monitoringPaused });
 	if (monitoringPaused) {
 		await setStoredOption("onDuplicateTabDetected", "N", false);
 		chrome.runtime.sendMessage({ action: "setStoredOption", data: { name: "onDuplicateTabDetected", value: "N" } }).catch(() => {});
@@ -80,6 +83,7 @@ const onCreatedTab = async (tab) => {
 		tabsInfo.setPendingCheck(tab.id, checkPromise);
 	}
 	tabsInfo.setTab(tab.id, {});
+	dtcLog("bg", "tab-created", { tabId: tab.id, windowId: tab.windowId, url: tab.url, status: tab.status, autoClose: options.autoCloseTab, burst: postStartupBurst });
 	if (!tabsInfo.hasNbDuplicateTabs(tab.windowId)) {
 		tabsInfo.setNbDuplicateTabs(tab.windowId, 0);
 		updateBadgeStyle();
@@ -100,9 +104,10 @@ const onBeforeNavigate = async (details) => {
 	const prev = _lastNavigate.get(details.tabId);
 	if (prev && prev.url === details.url && (Date.now() - prev.ts) < 1000) return;
 	_lastNavigate.set(details.tabId, { url: details.url, ts: Date.now() });
+	dtcLog("bg", "before-navigate", { tabId: details.tabId, url: details.url, autoClose: options.autoCloseTab, burst: postStartupBurst });
 	if (options.autoCloseTab && !postStartupBurst && !isBlankURL(details.url)) {
-		if (!tabsInfo.hasTab(details.tabId)) return;
-		if (tabsInfo.isClosingTab(details.tabId)) return;
+		if (!tabsInfo.hasTab(details.tabId)) { dtcLog("bg", "before-navigate-skip", { tabId: details.tabId, reason: "unregistered" }); return; }
+		if (tabsInfo.isClosingTab(details.tabId)) { dtcLog("bg", "before-navigate-skip", { tabId: details.tabId, reason: "closing" }); return; }
 		const tab = await getTab(details.tabId);
 		if (tab) {
 			tabsInfo.setTab(tab.id, { complete: false });
@@ -120,6 +125,7 @@ const onCompletedTab = async (details) => {
 		if (tab) {
 			const alreadyComplete = tabsInfo.getLastComplete(tab.id) !== null && !tabsInfo.hasUrlChanged(tab);
 			if (!alreadyComplete) tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
+			dtcLog("bg", "nav-completed", { tabId: tab.id, windowId: tab.windowId, url: tab.url, autoClose: options.autoCloseTab, burst: postStartupBurst, redundant: alreadyComplete });
 			dispatchTabCompletion(tab, tab.id, { alreadyComplete });
 		}
 	}
@@ -131,11 +137,13 @@ const onUpdatedTab = async (tabId, changeInfo, tab) => {
 	if (tabsInfo.isClosingTab(tabId)) return;
 	if (Object.prototype.hasOwnProperty.call(changeInfo, "status") && changeInfo.status === "complete") {
 		if (Object.prototype.hasOwnProperty.call(changeInfo, "url") && (changeInfo.url !== tab.url)) {
+			dtcLog("bg", "tab-updated-url", { tabId: tab.id, windowId: tab.windowId, url: tab.url, blank: isBlankURL(tab.url), favIcon: !!tab.favIconUrl, urlChanged: tabsInfo.hasUrlChanged(tab) });
 			if (isBlankURL(tab.url) || !tab.favIconUrl || !tabsInfo.hasUrlChanged(tab)) return;
 			tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
 			dispatchTabCompletion(tab, tab.id);
 		}
 		else if (isChromeURL(tab.url) || isBlankURL(tab.url)) {
+			dtcLog("bg", "tab-updated-blank", { tabId: tab.id, windowId: tab.windowId, url: tab.url });
 			tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
 			dispatchTabCompletion(tab, tab.id);
 		}
@@ -145,6 +153,7 @@ const onUpdatedTab = async (tabId, changeInfo, tab) => {
 const onAttached = async (tabId) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
+	dtcLog("bg", "tab-attached", { tabId, autoClose: options.autoCloseTab });
 	const tab = await getTab(tabId);
 	if (tab) dispatchTabCompletion(tab, null);
 };
@@ -153,9 +162,13 @@ const onRemovedTab = async (removedTabId, removeInfo) => {
 	await ensureInitialized();
 	tabsInfo.removeTab(removedTabId);
 	_lastNavigate.delete(removedTabId);
+	dtcLog("bg", "tab-removed", { tabId: removedTabId, windowId: removeInfo.windowId, windowClosing: removeInfo.isWindowClosing, hasDups: tabsInfo.hasDuplicateTabs(removeInfo.windowId) });
 	if (monitoringPaused) return;
 	if (removeInfo.isWindowClosing) {
-		if (options.searchInAllWindows && tabsInfo.hasDuplicateTabs(removeInfo.windowId)) refreshDuplicateTabsInfo();
+		if (options.searchInAllWindows && tabsInfo.hasDuplicateTabs(removeInfo.windowId)) {
+			dtcLog("bg", "refresh-queued", { windowId: null, reason: "window-closing-cross-window" });
+			refreshDuplicateTabsInfo();
+		}
 		tabsInfo.clearDuplicateTabsInfo(removeInfo.windowId);
 		refreshDuplicateTabsInfo.cleanup(removeInfo.windowId);
 		handleRemainingTab.cleanup(removeInfo.windowId);
@@ -163,6 +176,7 @@ const onRemovedTab = async (removedTabId, removeInfo) => {
 		updateBadgeStyle();
 	}
 	else if (tabsInfo.hasDuplicateTabs(removeInfo.windowId)) {
+		dtcLog("bg", "refresh-queued", { windowId: removeInfo.windowId, reason: "tab-removed" });
 		refreshDuplicateTabsInfo(removeInfo.windowId);
 	}
 };
@@ -170,7 +184,9 @@ const onRemovedTab = async (removedTabId, removeInfo) => {
 const onDetachedTab = async (detachedTabId, detachInfo) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
+	dtcLog("bg", "tab-detached", { tabId: detachedTabId, windowId: detachInfo.oldWindowId, hasDuplicates: tabsInfo.hasDuplicateTabs(detachInfo.oldWindowId) });
 	if (tabsInfo.hasDuplicateTabs(detachInfo.oldWindowId)) {
+		dtcLog("bg", "refresh-queued", { windowId: detachInfo.oldWindowId, reason: "tab-detached" });
 		refreshDuplicateTabsInfo(detachInfo.oldWindowId);
 	} else {
 		setBadge(detachInfo.oldWindowId);
@@ -180,19 +196,34 @@ const onDetachedTab = async (detachedTabId, detachInfo) => {
 const onActivatedTab = async (activeInfo) => {
 	await ensureInitialized();
 	if (environment.isFirefox) return;
+	dtcLog("bg", "tab-activated", { tabId: activeInfo.tabId, windowId: activeInfo.windowId });
 	setBadge(activeInfo.windowId, activeInfo.tabId);
 };
 
 const onReplacedTab = async (addedTabId, removedTabId) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
+	dtcLog("bg", "tab-replaced", { tabId: addedTabId, removedTabId });
+	dtcLog("bg", "tab-replaced-dispatch", { tabId: addedTabId, autoClose: options.autoCloseTab });
 	tabsInfo.removeTab(removedTabId);
 	const tab = await getTab(addedTabId);
 	if (tab) await searchForDuplicateTabsToClose(tab);
 };
 
+const onCommittedTab = async (details) => {
+	if (!environment.isChrome) return;
+	if (details.frameId !== 0 || details.tabId === -1) return;
+	await ensureInitialized();
+	const tab = await getTab(details.tabId);
+	if (tab) {
+		dtcLog("bg", "nav-committed", { tabId: tab.id, windowId: tab.windowId, url: details.url });
+		setBadge(tab.windowId, tab.id);
+	}
+};
+
 const onCommand = async (command) => {
 	await ensureInitialized();
+	dtcLog("bg", "command", { command });
 	if (command == "close-duplicate-tabs") closeDuplicateTabs();
 	else if (command == "toggle-close-mode") setStoredOption("onDuplicateTabDetected", options.autoCloseTab ? "N" : "A", false);
 	else if (command == "toggle-monitor-pause") toggleMonitorPause();
@@ -205,6 +236,9 @@ chrome.runtime.onStartup.addListener(() => ensureInitialized());
 // companion extension, or when multiple option pages are open simultaneously)
 chrome.storage.onChanged.addListener((changes, area) => {
 	if (area !== "local") return;
+	const wasSavingLocally = _savingLocally;
+	_savingLocally = false;
+	if (wasSavingLocally) return;
 	if (monitoringPaused) return;
 	let hasOptionChange = false;
 	for (const key of Object.keys(changes)) {
@@ -213,6 +247,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
 	if (!hasOptionChange) return;
 	getStoredOptions().then(current => {
 		setOptions(current.storedOptions);
+		dtcLog("bg", "refresh-queued", { windowId: null, reason: "options-changed" });
 		refreshGlobalDuplicateTabsInfo();
 	});
 });
@@ -222,6 +257,7 @@ chrome.tabs.onAttached.addListener(onAttached);
 chrome.tabs.onDetached.addListener(onDetachedTab);
 chrome.tabs.onUpdated.addListener(onUpdatedTab);
 chrome.webNavigation.onCompleted.addListener(onCompletedTab);
+chrome.webNavigation.onCommitted.addListener(onCommittedTab);
 chrome.tabs.onRemoved.addListener(onRemovedTab);
 chrome.tabs.onActivated.addListener(onActivatedTab);
 chrome.tabs.onReplaced.addListener(onReplacedTab);

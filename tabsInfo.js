@@ -16,16 +16,19 @@ class TabsInfo {
         if (!openedTabs) return;
         for (const openedTab of openedTabs) {
             const lastComplete = openedTab.lastAccessed ?? openedTab.index;
+            dtcLog("tabsInfo", "seed", { tabId: openedTab.id, index: openedTab.index, lastAccessed: openedTab.lastAccessed ?? null, lastComplete });
             this.setTab(openedTab.id, { url: openedTab.url, complete: true, lastComplete: lastComplete });
         }
         const result = await chrome.storage.session.get('intentionalDuplicates');
         const ids = result.intentionalDuplicates || [];
         ids.forEach(id => this.intentionalDuplicates.add(id));
+        dtcLog("tabsInfo", "init-done", { tabCount: openedTabs.length });
     }
 
     setTab(tabId, details) {
         const storedTab = this.storedTabs.get(tabId)
             || { url: null, lastComplete: null, closing: false };
+        const urlChanged = Object.prototype.hasOwnProperty.call(details, "url") && details.url !== storedTab.url;
         const completeChanged = Object.prototype.hasOwnProperty.call(details, "complete");
         if (Object.prototype.hasOwnProperty.call(details, "url"))
             storedTab.url = details.url;
@@ -34,10 +37,17 @@ class TabsInfo {
         if (Object.prototype.hasOwnProperty.call(details, "closing"))
             storedTab.closing = details.closing;
         this.storedTabs.set(tabId, storedTab);
+        if (urlChanged || completeChanged) {
+            const payload = { tabId };
+            if (urlChanged) payload.url = details.url;
+            if (completeChanged) payload.complete = details.complete;
+            dtcLog("tabsInfo", "tab-set", payload);
+        }
     }
 
     setClosingTab(tabId, state) {
         this.setTab(tabId, { closing: state });
+        if (state) dtcLog("tabsInfo", "tab-closing", { tabId });
     }
 
     isClosingTab(tabId) {
@@ -62,6 +72,7 @@ class TabsInfo {
             this._persistIntentionalDuplicates();
         }
         this.pendingChecks.delete(tabId);
+        dtcLog("tabsInfo", "tab-removed", { tabId });
     }
 
     hasTab(tabId) {
@@ -82,7 +93,10 @@ class TabsInfo {
     }
 
     setNbDuplicateTabs(windowId, nbDuplicateTabs) {
-        this.nbDuplicateTabs.set(windowId, nbDuplicateTabs.toString());
+        const newVal = nbDuplicateTabs.toString();
+        if (this.nbDuplicateTabs.get(windowId) === newVal) return;
+        this.nbDuplicateTabs.set(windowId, newVal);
+        dtcLog("tabsInfo", "dup-count-set", { windowId, count: nbDuplicateTabs });
     }
 
     clearDuplicateTabsInfo(windowId) {
@@ -100,6 +114,7 @@ class TabsInfo {
     setIntentionalDuplicate(tabId) {
         this.intentionalDuplicates.add(tabId);
         this._persistIntentionalDuplicates();
+        dtcLog("tabsInfo", "intentional-dup", { tabId });
     }
 
     _persistIntentionalDuplicates() {
