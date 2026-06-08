@@ -163,10 +163,14 @@ const initializeOptions = async () => {
 };
 
 // eslint-disable-next-line no-unused-vars
+let _savingLocally = false;
+
+// eslint-disable-next-line no-unused-vars
 const setStoredOption = async (name, value, refresh) => {
     const options = await getStoredOptions();
     const storedOptions = options.storedOptions;
     storedOptions[name].value = value;
+    _savingLocally = true;
     await saveStoredOptions(storedOptions);
     setOptions(storedOptions);
     if (name === "onDuplicateTabDetected") setBadgeIcon();

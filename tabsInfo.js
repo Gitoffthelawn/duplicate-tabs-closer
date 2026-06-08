@@ -82,7 +82,9 @@ class TabsInfo {
     }
 
     setNbDuplicateTabs(windowId, nbDuplicateTabs) {
-        this.nbDuplicateTabs.set(windowId, nbDuplicateTabs.toString());
+        const newVal = nbDuplicateTabs.toString();
+        if (this.nbDuplicateTabs.get(windowId) === newVal) return;
+        this.nbDuplicateTabs.set(windowId, newVal);
     }
 
     clearDuplicateTabsInfo(windowId) {

@@ -211,7 +211,7 @@ const handleObservedTab = (details) => {
     let matchingKey = matchingTabURL;
     let retainedTab = retainedTabs.get(matchingKey);
     if (!retainedTab) {
-        if (isTabComplete(observedTab)) retainedTabs.set(matchingKey, observedTab);
+        if (isTabComplete(observedTab) || tabsInfo.getLastComplete(observedTab.id) !== null) retainedTabs.set(matchingKey, observedTab);
         if (matchingTabTitle) {
             matchingKey = findFuzzyTitleKey(observedTab.title, retainedTabs) || matchingTabTitle;
             retainedTab = retainedTabs.get(matchingKey);
@@ -365,7 +365,7 @@ const sendDuplicateTabs = async (duplicateTabsGroups, retainedTabs) => {
     chrome.runtime.sendMessage({
         action: "updateDuplicateTabsTable",
         data: { "duplicateTabs": duplicateTabs }
-    });
+    }).catch(() => {});
 };
 
 const _refreshDuplicateTabsInfo = async (windowId) => {

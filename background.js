@@ -205,6 +205,9 @@ chrome.runtime.onStartup.addListener(() => ensureInitialized());
 // companion extension, or when multiple option pages are open simultaneously)
 chrome.storage.onChanged.addListener((changes, area) => {
 	if (area !== "local") return;
+	const wasSavingLocally = _savingLocally;
+	_savingLocally = false;
+	if (wasSavingLocally) return;
 	if (monitoringPaused) return;
 	let hasOptionChange = false;
 	for (const key of Object.keys(changes)) {
