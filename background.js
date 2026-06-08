@@ -219,8 +219,17 @@ chrome.storage.onChanged.addListener((changes, area) => {
 		refreshGlobalDuplicateTabsInfo();
 	});
 });
+const onCommittedTab = async (details) => {
+	if (!environment.isChrome) return;
+	if (details.frameId !== 0 || details.tabId === -1) return;
+	await ensureInitialized();
+	const tab = await getTab(details.tabId);
+	if (tab) setBadge(tab.windowId, tab.id);
+};
+
 chrome.tabs.onCreated.addListener(onCreatedTab);
 chrome.webNavigation.onBeforeNavigate.addListener(onBeforeNavigate);
+chrome.webNavigation.onCommitted.addListener(onCommittedTab);
 chrome.tabs.onAttached.addListener(onAttached);
 chrome.tabs.onDetached.addListener(onDetachedTab);
 chrome.tabs.onUpdated.addListener(onUpdatedTab);
