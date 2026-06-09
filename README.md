@@ -55,7 +55,7 @@ Determines what happens to the kept tab after its duplicate is closed.
 
 > Available in the **Options page** only.
 
-A list of URL patterns, one per line. Whitelisted tabs are always detected and shown in the duplicate tabs list, marked with a tooltip indicating they are whitelisted. In *Close tab automatically* mode, they are excluded from automatic closing.
+A list of URL patterns, one per line. Whitelisted tabs are always detected and shown in the duplicate tabs list, marked with a tooltip indicating they are whitelisted. In *Close tab automatically* mode, they are never auto-closed. When the **Hide whitelisted tabs** button is active, they are also excluded from the **Close duplicates** button in manual mode.
 
 **Pattern syntax:** `*` matches any sequence of characters. All other characters match literally.
 
