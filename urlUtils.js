@@ -9,7 +9,7 @@ const isChromeURL = (url) => url.startsWith("chrome://") || url.startsWith("chro
 const isBrowserURL = (url) => url.startsWith("about:") || url.startsWith("chrome://") || url.startsWith("edge://") || url.startsWith("opera://") || url.startsWith("vivaldi://") || url.startsWith("brave://");
 
 const isValidURL = (url) => {
-	const regex = /^(f|ht)tps?:\/\//i;
+	const regex = /^((f|ht)tps?|file):\/\//i;
 	return regex.test(url);
 };
 
@@ -25,7 +25,7 @@ const getMatchingURL = (url) => {
 	let matchingURL = url;
 	if (options.ignorePathPart) {
 		const uri = new URL(matchingURL);
-		matchingURL = uri.origin;
+		matchingURL = uri.protocol === "file:" ? `file://${uri.hostname}` : uri.origin;
 	} else {
 		if (options.ignoreSearchPart) {
 			matchingURL = matchingURL.split("?")[0];
@@ -52,6 +52,7 @@ const getMatchPatternURL = (url) => {
 	let urlPattern = null;
 	if (isValidURL(url)) {
 		const uri = new URL(url);
+		if (uri.protocol === "file:") return null;
 		urlPattern = `*://${uri.hostname}`;
 		if (options.ignorePathPart) {
 			urlPattern += "/*";

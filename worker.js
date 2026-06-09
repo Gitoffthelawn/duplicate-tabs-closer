@@ -1,6 +1,9 @@
 "use strict";
 
-const isUrlWhiteListed = (url) => options.whiteList.some(pattern => pattern.test(url));
+const isUrlWhiteListed = (url) => {
+    const normalizedUrl = url.replace(/\/$/, "");
+    return options.whiteList.some(pattern => pattern.test(normalizedUrl));
+};
 
 const matchByUrlPattern = (url1, url2) => {
     for (const { source, regex } of options.urlRegexRules) {
