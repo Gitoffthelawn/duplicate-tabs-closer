@@ -222,10 +222,10 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 const onCommittedTab = async (details) => {
 	if (!environment.isChrome) return;
-	if (details.frameId !== 0 || details.tabId === -1) return;
+	if (details.frameId !== 0 || details.tabId <= 0) return;
 	await ensureInitialized();
 	const tab = await getTab(details.tabId);
-	if (tab) setBadge(tab.windowId, tab.id);
+	if (tab && tab.id > 0) setBadge(tab.windowId, tab.id);
 };
 
 chrome.tabs.onCreated.addListener(onCreatedTab);
