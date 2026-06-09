@@ -32,9 +32,8 @@ const matchTitle = (tab1, tab2) => {
 
 const getHttpsTabId = (observedTab, observedTabUrl, openedTab) => {
     if (options.keepTabWithHttps) {
-        const regex = /^https:\/\//i;
-        const match1 = regex.test(observedTabUrl);
-        const match2 = regex.test(openedTab.url);
+        const match1 = isHttps(observedTabUrl);
+        const match2 = isHttps(openedTab.url);
         if (match1) {
             return match2 ? null : observedTab.id;
         } else {
@@ -169,12 +168,9 @@ const closeDuplicateTab = async (tabToCloseId, remainingTabInfo) => {
         return;
     }
     if (await tabExists(tabToCloseId)) {
-        await wait(200);
-        if (await tabExists(tabToCloseId)) {
-            tabsInfo.setClosingTab(tabToCloseId, false);
-            refreshDuplicateTabsInfo(remainingTabInfo.windowId);
-            return;
-        }
+        tabsInfo.setClosingTab(tabToCloseId, false);
+        refreshDuplicateTabsInfo(remainingTabInfo.windowId);
+        return;
     }
     handleRemainingTab(remainingTabInfo.windowId, remainingTabInfo);
 };
@@ -197,6 +193,13 @@ const _handleRemainingTab = async (details) => {
 };
 
 const handleRemainingTab = debounce(_handleRemainingTab, 500);
+
+const invalidateRetainedURLKey = (retainedTab, currentMatchingKey, retainedTabs) => {
+    const urlKey = getMatchingURL(retainedTab.url) + (options.searchPerContainer ? retainedTab.cookieStoreId : "");
+    if (urlKey !== currentMatchingKey && retainedTabs.get(urlKey) === retainedTab) {
+        retainedTabs.delete(urlKey);
+    }
+};
 
 const handleObservedTab = (details) => {
     const observedTab = details.tab;
@@ -250,11 +253,13 @@ const handleObservedTab = (details) => {
             }
             else {
                 details.tabsToClose.add(retainedTab.id);
+                invalidateRetainedURLKey(retainedTab, matchingKey, retainedTabs);
                 retainedTabs.set(matchingKey, observedTab);
             }
         } else {
             const [tabToCloseId] = getCloseInfo({ observedTab: observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
             if (tabToCloseId === retainedTab.id) {
+                invalidateRetainedURLKey(retainedTab, matchingKey, retainedTabs);
                 retainedTabs.set(matchingKey, observedTab);
             }
             const tabs = duplicateTabsGroups.get(matchingKey) || new Set([retainedTab]);

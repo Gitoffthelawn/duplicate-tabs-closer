@@ -8,7 +8,6 @@ class TabsInfo {
         this.knownSessionIds = new Set();
         this.intentionalDuplicates = new Set();
         this.pendingChecks = new Map();
-        this.initialize();
     }
 
     async initialize() {

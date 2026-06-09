@@ -54,6 +54,7 @@ const updateBadgesValue = async (duplicateTabsGroups, windowId) => {
 	const nbDuplicateTabs = getNbDuplicateTabs(duplicateTabsGroups);
 	if (options.searchInAllWindows) {
 		const windows = await getWindows();
+		if (!windows) return;
 		windows.forEach(window => updateBadgeValue(nbDuplicateTabs, window.id));
 	}
 	else {
@@ -64,7 +65,11 @@ const updateBadgesValue = async (duplicateTabsGroups, windowId) => {
 // eslint-disable-next-line no-unused-vars
 const updateBadgeStyle = async () => {
 	const windows = await getWindows();
-	windows.forEach(window => setBadge(window.id));
+	if (!windows) return;
+	await Promise.all(windows.map(async w => {
+		const activeTabId = await getActiveTabId(w.id);
+		setBadge(w.id, activeTabId);
+	}));
 };
 
 // eslint-disable-next-line no-unused-vars

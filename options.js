@@ -172,6 +172,7 @@ let _savingLocally = false;
 const setStoredOption = async (name, value, refresh) => {
     const options = await getStoredOptions();
     const storedOptions = options.storedOptions;
+    if (!storedOptions[name]) storedOptions[name] = { value: defaultOptions[name].value };
     storedOptions[name].value = value;
     _savingLocally = true;
     await saveStoredOptions(storedOptions);
@@ -254,7 +255,8 @@ const isPopupOpen = async () => {
 
 const escapeRegexChar = (ch) => ch.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
 
-const whiteListToPattern = (whiteList) => {    const whiteListPatterns = new Set();
+const whiteListToPattern = (whiteList) => {
+    const whiteListPatterns = new Set();
     const whiteListLines = whiteList.split("\n").map(line => line.trim()).filter(line => line.length > 0);
     whiteListLines.forEach(whiteListLine => {
         const normalizedLine = whiteListLine.replace(/\/$/, "");

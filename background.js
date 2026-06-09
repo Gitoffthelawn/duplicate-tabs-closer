@@ -15,12 +15,13 @@ const _lastNavigate = new Map(); // tabId -> { url, ts }
 
 // eslint-disable-next-line no-unused-vars
 const ensureInitialized = () => {
-	if (!initPromise) initPromise = initialize();
+	if (!initPromise) initPromise = initialize().catch(err => { initPromise = null; throw err; });
 	return initPromise;
 };
 
 const initialize = async () => {
 	await initializeOptions();
+	await tabsInfo.initialize();
 	const sessionData = await chrome.storage.session.get('monitoringPaused');
 	monitoringPaused = sessionData.monitoringPaused || false;
 	setBadgeIcon();
