@@ -80,6 +80,32 @@ body {
     cursor: not-allowed;
 }
 
+#hideWhitelistedTabsBtn {
+    margin-right: 6px;
+    opacity: 0.55;
+    transition: opacity 0.15s;
+}
+
+#hideWhitelistedTabsBtn:not(.disabled):hover {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+#hideWhitelistedTabsBtn.active {
+    color: #0ea5e9;
+    opacity: 1;
+}
+
+#hideWhitelistedTabsBtn.active:hover {
+    color: #38bdf8;
+    transform: scale(1.2);
+}
+
+#hideWhitelistedTabsBtn.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
 .fa-gear:hover {
     cursor: pointer;
     transform: scale(1.2);

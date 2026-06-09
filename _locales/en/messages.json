@@ -131,6 +131,10 @@
     "message": "Group by URL",
     "description": "Toggle grouped view of duplicate tabs in the popup"
   },
+  "groupDuplicateTabsTooltip": {
+    "message": "Group duplicate tabs",
+    "description": "Tooltip for the group duplicate tabs button"
+  },
   "closeGroup": {
     "message": "Close group",
     "description": "Close all duplicate tabs in a group"
@@ -165,9 +169,9 @@
     "message": "Whitelisted - not auto-closed",
     "description": "Tooltip shown on duplicate tabs that match the whitelist"
   },
-  "skipWhitelistedTooltip": {
-    "message": "Skip whitelisted tabs when closing duplicates",
-    "description": "Tooltip for the shield icon checkbox next to the Close All button"
+  "hideWhitelistedTooltip": {
+    "message": "Hide whitelisted tabs from the list",
+    "description": "Tooltip for the hide-whitelisted eye icon checkbox in the tab list footer"
   },
   "customization": {
     "message": "Customization",

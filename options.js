@@ -106,8 +106,8 @@ const defaultOptions = {
     closePopup: {
         value: false
     },
-    closeAllSkipWhitelisted: {
-        value: true
+    hideWhitelistedTabs: {
+        value: false
     },
     popupTwoColumns: {
         value: "2"

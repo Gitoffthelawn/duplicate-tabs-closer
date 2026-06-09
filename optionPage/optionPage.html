@@ -40,10 +40,14 @@
                   <option value="B" i18n-content="defaultTabBehavior"></option>
                 </select>
               </div>
-              <div id="whiteListGroup">
-                <label class="titleLabel" for="whiteList" i18n-content="whiteList"></label>
-                <textarea class="form-control rules-textarea" rows="4" id="whiteList"></textarea>
-              </div>
+            </div>
+          </li>
+          <li class="list-group-item list-group-item-header">
+            <span class="list-group-item-title list-group-expanded" i18n-content="whiteList" id="whiteListTitle"></span>
+          </li>
+          <li class="list-group-item">
+            <div class="form-group" id="whiteListBody">
+              <textarea class="form-control rules-textarea" rows="4" id="whiteList"></textarea>
             </div>
           </li>
           <li class="list-group-item list-group-item-header">
@@ -256,12 +260,9 @@
         </div>
       </div>
       <div class="table-footer d-flex align-items-center">
-        <button type="button" class="icon-btn disabled" id="groupDuplicateTabsBtn" disabled aria-disabled="true" aria-pressed="false" i18n-aria-label="groupDuplicateTabs"><span class="fa-solid fa-layer-group fa-sm" aria-hidden="true"></span></button>
+        <button type="button" class="icon-btn disabled" id="groupDuplicateTabsBtn" disabled aria-disabled="true" aria-pressed="false" i18n-aria-label="groupDuplicateTabs" title="groupDuplicateTabsTooltip"><span class="fa-solid fa-layer-group fa-sm" aria-hidden="true"></span></button>
+        <button type="button" class="icon-btn disabled" id="hideWhitelistedTabsBtn" disabled aria-disabled="true" aria-pressed="false" i18n-aria-label="hideWhitelistedTooltip" title="hideWhitelistedTooltip"><span class="fa-solid fa-list-check fa-sm" aria-hidden="true"></span></button>
         <button type="button" class="btn btn-xs btn-close-tabs disabled" id="closeDuplicateTabsBtn" disabled aria-disabled="true" i18n-content="closeAllDuplicateTabs"></button>
-        <label class="skip-whitelisted-label" for="closeAllSkipWhitelisted">
-          <input type="checkbox" id="closeAllSkipWhitelisted" checked />
-          <span class="fa-solid fa-shield-halved fa-sm" aria-hidden="true" title="skipWhitelistedTooltip"></span>
-        </label>
       </div>
     </div>
 

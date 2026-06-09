@@ -15,6 +15,10 @@
     "message": "Fermer l'onglet automatiquement",
     "description": "Close tab automatically"
   },
+  "showPanel": {
+    "message": "Afficher le panneau",
+    "description": "Show panel"
+  },
   "openPopupOnDuplicateDetected": {
     "message": "Ouvrir le panneau lors d'un doublon détecté",
     "description": "Open popup panel when a new duplicate tab is detected"
@@ -124,11 +128,15 @@
     "description": "Close all duplicate tabs (keeps one per group)"
   },
   "groupDuplicateTabs": {
-    "message": "Group by URL",
+    "message": "Grouper par URL",
     "description": "Toggle grouped view of duplicate tabs in the popup"
   },
+  "groupDuplicateTabsTooltip": {
+    "message": "Grouper les onglets en doublon",
+    "description": "Tooltip for the group duplicate tabs button"
+  },
   "closeGroup": {
-    "message": "Close group",
+    "message": "Fermer le groupe",
     "description": "Close all duplicate tabs in a group"
   },
   "tabsCount": {
@@ -146,24 +154,24 @@
     "description": "URLs de la Liste blanche"
   },
   "pauseMonitoring": {
-    "message": "Pause monitoring",
+    "message": "Mettre en pause la surveillance",
     "description": "Pause duplicate tab monitoring"
   },
   "resumeMonitoring": {
-    "message": "Resume monitoring",
+    "message": "Reprendre la surveillance",
     "description": "Resume duplicate tab monitoring"
   },
   "monitoringPaused": {
-    "message": "Monitoring is paused",
+    "message": "La surveillance est en pause",
     "description": "Shown in the duplicate tabs list when monitoring is paused"
   },
   "whitelistedTab": {
-    "message": "Whitelisted - not auto-closed",
+    "message": "En liste blanche - non fermé automatiquement",
     "description": "Tooltip shown on duplicate tabs that match the whitelist"
   },
-  "skipWhitelistedTooltip": {
-    "message": "Ignorer les onglets de la liste blanche lors de la fermeture des doublons",
-    "description": "Tooltip for the shield icon checkbox next to the Close All button"
+  "hideWhitelistedTooltip": {
+    "message": "Masquer les onglets en liste blanche",
+    "description": "Tooltip for the hide-whitelisted eye icon checkbox in the tab list footer"
   },
   "customization": {
     "message": "Personnalisation",
@@ -190,15 +198,15 @@
     "description": "Fermer le panneau de popup après la fermeture des onglets en doublon"
   },
   "popupTwoColumns": {
-    "message": "Popup layout",
+    "message": "Disposition du popup",
     "description": "Label for popup layout selector"
   },
   "popupOneColumn": {
-    "message": "Single column",
+    "message": "Colonne unique",
     "description": "Single column popup layout option"
   },
   "popupTwoColumnsOption": {
-    "message": "Two columns",
+    "message": "Deux colonnes",
     "description": "Two column popup layout option"
   },
   "moreOptions": {

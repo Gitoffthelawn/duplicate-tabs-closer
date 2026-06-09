@@ -24,9 +24,11 @@ const applyPausedState = (paused) => {
   if (paused) {
     icon.className = "fa-solid fa-play fa-lg";
     btn.setAttribute("aria-label", chrome.i18n.getMessage("resumeMonitoring"));
+    btn.setAttribute("title", chrome.i18n.getMessage("resumeMonitoring"));
   } else {
     icon.className = "fa-solid fa-pause fa-lg";
     btn.setAttribute("aria-label", chrome.i18n.getMessage("pauseMonitoring"));
+    btn.setAttribute("title", chrome.i18n.getMessage("pauseMonitoring"));
   }
 };
 
@@ -77,7 +79,7 @@ const loadPopupEvents = () => {
   if (whiteListEl) whiteListEl.addEventListener("change", function () {
     const whiteList = cleanUpWhiteList(this.value);
     setWhiteList(whiteList);
-    saveOption(this.id, whiteList, false);
+    saveOption(this.id, whiteList, true);
   });
 
   /* Save URL/title pattern rules */
@@ -158,7 +160,7 @@ const loadPopupEvents = () => {
   const closeBtn = document.getElementById("closeDuplicateTabsBtn");
   if (closeBtn) closeBtn.addEventListener("click", function () {
     if (!this.classList.contains("disabled")) {
-      const skipWhitelisted = document.getElementById("closeAllSkipWhitelisted")?.checked ?? true;
+      const skipWhitelisted = document.getElementById("hideWhitelistedTabsBtn")?.classList.contains("active") ?? false;
       requestCloseDuplicateTabs(skipWhitelisted);
     }
   });
@@ -178,6 +180,15 @@ const loadPopupEvents = () => {
       );
       resizeDuplicateTabsPanel(false);
     }
+  });
+
+  /* Toggle hide whitelisted */
+  const hideWhitelistedBtn = document.getElementById("hideWhitelistedTabsBtn");
+  if (hideWhitelistedBtn) hideWhitelistedBtn.addEventListener("click", function () {
+    if (this.classList.contains("disabled")) return;
+    const newValue = !this.classList.contains("active");
+    updateHideWhitelistedButton(newValue);
+    saveOption("hideWhitelistedTabs", newValue, false);
   });
 
 };
@@ -200,7 +211,6 @@ const cleanUpWhiteList = (whiteList) => {
 /* Show/Hide the AutoClose option */
 const changeAutoCloseOptionState = (state, resize) => {
   document.getElementById("onRemainingTabGroup").classList.toggle("hidden", state !== "A");
-  document.getElementById("whiteListGroup").classList.toggle("hidden", state !== "A");
   if (resize) resizeDuplicateTabsPanel();
 };
 
@@ -219,6 +229,7 @@ const setDuplicateTabsTable = (duplicateTabs) => {
   tbody.replaceChildren();
   const closeBtn = document.getElementById("closeDuplicateTabsBtn");
   const groupBtn = document.getElementById("groupDuplicateTabsBtn");
+  const hideBtn = document.getElementById("hideWhitelistedTabsBtn");
   if (duplicateTabs) {
     tbody.appendChild(groupedView
       ? buildGroupedDuplicateTabRows(duplicateTabs, activeWindowId)
@@ -241,6 +252,9 @@ const setDuplicateTabsTable = (duplicateTabs) => {
     groupBtn.classList.remove("disabled");
     groupBtn.setAttribute("aria-disabled", "false");
     groupBtn.removeAttribute("disabled");
+    hideBtn.classList.remove("disabled");
+    hideBtn.setAttribute("aria-disabled", "false");
+    hideBtn.removeAttribute("disabled");
   }
   else {
     chrome.storage.session.get('monitoringPaused').then(data => {
@@ -263,6 +277,9 @@ const setDuplicateTabsTable = (duplicateTabs) => {
     groupBtn.classList.add("disabled");
     groupBtn.setAttribute("aria-disabled", "true");
     groupBtn.setAttribute("disabled", "");
+    hideBtn.classList.add("disabled");
+    hideBtn.setAttribute("aria-disabled", "true");
+    hideBtn.setAttribute("disabled", "");
   }
   if (duplicateTabs) resizeDuplicateTabsPanel(isUpdate);
 };
@@ -316,6 +333,9 @@ const setPanelOption = (details) => {
       else if (storedOption === "popupGroupedView") {
         groupedView = value;
         updateGroupButton(value);
+      }
+      else if (storedOption === "hideWhitelistedTabs") {
+        updateHideWhitelistedButton(value);
       }
     }
     else if (typeof (value) === "number") {

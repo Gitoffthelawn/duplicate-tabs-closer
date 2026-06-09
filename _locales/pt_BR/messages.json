@@ -124,11 +124,15 @@
     "description": "Close all duplicate tabs (keeps one per group)"
   },
   "groupDuplicateTabs": {
-    "message": "Group by URL",
+    "message": "Agrupar por URL",
     "description": "Toggle grouped view of duplicate tabs in the popup"
   },
+  "groupDuplicateTabsTooltip": {
+    "message": "Agrupar abas duplicadas",
+    "description": "Tooltip for the group duplicate tabs button"
+  },
   "closeGroup": {
-    "message": "Close group",
+    "message": "Fechar grupo",
     "description": "Close all duplicate tabs in a group"
   },
   "tabsCount": {
@@ -161,9 +165,9 @@
     "message": "Na lista de permissões - não fechada automaticamente",
     "description": "Tooltip shown on duplicate tabs that match the whitelist"
   },
-  "skipWhitelistedTooltip": {
-    "message": "Ignorar abas da lista de permissões ao fechar duplicatas",
-    "description": "Tooltip for the shield icon checkbox next to the Close All button"
+  "hideWhitelistedTooltip": {
+    "message": "Ocultar abas da lista de permissões",
+    "description": "Tooltip for the hide-whitelisted eye icon checkbox in the tab list footer"
   },
   "customization": {
     "message": "Customização",
@@ -190,15 +194,15 @@
     "description": "Close popup panel after closing duplicate tabs"
   },
   "popupTwoColumns": {
-    "message": "Popup layout",
+    "message": "Layout do popup",
     "description": "Label for popup layout selector"
   },
   "popupOneColumn": {
-    "message": "Single column",
+    "message": "Coluna única",
     "description": "Single column popup layout option"
   },
   "popupTwoColumnsOption": {
-    "message": "Two columns",
+    "message": "Duas colunas",
     "description": "Two column popup layout option"
   },
   "moreOptions": {

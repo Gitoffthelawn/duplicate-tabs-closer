@@ -124,11 +124,15 @@
     "description": "Close all duplicate tabs (keeps one per group)"
   },
   "groupDuplicateTabs": {
-    "message": "Group by URL",
+    "message": "按URL分组",
     "description": "Toggle grouped view of duplicate tabs in the popup"
   },
+  "groupDuplicateTabsTooltip": {
+    "message": "将重复标签页分组",
+    "description": "Tooltip for the group duplicate tabs button"
+  },
   "closeGroup": {
-    "message": "Close group",
+    "message": "关闭分组",
     "description": "Close all duplicate tabs in a group"
   },
   "tabsCount": {
@@ -161,9 +165,9 @@
     "message": "已加入白名单 - 不会自动关闭",
     "description": "Tooltip shown on duplicate tabs that match the whitelist"
   },
-  "skipWhitelistedTooltip": {
-    "message": "关闭重复标签页时跳过白名单标签页",
-    "description": "Tooltip for the shield icon checkbox next to the Close All button"
+  "hideWhitelistedTooltip": {
+    "message": "从列表中隐藏白名单标签页",
+    "description": "Tooltip for the hide-whitelisted eye icon checkbox in the tab list footer"
   },
   "customization": {
     "message": "定制",
@@ -190,15 +194,15 @@
     "description": "Close popup panel after closing duplicate tabs"
   },
   "popupTwoColumns": {
-    "message": "Popup layout",
+    "message": "弹出窗口布局",
     "description": "Label for popup layout selector"
   },
   "popupOneColumn": {
-    "message": "Single column",
+    "message": "单列",
     "description": "Single column popup layout option"
   },
   "popupTwoColumnsOption": {
-    "message": "Two columns",
+    "message": "双列",
     "description": "Two column popup layout option"
   },
   "moreOptions": {

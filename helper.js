@@ -321,6 +321,7 @@ const buildTabRow = (duplicateTab, activeWindowId) => {
     tr.setAttribute("tabId", parseInt(duplicateTab.id, 10));
     tr.setAttribute("windowId", parseInt(duplicateTab.windowId, 10));
     if (!duplicateTab.isRetained) tr.classList.add("tab-row-duplicate");
+    if (duplicateTab.whitelisted) tr.setAttribute("data-whitelisted", "true");
 
     const tdIcon = document.createElement("td");
     tdIcon.className = "td-tab-icon";
@@ -384,6 +385,7 @@ const buildGroupedDuplicateTabRows = (duplicateTabs, activeWindowId) => {
         const headerTr = document.createElement("tr");
         headerTr.className = "tr-group-header collapsed";
         headerTr.dataset.groupTabIds = tabs.map(t => t.id).join(",");
+        if (tabs.every(tab => tab.whitelisted)) headerTr.setAttribute("data-whitelisted", "true");
 
         const tdHeader = document.createElement("td");
         tdHeader.className = "td-group-header-cell";

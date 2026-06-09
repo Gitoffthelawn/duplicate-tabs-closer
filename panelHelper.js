@@ -24,6 +24,15 @@ const updateGroupButton = (grouped) => {
     btn.setAttribute("aria-pressed", String(grouped));
 };
 
+// eslint-disable-next-line no-unused-vars
+const updateHideWhitelistedButton = (hidden) => {
+    const btn = document.getElementById("hideWhitelistedTabsBtn");
+    if (!btn) return;
+    btn.classList.toggle("active", hidden);
+    btn.setAttribute("aria-pressed", String(hidden));
+    document.getElementById("duplicateTabsTable")?.classList.toggle("hide-whitelisted", hidden);
+};
+
 let highlightBottomScrollShadowTimer = null;
 // eslint-disable-next-line no-unused-vars
 const highlightBottomScrollShadow = () => {
