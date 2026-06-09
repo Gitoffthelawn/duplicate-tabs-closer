@@ -25,7 +25,7 @@ const getMatchingURL = (url) => {
 	let matchingURL = url;
 	if (options.ignorePathPart) {
 		const uri = new URL(matchingURL);
-		matchingURL = uri.protocol === "file:" ? `file://${uri.hostname}` : uri.origin;
+		if (uri.protocol !== "file:") matchingURL = uri.origin;
 	} else {
 		if (options.ignoreSearchPart) {
 			matchingURL = matchingURL.split("?")[0];

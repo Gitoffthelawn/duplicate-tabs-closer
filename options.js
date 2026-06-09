@@ -149,10 +149,13 @@ const initializeOptions = async () => {
         const defaultKeys = Object.keys(defaultOptions).sort();
         if (JSON.stringify(storedKeys) !== JSON.stringify(defaultKeys)) {
             const obsoleteKeys = getNotInReferenceKeys(storedKeys, defaultKeys);
+            const legacySkipWhitelisted = storedOptions.closeAllSkipWhitelisted?.value; // TODO: remove after v4.4
             obsoleteKeys.forEach(key => delete storedOptions[key]);
             const missingKeys = getNotInReferenceKeys(defaultKeys, storedKeys);
             // eslint-disable-next-line no-return-assign
             missingKeys.forEach(key => storedOptions[key] = { value: defaultOptions[key].value });
+            if (legacySkipWhitelisted !== undefined) // TODO: remove after v4.4
+                storedOptions.hideWhitelistedTabs = { value: legacySkipWhitelisted };
             const environment = getEnvironment();
             storedOptions.environment.value = environment;
             storedOptions = await saveStoredOptions(storedOptions, true);
@@ -254,13 +257,14 @@ const escapeRegexChar = (ch) => ch.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
 const whiteListToPattern = (whiteList) => {    const whiteListPatterns = new Set();
     const whiteListLines = whiteList.split("\n").map(line => line.trim()).filter(line => line.length > 0);
     whiteListLines.forEach(whiteListLine => {
-        const length = whiteListLine.length;
+        const normalizedLine = whiteListLine.replace(/\/$/, "");
+        const length = normalizedLine.length;
         let pattern = "^";
         for (let index = 0; index < length; index += 1) {
-            const character = whiteListLine.charAt(index);
+            const character = normalizedLine.charAt(index);
             pattern = (character === "*") ? `${pattern}.*?` : pattern + escapeRegexChar(character);
         }
-        whiteListPatterns.add(new RegExp(`${pattern}$`));
+        whiteListPatterns.add(new RegExp(`${pattern}\\/?$`));
     });
     return Array.from(whiteListPatterns);
 };

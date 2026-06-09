@@ -1,9 +1,6 @@
 "use strict";
 
-const isUrlWhiteListed = (url) => {
-    const normalizedUrl = url.replace(/\/$/, "");
-    return options.whiteList.some(pattern => pattern.test(normalizedUrl));
-};
+const isUrlWhiteListed = (url) => options.whiteList.some(pattern => pattern.test(url));
 
 const matchByUrlPattern = (url1, url2) => {
     for (const { source, regex } of options.urlRegexRules) {
@@ -131,7 +128,7 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
         return;
     }
     const queryInfo = {};
-    if (isValidURL(observedTabUrl) && options.urlRegexRules.length === 0 && options.titleRegexRules.length === 0) queryInfo.url = getMatchPatternURL(observedTabUrl);
+    if (isValidURL(observedTabUrl) && options.urlRegexRules.length === 0 && options.titleRegexRules.length === 0) { const matchPattern = getMatchPatternURL(observedTabUrl); if (matchPattern) queryInfo.url = matchPattern; }
     queryInfo.windowId = options.searchInAllWindows ? null : observedWindowsId;
     if (environment.isFirefox) queryInfo.cookieStoreId = options.searchPerContainer ? observedTab.cookieStoreId : null;
     const openedTabs = await getTabs(queryInfo);
