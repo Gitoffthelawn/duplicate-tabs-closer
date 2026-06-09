@@ -53,10 +53,9 @@ Determines what happens to the kept tab after its duplicate is closed.
 
 #### Whitelisted URLs
 
-> Only active when **On duplicate tab detected** is set to *Close tab automatically*.
 > Available in the **Options page** only.
 
-A list of URL patterns, one per line. Tabs whose URLs match any entry are excluded from automatic closing. They are still counted in the badge.
+A list of URL patterns, one per line. Whitelisted tabs are always detected and shown in the duplicate tabs list, marked with a tooltip indicating they are whitelisted. In *Close tab automatically* mode, they are excluded from automatic closing.
 
 **Pattern syntax:** `*` matches any sequence of characters. All other characters match literally.
 
@@ -101,7 +100,7 @@ Controls how two tabs are compared to determine whether they are duplicates.
 | **Ignore 'www' in URL domain name** | off | Treats `www.example.com` and `example.com` as identical. |
 | **Ignore hash part in URL** | off | Ignores everything after `#` (`page.html#intro` = `page.html#setup`). Has no effect when *Ignore path part* is enabled. |
 | **Ignore search part in URL** | off | Ignores the query string (everything after `?`). Has no effect when *Ignore path part* is enabled. |
-| **Ignore path part in URL** | off | Compares only the origin (scheme + domain), ignoring path, query string, and hash. When this is enabled, *Ignore hash part* and *Ignore search part* are redundant. |
+| **Ignore path part in URL (domain only)** | off | Compares only the origin (scheme + domain), ignoring path, query string, and hash. When this is enabled, *Ignore hash part* and *Ignore search part* are redundant. |
 | **Compare with title** | off | Two tabs are also considered duplicates when their page titles match (see *% title similarity* below). Useful for pages that display the same title across different URLs. |
 | **% title similarity** | 100 | Minimum similarity percentage (1–100) for two titles to be considered a match. `100` requires an exact match (case-insensitive). Only active when *Compare with title* is enabled. |
 
@@ -155,7 +154,7 @@ Available in the **Options page** only.
 | **Duplicate tabs badge color** | `#f22121` (red) | Color of the extension icon badge when duplicate tabs are detected. |
 | **No duplicate tabs badge color** | `#1e90ff` (blue) | Color of the badge when no duplicates exist. Only relevant when *Show badge if no duplicate tabs* is enabled. |
 | **Show badge if no duplicate tabs** | on | Always displays the badge. When off, the badge is hidden entirely when there are no duplicates. |
-| **Close popup after closing duplicate tabs** | off | Automatically closes the popup panel after the *Close all* button is clicked. |
+| **Close popup after closing duplicate tabs** | off | Automatically closes the popup panel after the *Close duplicates* button is clicked. |
 | **Open popup on duplicate detected** | off | Automatically opens the popup panel whenever a new duplicate tab is detected. The Options section collapses automatically when the popup is opened this way, giving more space to the duplicate tabs list. |
 
 #### Themes
@@ -168,7 +167,11 @@ Available in the **Options page** only.
 
 ### Popup Panel
 
-* **Grouped view:** click the group icon in the duplicate tabs footer to switch between flat and grouped views. In grouped view, duplicate tabs are organised by matching rule group, collapsed by default. Each group shows a count badge and a close button to close all tabs in the group at once. The view preference is saved and shared with the options page.
+In the duplicate tabs list, tabs that will be closed show a strikethrough title. The tab that will be kept is shown at full brightness.
+
+* **Grouped view:** click the group icon in the duplicate tabs footer to switch between flat and grouped views. In grouped view, duplicate tabs are organised by matching rule group, collapsed by default. Each group shows a count badge and a close button to close all tabs in the group at once. Expand/collapse state per group is preserved while the panel is open. The view preference is saved and shared with the options page.
+
+* **Hide whitelisted tabs:** click the hide-whitelisted icon in the duplicate tabs footer to show or hide whitelisted tabs in the list. When active, tabs whose URLs match a whitelist entry are hidden from the panel. The preference is saved and shared with the options page. When hiding is active, the **Close duplicates** button also skips whitelisted tabs.
 
 * **Shrunk mode:** toggle the compress icon in the popup to hide all unpinned sections, keeping the panel compact. Sections can be pinned with the pin icon (📌) in the popup panel so they stay visible when shrunk mode is active.
 
