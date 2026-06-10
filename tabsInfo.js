@@ -8,6 +8,7 @@ class TabsInfo {
         this.knownSessionIds = new Set();
         this.intentionalDuplicates = new Set();
         this.pendingChecks = new Map();
+        this.tabSessionIdMap = new Map();
     }
 
     async initialize() {
@@ -60,6 +61,11 @@ class TabsInfo {
             this.intentionalDuplicates.delete(tabId);
             this._persistIntentionalDuplicates();
         }
+        const sessionId = this.tabSessionIdMap.get(tabId);
+        if (sessionId !== undefined) {
+            this.knownSessionIds.delete(sessionId);
+            this.tabSessionIdMap.delete(tabId);
+        }
         this.pendingChecks.delete(tabId);
     }
 
@@ -92,6 +98,11 @@ class TabsInfo {
 
     registerSessionId(sessionId) {
         this.knownSessionIds.add(sessionId);
+    }
+
+    storeTabSessionId(tabId, sessionId) {
+        this.knownSessionIds.add(sessionId);
+        this.tabSessionIdMap.set(tabId, sessionId);
     }
 
     isKnownSessionId(sessionId) {

@@ -59,7 +59,7 @@ const initializeTabSessionIds = async () => {
 			id = generateTabSessionId();
 			browser.sessions.setTabValue(tab.id, 'dtc-tab-id', id);
 		}
-		tabsInfo.registerSessionId(id);
+		tabsInfo.storeTabSessionId(tab.id, id);
 	}));
 };
 
@@ -76,7 +76,7 @@ const onCreatedTab = async (tab) => {
 				tabsInfo.setIntentionalDuplicate(tab.id);
 			}
 			const newId = generateTabSessionId();
-			tabsInfo.registerSessionId(newId);
+			tabsInfo.storeTabSessionId(tab.id, newId);
 			browser.sessions.setTabValue(tab.id, 'dtc-tab-id', newId);
 		})();
 		tabsInfo.setPendingCheck(tab.id, checkPromise);
