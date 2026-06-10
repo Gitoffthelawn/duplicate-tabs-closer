@@ -13,6 +13,7 @@ $SingleFiles = @(
     "messageListener.js",
     "options.js",
     "tabsInfo.js",
+    "tst.js",
     "urlUtils.js",
     "worker.js",
     "LICENSE",

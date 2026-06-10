@@ -26,6 +26,7 @@
       "options.js",
       "urlUtils.js",
       "badge.js",
+      "tst.js",
       "worker.js",
       "messageListener.js",
       "background.js"

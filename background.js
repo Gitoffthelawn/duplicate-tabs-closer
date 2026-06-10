@@ -2,7 +2,7 @@
 
 // Chrome MV3 service worker only — Firefox loads scripts via manifest background.scripts
 if (typeof importScripts === "function") {
-	importScripts("helper.js", "tabsInfo.js", "options.js", "urlUtils.js", "badge.js", "worker.js", "messageListener.js");
+	importScripts("helper.js", "tabsInfo.js", "options.js", "urlUtils.js", "badge.js", "tst.js", "worker.js", "messageListener.js");
 }
 
 let initPromise = null;
@@ -22,6 +22,7 @@ const ensureInitialized = () => {
 const initialize = async () => {
 	await initializeOptions();
 	await tabsInfo.initialize();
+	if (environment.isFirefox) await registerWithTST();
 	const sessionData = await chrome.storage.session.get('monitoringPaused');
 	monitoringPaused = sessionData.monitoringPaused || false;
 	setBadgeIcon();

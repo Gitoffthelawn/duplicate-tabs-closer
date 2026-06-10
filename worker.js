@@ -88,7 +88,7 @@ const getCloseInfo = (details) => {
         retainedTabId = getHttpsTabId(observedTab, observedTabUrl, openedTab);
         if (!retainedTabId) {
             retainedTabId = getLastUpdatedTabId(observedTab, openedTab);
-            if (activeWindowId) {
+            if (activeWindowId && observedTab.windowId !== openedTab.windowId) {
                 retainedTabId = getFocusedTab(observedTab, openedTab, activeWindowId, retainedTabId);
             }
         }
@@ -161,6 +161,11 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
 const closeDuplicateTab = async (tabToCloseId, remainingTabInfo) => {
     try {
         tabsInfo.setClosingTab(tabToCloseId, true);
+        if (environment.isFirefox && !(await expandTSTTabIfCollapsed(tabToCloseId))) {
+            tabsInfo.setClosingTab(tabToCloseId, false);
+            refreshDuplicateTabsInfo(remainingTabInfo.windowId);
+            return;
+        }
         await removeTab(tabToCloseId);
     }
     catch (ex) {
@@ -309,9 +314,18 @@ const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted) => {
     if (closeTabs) {
         if (tabsToClose.size > 0) {
             tabsToClose.forEach(tabId => tabsInfo.setClosingTab(tabId, true));
-            chrome.tabs.remove(Array.from(tabsToClose)).catch(() => {
-                tabsToClose.forEach(tabId => tabsInfo.setClosingTab(tabId, false));
-            });
+            let safeToClose = Array.from(tabsToClose);
+            if (environment.isFirefox) {
+                const results = await Promise.all(safeToClose.map(expandTSTTabIfCollapsed));
+                const blocked = safeToClose.filter((_, i) => !results[i]);
+                blocked.forEach(tabId => tabsInfo.setClosingTab(tabId, false));
+                safeToClose = safeToClose.filter((_, i) => results[i]);
+            }
+            if (safeToClose.length > 0) {
+                chrome.tabs.remove(safeToClose).catch(() => {
+                    safeToClose.forEach(tabId => tabsInfo.setClosingTab(tabId, false));
+                });
+            }
         }
         return;
     }
