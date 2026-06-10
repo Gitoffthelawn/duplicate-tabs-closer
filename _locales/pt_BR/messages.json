@@ -260,5 +260,9 @@
   "themeViolet": {
     "message": "Violet",
     "description": "Violet light theme"
+  },
+  "whiteListHint": {
+    "message": "Use * como curinga, ou envolva em /.../ para regex: /^(?!.*google\\.com)/",
+    "description": "Hint below the whitelist textarea showing pattern syntax examples"
   }
 }

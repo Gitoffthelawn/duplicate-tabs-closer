@@ -260,5 +260,9 @@
   "themeViolet": {
     "message": "Violet",
     "description": "Violet light theme"
+  },
+  "whiteListHint": {
+    "message": "* はワイルドカード。正規表現は /.../ で囲む例: /^(?!.*google\\.com)/",
+    "description": "Hint below the whitelist textarea showing pattern syntax examples"
   }
 }

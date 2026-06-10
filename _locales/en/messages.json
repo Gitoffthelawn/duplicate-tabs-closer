@@ -264,5 +264,9 @@
   "themeViolet": {
     "message": "Violet",
     "description": "Violet light theme"
+  },
+  "whiteListHint": {
+    "message": "Use * as wildcard, or wrap in /.../ for regex: /^(?!.*google\\.com)/",
+    "description": "Hint below the whitelist textarea showing pattern syntax examples"
   }
 }

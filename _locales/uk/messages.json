@@ -260,5 +260,9 @@
   "themeViolet": {
     "message": "Violet",
     "description": "Violet light theme"
+  },
+  "whiteListHint": {
+    "message": "Використовуйте * як символ підстановки або оберніть у /.../ для регулярного виразу: /^(?!.*google\\.com)/",
+    "description": "Hint below the whitelist textarea showing pattern syntax examples"
   }
 }

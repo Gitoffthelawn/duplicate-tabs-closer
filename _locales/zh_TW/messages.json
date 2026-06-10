@@ -260,5 +260,9 @@
   "themeViolet": {
     "message": "Violet",
     "description": "Violet light theme"
+  },
+  "whiteListHint": {
+    "message": "使用 * 作為萬用字元，或用 /.../ 包裹正規表示式，例如: /^(?!.*google\\.com)/",
+    "description": "Hint below the whitelist textarea showing pattern syntax examples"
   }
 }

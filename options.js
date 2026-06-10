@@ -259,14 +259,19 @@ const whiteListToPattern = (whiteList) => {
     const whiteListPatterns = new Set();
     const whiteListLines = whiteList.split("\n").map(line => line.trim()).filter(line => line.length > 0);
     whiteListLines.forEach(whiteListLine => {
-        const normalizedLine = whiteListLine.replace(/\/$/, "");
-        const length = normalizedLine.length;
-        let pattern = "^";
-        for (let index = 0; index < length; index += 1) {
-            const character = normalizedLine.charAt(index);
-            pattern = (character === "*") ? `${pattern}.*?` : pattern + escapeRegexChar(character);
+        const regexMatch = whiteListLine.match(/^\/(.+)\/([gimsuy]*)$/);
+        if (regexMatch) {
+            try { whiteListPatterns.add(new RegExp(regexMatch[1], regexMatch[2])); } catch (_) {}
+        } else {
+            const normalizedLine = whiteListLine.replace(/\/$/, "");
+            const length = normalizedLine.length;
+            let pattern = "^";
+            for (let index = 0; index < length; index += 1) {
+                const character = normalizedLine.charAt(index);
+                pattern = (character === "*") ? `${pattern}.*?` : pattern + escapeRegexChar(character);
+            }
+            whiteListPatterns.add(new RegExp(`${pattern}\\/?$`));
         }
-        whiteListPatterns.add(new RegExp(`${pattern}\\/?$`));
     });
     return Array.from(whiteListPatterns);
 };
