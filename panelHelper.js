@@ -1,6 +1,146 @@
 "use strict";
 
 // eslint-disable-next-line no-unused-vars
+const getElement = (sel, ctx = document) => ctx.querySelector(sel);
+// eslint-disable-next-line no-unused-vars
+const getElements = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
+// eslint-disable-next-line no-unused-vars
+const areSameArrays = (array1, array2) => {
+    if (!array1 && !array2) {
+        return true;
+    }
+    if (!array1 || !array2) {
+        return false;
+    }
+    return JSON.stringify(array1) === JSON.stringify(array2);
+};
+
+// eslint-disable-next-line no-unused-vars
+const escapeHTML = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+
+// eslint-disable-next-line no-unused-vars
+const buildTabRow = (duplicateTab, activeWindowId) => {
+    const tr = document.createElement("tr");
+    tr.setAttribute("tabId", parseInt(duplicateTab.id, 10));
+    tr.setAttribute("windowId", parseInt(duplicateTab.windowId, 10));
+    if (!duplicateTab.isRetained) tr.classList.add("tab-row-duplicate");
+    if (duplicateTab.whitelisted) tr.setAttribute("data-whitelisted", "true");
+
+    const tdIcon = document.createElement("td");
+    tdIcon.className = "td-tab-icon";
+    const img = document.createElement("img");
+    img.src = duplicateTab.icon || "../images/default-favicon.png";
+    img.alt = "";
+    tdIcon.appendChild(img);
+
+    const tdTitle = document.createElement("td");
+    tdTitle.className = "td-tab-title";
+    tdTitle.title = duplicateTab.url;
+    if (duplicateTab.containerColor) {
+        tdTitle.style.textDecorationColor = duplicateTab.containerColor;
+    }
+    if (duplicateTab.whitelisted) {
+        const badge = document.createElement("span");
+        badge.className = "whitelist-badge fa-solid fa-list-check";
+        badge.title = chrome.i18n.getMessage("whitelistedTab");
+        tdTitle.appendChild(badge);
+        tdTitle.appendChild(document.createTextNode(" "));
+    }
+    if (duplicateTab.windowId === activeWindowId) {
+        tdTitle.appendChild(document.createTextNode(duplicateTab.title));
+    } else {
+        const em = document.createElement("em");
+        em.textContent = duplicateTab.title;
+        tdTitle.appendChild(em);
+    }
+
+    const tdClose = document.createElement("td");
+    tdClose.className = "td-close-button";
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-tab-close";
+    btn.setAttribute("aria-label", "Close");
+    btn.textContent = "×";
+    tdClose.appendChild(btn);
+
+    tr.appendChild(tdIcon);
+    tr.appendChild(tdTitle);
+    tr.appendChild(tdClose);
+    return tr;
+};
+
+// eslint-disable-next-line no-unused-vars
+const buildDuplicateTabRows = (duplicateTabs, activeWindowId) => {
+    const fragment = document.createDocumentFragment();
+    duplicateTabs.forEach(tab => fragment.appendChild(buildTabRow(tab, activeWindowId)));
+    return fragment;
+};
+
+// eslint-disable-next-line no-unused-vars
+const buildGroupedDuplicateTabRows = (duplicateTabs, activeWindowId) => {
+    const fragment = document.createDocumentFragment();
+    const groups = new Map();
+    duplicateTabs.forEach(tab => {
+        if (!groups.has(tab.groupIndex)) groups.set(tab.groupIndex, []);
+        groups.get(tab.groupIndex).push(tab);
+    });
+    groups.forEach((tabs) => {
+        const headerTr = document.createElement("tr");
+        headerTr.className = "tr-group-header collapsed";
+        headerTr.dataset.groupTabIds = tabs.map(t => t.id).join(",");
+        if (tabs.every(tab => tab.whitelisted)) headerTr.setAttribute("data-whitelisted", "true");
+
+        const tdHeader = document.createElement("td");
+        tdHeader.className = "td-group-header-cell";
+        tdHeader.colSpan = 2;
+
+        const chevron = document.createElement("span");
+        chevron.className = "fa-solid fa-chevron-right fa-xs";
+        chevron.setAttribute("aria-hidden", "true");
+
+        const img = document.createElement("img");
+        img.src = tabs[0].icon || "../images/default-favicon.png";
+        img.alt = "";
+        img.className = "group-favicon";
+
+        const titleSpan = document.createElement("span");
+        titleSpan.className = "group-header-title";
+        titleSpan.title = tabs[0].url;
+        titleSpan.textContent = tabs[0].title;
+
+        const badge = document.createElement("span");
+        badge.className = "group-count-badge";
+        badge.textContent = chrome.i18n.getMessage("tabsCount", [String(tabs.length)]);
+
+        const closeBtn = document.createElement("button");
+        closeBtn.type = "button";
+        closeBtn.className = "btn-tab-close btn-group-close";
+        closeBtn.setAttribute("aria-label", chrome.i18n.getMessage("closeGroup"));
+        closeBtn.textContent = "×";
+
+        const innerDiv = document.createElement("div");
+        innerDiv.className = "group-header-inner";
+        innerDiv.append(chevron, img, titleSpan, badge);
+        tdHeader.appendChild(innerDiv);
+
+        const tdClose = document.createElement("td");
+        tdClose.className = "td-close-button";
+        tdClose.appendChild(closeBtn);
+
+        headerTr.append(tdHeader, tdClose);
+        fragment.appendChild(headerTr);
+
+        tabs.forEach(tab => {
+            const row = buildTabRow(tab, activeWindowId);
+            row.classList.add("group-row", "group-collapsed");
+            fragment.appendChild(row);
+        });
+    });
+    return fragment;
+};
+
+// eslint-disable-next-line no-unused-vars
 const applyTheme = (value) => {
     const darkThemes = ["ocean", "charcoal", "purple", "teal", "oled"];
     const lightThemes = ["sage", "rose", "amber", "slate", "violet"];

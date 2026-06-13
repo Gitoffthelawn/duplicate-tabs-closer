@@ -7,11 +7,6 @@ module.exports = {
     "extends": "eslint:recommended",
     "globals": {
         "activateTab": "readonly",
-        "areSameArrays": "readonly",
-        "buildDuplicateTabRows": "readonly",
-        "escapeHTML": "readonly",
-        "getElement": "readonly",
-        "getElements": "readonly",
         "closeDuplicateTabs": "readonly",
         "debounce": "readonly",
         "environment": "readonly",

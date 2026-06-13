@@ -16,6 +16,13 @@ const matchByTitlePattern = (title1, title2) => {
     return null;
 };
 
+const findPatternSource = (value, rules) => {
+    for (const { source, regex } of rules) {
+        if (regex.test(value)) return source;
+    }
+    return null;
+};
+
 const matchTitle = (tab1, tab2) => {
     if (options.compareWithTitle) {
         if (isTabComplete(tab1) && isTabComplete(tab2)) {
@@ -229,10 +236,7 @@ const handleObservedTab = (details) => {
             }
         }
         if (!retainedTab && options.urlRegexRules.length > 0) {
-            let urlPatSource = null;
-            for (const { source, regex } of options.urlRegexRules) {
-                if (regex.test(observedTab.url)) { urlPatSource = source; break; }
-            }
+            const urlPatSource = findPatternSource(observedTab.url, options.urlRegexRules);
             if (urlPatSource) {
                 matchingKey = `urlpattern=${urlPatSource}`;
                 retainedTab = retainedTabs.get(matchingKey);
@@ -240,10 +244,7 @@ const handleObservedTab = (details) => {
             }
         }
         if (!retainedTab && isTabComplete(observedTab) && options.titleRegexRules.length > 0) {
-            let titlePatSource = null;
-            for (const { source, regex } of options.titleRegexRules) {
-                if (regex.test(observedTab.title)) { titlePatSource = source; break; }
-            }
+            const titlePatSource = findPatternSource(observedTab.title, options.titleRegexRules);
             if (titlePatSource) {
                 matchingKey = `titlepattern=${titlePatSource}`;
                 retainedTab = retainedTabs.get(matchingKey);
