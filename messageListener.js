@@ -23,17 +23,6 @@ const handleMessage = (message, sender, response) => {
             response({});
             break;
         }
-        // The following cases are used by the dtc-test companion extension for automated testing
-        case "getDuplicateCount": {
-            const windowId = message.data ? message.data.windowId : null;
-            const count = tabsInfo.getNbDuplicateTabs(windowId);
-            response({ count });
-            return true;
-        }
-        case "getAutoClose": {
-            response({ autoClose: options.autoCloseTab });
-            return true;
-        }
         case "closeDuplicateTabs": {
             if (!message.data) return response({});
             closeDuplicateTabs(message.data.windowId, message.data.skipWhitelisted);
