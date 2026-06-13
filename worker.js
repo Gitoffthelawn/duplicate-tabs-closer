@@ -255,10 +255,10 @@ const handleObservedTab = (details) => {
         if (details.closeTab) {
             const [tabToCloseId] = getCloseInfo({ observedTab: observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
             if (tabToCloseId === observedTab.id) {
-                if (!details.skipWhitelisted || !isUrlWhiteListed(observedTab.url)) details.tabsToClose.add(observedTab.id);
+                if (details.skipWhitelisted === false || !isUrlWhiteListed(observedTab.url)) details.tabsToClose.add(observedTab.id);
             }
             else {
-                if (!details.skipWhitelisted || !isUrlWhiteListed(retainedTab.url)) {
+                if (details.skipWhitelisted === false || !isUrlWhiteListed(retainedTab.url)) {
                     details.tabsToClose.add(retainedTab.id);
                     invalidateRetainedURLKey(retainedTab, matchingKey, retainedTabs);
                     retainedTabs.set(matchingKey, observedTab);
