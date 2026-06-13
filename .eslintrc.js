@@ -36,6 +36,7 @@ module.exports = {
         "reloadTab": "readonly",
         "removeTab": "readonly",
         "requestDuplicateTabsFromPanel": "readonly",
+        "removeStoredOptions": "readonly",
         "saveStoredOptions": "readonly",
         "searchForDuplicateTabsToClose": "readonly",
         "sendMessage": "readonly",

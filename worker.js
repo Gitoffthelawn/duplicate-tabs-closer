@@ -144,6 +144,7 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
             || (isTabComplete(openedTab) && isTabComplete(observedTab) && matchByTitlePattern(openedTab.title, observedTab.title))) {
             match = true;
             const [tabToCloseId, remainingTabInfo] = getCloseInfo({ observedTab: observedTab, observedTabUrl: observedTabUrl, openedTab: openedTab });
+            if (tabToCloseId === openedTab.id && isUrlWhiteListed(openedTab.url)) continue;
             closeDuplicateTab(tabToCloseId, remainingTabInfo);
             if (remainingTabInfo.observedTabClosed) break;
         }
@@ -254,12 +255,14 @@ const handleObservedTab = (details) => {
         if (details.closeTab) {
             const [tabToCloseId] = getCloseInfo({ observedTab: observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
             if (tabToCloseId === observedTab.id) {
-                details.tabsToClose.add(observedTab.id);
+                if (!details.skipWhitelisted || !isUrlWhiteListed(observedTab.url)) details.tabsToClose.add(observedTab.id);
             }
             else {
-                details.tabsToClose.add(retainedTab.id);
-                invalidateRetainedURLKey(retainedTab, matchingKey, retainedTabs);
-                retainedTabs.set(matchingKey, observedTab);
+                if (!details.skipWhitelisted || !isUrlWhiteListed(retainedTab.url)) {
+                    details.tabsToClose.add(retainedTab.id);
+                    invalidateRetainedURLKey(retainedTab, matchingKey, retainedTabs);
+                    retainedTabs.set(matchingKey, observedTab);
+                }
             }
         } else {
             const [tabToCloseId] = getCloseInfo({ observedTab: observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
@@ -306,6 +309,7 @@ const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted) => {
             retainedTabs: retainedTabs,
             activeWindowId: activeWindowId,
             closeTab: closeTabs,
+            skipWhitelisted: skipWhitelisted,
             duplicateTabsGroups: duplicateTabsGroups,
             tabsToClose: tabsToClose
         };

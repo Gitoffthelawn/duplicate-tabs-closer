@@ -248,8 +248,15 @@ const clearStoredOptions = () => new Promise((resolve) => {
 });
 
 // eslint-disable-next-line no-unused-vars
-const saveStoredOptions = async (options, overwrite) => {
-    if (overwrite) await clearStoredOptions();
+const removeStoredOptions = (keys) => new Promise((resolve) => {
+    chrome.storage.local.remove(keys, () => {
+        if (chrome.runtime.lastError) console.error("removeStoredOptions error:", chrome.runtime.lastError.message);
+        resolve();
+    });
+});
+
+// eslint-disable-next-line no-unused-vars
+const saveStoredOptions = async (options) => {
     return new Promise((resolve) => {
         chrome.storage.local.set(options, () => {
             if (chrome.runtime.lastError) console.error("saveStoredOptions error:", chrome.runtime.lastError.message);
