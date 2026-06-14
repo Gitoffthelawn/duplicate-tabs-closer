@@ -259,6 +259,7 @@ const isPopupOpen = async () => {
 const escapeRegexChar = (ch) => ch.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
 
 const whiteListToPattern = (whiteList) => {
+    const MAX_WILDCARDS = 5;
     const whiteListPatterns = new Set();
     const whiteListLines = whiteList.split("\n").map(line => line.trim()).filter(line => line.length > 0);
     whiteListLines.forEach(whiteListLine => {
@@ -267,6 +268,7 @@ const whiteListToPattern = (whiteList) => {
             try { whiteListPatterns.add(new RegExp(regexMatch[1], regexMatch[2])); } catch (_) {}
         } else {
             const normalizedLine = whiteListLine.replace(/\/$/, "");
+            if ((normalizedLine.match(/\*/g) || []).length > MAX_WILDCARDS) return;
             const length = normalizedLine.length;
             let pattern = "^";
             for (let index = 0; index < length; index += 1) {
@@ -281,9 +283,11 @@ const whiteListToPattern = (whiteList) => {
 
 const parsePatternRules = (text) => {
     const MAX_LINE_LENGTH = 200;
+    const MAX_WILDCARDS = 5;
     return text.split("\n")
         .map(line => line.trim().slice(0, MAX_LINE_LENGTH))
         .filter(line => line.length > 0)
+        .filter(line => (line.match(/\*/g) || []).length <= MAX_WILDCARDS)
         .map(line => {
             let pattern = "^";
             for (const ch of line) pattern = ch === "*" ? `${pattern}.*?` : pattern + escapeRegexChar(ch);

@@ -31,7 +31,7 @@ $Directories = @(
 )
 
 function Build-Package {
-    param([string]$ManifestSrc, [string]$OutputFile, [string[]]$StripKeys = @())
+    param([string]$ManifestSrc, [string]$OutputFile, [string[]]$StripKeys = @(), [string[]]$StripScripts = @())
 
     $ManifestDst = Join-Path $Root "manifest.json"
     $TempDir = Join-Path $env:TEMP "dtc-build-$(Get-Random)"
@@ -52,10 +52,13 @@ function Build-Package {
 
         $manifestInTmp = Join-Path $TempDir "manifest.json"
         Copy-Item $ManifestDst $manifestInTmp
-        if ($StripKeys.Count -gt 0) {
+        if ($StripKeys.Count -gt 0 -or $StripScripts.Count -gt 0) {
             $json = Get-Content $manifestInTmp -Raw | ConvertFrom-Json
             foreach ($key in $StripKeys) {
                 $json.PSObject.Properties.Remove($key)
+            }
+            if ($StripScripts.Count -gt 0 -and $json.background -and $json.background.scripts) {
+                $json.background.scripts = $json.background.scripts | Where-Object { $_ -notin $StripScripts }
             }
             $json | ConvertTo-Json -Depth 10 | Set-Content $manifestInTmp -Encoding UTF8
         }
@@ -98,7 +101,7 @@ function Build-Package {
 }
 
 if ($Target -eq "firefox" -or $Target -eq "all") {
-    Build-Package "manifest-f.json" "duplicate-tabs-closer-firefox.xpi"
+    Build-Package "manifest-f.json" "duplicate-tabs-closer-firefox.xpi" -StripScripts @("dtcLog.js", "testHooks.js")
 }
 if ($Target -eq "chrome" -or $Target -eq "all") {
     Build-Package "manifest-c.json" "duplicate-tabs-closer-chrome.zip" -StripKeys @("externally_connectable")
