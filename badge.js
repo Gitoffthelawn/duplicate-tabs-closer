@@ -16,7 +16,7 @@ const setBadge = async (windowId, activeTabId) => {
 		setWindowBadgeBackgroundColor(windowId, backgroundColor);
 	}
 	else {
-		if (activeTabId) {
+		if (activeTabId != null) {
 			setTabBadgeText(activeTabId, nbDuplicateTabs);
 			setTabBadgeBackgroundColor(activeTabId, backgroundColor);
 		} else {

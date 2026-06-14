@@ -429,7 +429,7 @@ const dispatchTabCompletion = (tab, activeTabId, { queryComplete = false, alread
 // eslint-disable-next-line no-unused-vars
 const refreshGlobalDuplicateTabsInfo = async () => {
     if (options.searchInAllWindows) {
-        refreshDuplicateTabsInfo();
+        refreshDuplicateTabsInfo(null);
     } else {
         const windows = await getWindows();
         if (windows) windows.forEach(window => refreshDuplicateTabsInfo(window.id));
