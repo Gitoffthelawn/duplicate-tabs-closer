@@ -256,10 +256,10 @@ const handleObservedTab = (details) => {
         if (details.closeTab) {
             const [tabToCloseId] = getCloseInfo({ observedTab: observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
             if (tabToCloseId === observedTab.id) {
-                if (details.skipWhitelisted === false || !isUrlWhiteListed(observedTab.url)) details.tabsToClose.add(observedTab.id);
+                if (!details.skipWhitelisted || !isUrlWhiteListed(observedTab.url)) details.tabsToClose.add(observedTab.id);
             }
             else {
-                if (details.skipWhitelisted === false || !isUrlWhiteListed(retainedTab.url)) {
+                if (!details.skipWhitelisted || !isUrlWhiteListed(retainedTab.url)) {
                     details.tabsToClose.add(retainedTab.id);
                     invalidateRetainedURLKey(retainedTab, matchingKey, retainedTabs);
                     retainedTabs.set(matchingKey, observedTab);
@@ -293,7 +293,7 @@ const findFuzzyTitleKey = (title, retainedTabs) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted) => {
+const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted = true) => {
     const queryInfo = { windowType: "normal" };
     if (!options.searchInAllWindows) queryInfo.windowId = windowId;
     const [activeWindowId, openedTabs] = await Promise.all([getActiveWindowId(), getTabs(queryInfo)]);
@@ -304,7 +304,7 @@ const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted) => {
     for (const openedTab of openedTabs) {
         if ((isBlankURL(openedTab.url) && !isTabComplete(openedTab)) || tabsInfo.isClosingTab(openedTab.id)) continue;
         if (tabsInfo.isIntentionalDuplicate(openedTab.id)) continue;
-        if (closeTabs && skipWhitelisted === true && isUrlWhiteListed(openedTab.url)) continue;
+        if (closeTabs && skipWhitelisted && isUrlWhiteListed(openedTab.url)) continue;
         const details = {
             tab: openedTab,
             retainedTabs: retainedTabs,
