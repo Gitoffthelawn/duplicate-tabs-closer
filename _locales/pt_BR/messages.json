@@ -103,6 +103,10 @@
     "message": "Escopo",
     "description": "Scope"
   },
+  "prioritizeActiveWindow": {
+    "message": "Priorizar janela ativa (somente escopo todas as janelas)",
+    "description": "Keep the tab in the focused window when duplicates span multiple windows"
+  },
   "activewindow": {
     "message": "Janela ativa",
     "description": "Active window"

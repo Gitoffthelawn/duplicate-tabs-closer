@@ -103,6 +103,10 @@
     "message": "搜尋範圍",
     "description": "Scope"
   },
+  "prioritizeActiveWindow": {
+    "message": "優先使用活動視窗（僅適用於所有視窗範圍）",
+    "description": "Keep the tab in the focused window when duplicates span multiple windows"
+  },
   "activewindow": {
     "message": "目前視窗",
     "description": "Active window"

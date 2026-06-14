@@ -103,6 +103,10 @@
     "message": "重複を検出する範囲",
     "description": "Scope"
   },
+  "prioritizeActiveWindow": {
+    "message": "アクティブウィンドウを優先（全ウィンドウスコープのみ）",
+    "description": "Keep the tab in the focused window when duplicates span multiple windows"
+  },
   "activewindow": {
     "message": "アクティブなウィンドウ",
     "description": "Active window"

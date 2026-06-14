@@ -95,7 +95,7 @@ const getCloseInfo = (details) => {
         retainedTabId = getHttpsTabId(observedTab, observedTabUrl, openedTab);
         if (!retainedTabId) {
             retainedTabId = getLastUpdatedTabId(observedTab, openedTab);
-            if (activeWindowId && observedTab.windowId !== openedTab.windowId) {
+            if (options.prioritizeActiveWindow && activeWindowId && observedTab.windowId !== openedTab.windowId) {
                 retainedTabId = getFocusedTab(observedTab, openedTab, activeWindowId, retainedTabId);
             }
         }

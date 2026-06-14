@@ -15,10 +15,6 @@
     "message": "Close tab automatically",
     "description": "Close tab automatically"
   },
-  "showPanel": {
-    "message": "Show panel",
-    "description": "Show panel"
-  },
   "openPopupOnDuplicateDetected": {
     "message": "Open popup on duplicate detected",
     "description": "Open popup panel when a new duplicate tab is detected"
@@ -106,6 +102,10 @@
   "scope": {
     "message": "Scope",
     "description": "Scope"
+  },
+  "prioritizeActiveWindow": {
+    "message": "Prioritize active window (all windows scope only)",
+    "description": "Keep the tab in the focused window when duplicates span multiple windows"
   },
   "activewindow": {
     "message": "Active window",

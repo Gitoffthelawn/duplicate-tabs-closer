@@ -103,6 +103,10 @@
     "message": "Границы поиска",
     "description": "Scope"
   },
+  "prioritizeActiveWindow": {
+    "message": "Приоритет активного окна (только при охвате всех окон)",
+    "description": "Keep the tab in the focused window when duplicates span multiple windows"
+  },
   "activewindow": {
     "message": "Активное окно",
     "description": "Active window"

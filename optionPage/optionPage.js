@@ -48,7 +48,8 @@ const loadPopupEvents = () => {
     else if (this.id === "ignorePathPart") updateIgnorePathPartDependents(this.checked);
     const refresh = this.className.includes("checkbox-filter")
       || this.id === "keepTabWithHttps"
-      || this.id === "keepPinnedTab";
+      || this.id === "keepPinnedTab"
+      || this.id === "prioritizeActiveWindow";
     saveOption(this.id, this.checked, refresh);
   }));
 
@@ -59,6 +60,7 @@ const loadPopupEvents = () => {
     saveOption(this.id, this.value, refresh);
     if (this.id === "onDuplicateTabDetected") changeAutoCloseOptionState(this.value, true);
     else if (this.id === "theme") applyTheme(this.value);
+    else if (this.id === "scope") updatePrioritizeActiveWindowState(this.value);
   }));
 
   /* Save badge color settings */
@@ -349,6 +351,7 @@ const setPanelOption = (details) => {
       if (opt) opt.selected = true;
       if (storedOption === "onDuplicateTabDetected") changeAutoCloseOptionState(value, resize);
       else if (storedOption === "theme") applyTheme(value);
+      else if (storedOption === "scope") updatePrioritizeActiveWindowState(value);
     }
     if (isLockedKey && el) el.disabled = true;
   }

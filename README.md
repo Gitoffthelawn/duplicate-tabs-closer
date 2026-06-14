@@ -80,6 +80,7 @@ Determines which of two duplicate tabs is kept when one must be closed. Rules ar
 1. Pinned tab preference (if *Keep pinned tab* is enabled)
 2. HTTPS preference (if *Keep tab with HTTPS* is enabled)
 3. Age-based preference (*Keep older tab* / *Keep newer tab*)
+4. Active window preference (if *Prioritize active window* is enabled and scope covers multiple windows)
 
 | Option | Default | Description |
 | --- | --- | --- |
@@ -88,6 +89,7 @@ Determines which of two duplicate tabs is kept when one must be closed. Rules ar
 | **Keep and reload older tab** | off | Keeps the older tab but reloads it with the newer tab's URL. Useful when the newer URL contains updated content such as a redirect destination. |
 | **Keep tab with HTTPS** | on | When one tab uses HTTP and the other HTTPS for the same URL, the HTTPS tab is kept. Also normalises `http://` to `https://` during URL comparison so the two are treated as duplicates. |
 | **Keep pinned tab** | on | A pinned tab is always kept; the unpinned duplicate is closed instead. |
+| **Prioritize active window** | on | When duplicates span multiple windows and the age-based preference would close the tab in the currently focused window, keeps that tab instead. Only applies when **Scope** is set to *All windows* or *Container in all windows*. |
 
 > The first three options (Keep older tab / Keep newer tab / Keep and reload older tab) are mutually exclusive. Only one is active at a time.
 

@@ -103,6 +103,10 @@
     "message": "Межі пошуку",
     "description": "Scope"
   },
+  "prioritizeActiveWindow": {
+    "message": "Пріоритет активного вікна (тільки при охопленні всіх вікон)",
+    "description": "Keep the tab in the focused window when duplicates span multiple windows"
+  },
   "activewindow": {
     "message": "Активне вікно",
     "description": "Active window"

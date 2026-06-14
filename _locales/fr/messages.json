@@ -15,10 +15,6 @@
     "message": "Fermer l'onglet automatiquement",
     "description": "Close tab automatically"
   },
-  "showPanel": {
-    "message": "Afficher le panneau",
-    "description": "Show panel"
-  },
   "openPopupOnDuplicateDetected": {
     "message": "Ouvrir le panneau lors d'un doublon détecté",
     "description": "Open popup panel when a new duplicate tab is detected"
@@ -106,6 +102,10 @@
   "scope": {
     "message": "Cadre",
     "description": "Scope"
+  },
+  "prioritizeActiveWindow": {
+    "message": "Prioriser la fenêtre active (portée toutes fenêtres uniquement)",
+    "description": "Keep the tab in the focused window when duplicates span multiple windows"
   },
   "activewindow": {
     "message": "Fenêtre active",

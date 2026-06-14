@@ -157,6 +157,12 @@ const updateIgnorePathPartDependents = (checked) => {
 };
 
 // eslint-disable-next-line no-unused-vars
+const updatePrioritizeActiveWindowState = (scopeValue) => {
+    const el = document.getElementById("prioritizeActiveWindow");
+    if (el) el.disabled = scopeValue !== "A" && scopeValue !== "CA";
+};
+
+// eslint-disable-next-line no-unused-vars
 const updateGroupButton = (grouped) => {
     const btn = document.getElementById("groupDuplicateTabsBtn");
     if (!btn) return;

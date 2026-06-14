@@ -195,7 +195,10 @@ const onReplacedTab = async (addedTabId, removedTabId) => {
 
 const onCommand = async (command) => {
 	await ensureInitialized();
-	if (command == "close-duplicate-tabs") closeDuplicateTabs(undefined, true);
+	if (command == "close-duplicate-tabs") {
+		const windowId = options.searchInAllWindows ? undefined : await getActiveWindowId();
+		closeDuplicateTabs(windowId, true);
+	}
 	else if (command == "toggle-close-mode") setStoredOption("onDuplicateTabDetected", options.autoCloseTab ? "N" : "A", false);
 	else if (command == "toggle-monitor-pause") toggleMonitorPause();
 };

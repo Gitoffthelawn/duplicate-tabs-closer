@@ -25,6 +25,9 @@ const defaultOptions = {
     scope: {
         value: "C"
     },
+    prioritizeActiveWindow: {
+        value: true
+    },
     ignoreHashPart: {
         value: false
     },
@@ -204,6 +207,7 @@ const setOptions = (storedOptions) => {
     options.caseInsensitive = storedOptions.caseInsensitive.value;
     options.searchInAllWindows = storedOptions.scope.value === "A" || storedOptions.scope.value === "CA";
     options.searchPerContainer = storedOptions.scope.value === "CC" || storedOptions.scope.value === "CA";
+    options.prioritizeActiveWindow = storedOptions.prioritizeActiveWindow.value;
     options.whiteList = whiteListToPattern(storedOptions.whiteList.value);
     options.urlRegexRules = parsePatternRules(storedOptions.urlRegexRules.value);
     options.titleRegexRules = parsePatternRules(storedOptions.titleRegexRules.value);
