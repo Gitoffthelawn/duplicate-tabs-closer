@@ -173,6 +173,10 @@
     "message": "Приховати дозволені вкладки зі списку",
     "description": "Tooltip for the hide-whitelisted eye icon checkbox in the tab list footer"
   },
+  "toggleOptionsPanelTooltip": {
+    "message": "Показати/приховати панель параметрів",
+    "description": "Tooltip for the button that shows/hides the options column in two-column mode"
+  },
   "customization": {
     "message": "Налаштування",
     "description": "Customization"

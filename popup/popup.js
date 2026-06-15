@@ -34,6 +34,13 @@ const applyTwoColumnsMode = (enabled) => {
     resizeDuplicateTabsPanel(false);
 };
 
+const applyShowOptions = (visible) => {
+    document.body.classList.toggle("options-hidden", !visible);
+    const btn = document.getElementById("toggleOptionsPanelBtn");
+    if (btn) btn.classList.toggle("active", !visible);
+    resizeDuplicateTabsPanel(false);
+};
+
 const toggleExpendOptions = (resize) => {
     document.getElementById("optionHeader").classList.toggle("collapsed");
     if (resize) resizeDuplicateTabsPanel();
@@ -182,6 +189,7 @@ const setPanelOptions = async () => {
                 else if (storedOption === "hideWhitelistedTabs") {
                     updateHideWhitelistedButton(value);
                 }
+                else if (storedOption === "popupShowOptions") applyShowOptions(value);
             }
             // number input
             else if (typeof (value) === "number") {
@@ -205,13 +213,12 @@ const setPanelOptions = async () => {
     if (collapseOptions) toggleExpendOptions(false);
     applyPopupRuleVisibility(storedOptions);
     updateIgnorePathPartDependents(storedOptions.ignorePathPart ? storedOptions.ignorePathPart.value : false);
-    const sessionData = await chrome.storage.session.get(['autoOpenedPopup', 'monitoringPaused']);
+    const sessionData = await chrome.storage.session.get('autoOpenedPopup');
     if (sessionData.autoOpenedPopup) {
         chrome.storage.session.remove('autoOpenedPopup');
         document.getElementById("optionHeader").classList.add("collapsed");
         resizeDuplicateTabsPanel();
     }
-    applyPausedState(sessionData.monitoringPaused || false);
     if (document.body.classList.contains("two-columns"))
         document.getElementById("optionHeader").classList.remove("collapsed");
 };
@@ -426,6 +433,14 @@ const loadListenerEvents = () => {
         saveOption("hideWhitelistedTabs", newValue, false);
     });
 
+    /* Toggle options panel visibility */
+    const toggleOptionsPanelBtn = document.getElementById("toggleOptionsPanelBtn");
+    if (toggleOptionsPanelBtn) toggleOptionsPanelBtn.addEventListener("click", function () {
+        const newVisible = this.classList.contains("active");
+        applyShowOptions(newVisible);
+        saveOption("popupShowOptions", newVisible, false);
+    });
+
     /* Toggle options panel */
     const optionsTitle = document.getElementById("optionsTitle");
     if (optionsTitle) optionsTitle.addEventListener("click", () => {
@@ -466,6 +481,8 @@ const initialize = async () => {
     requestGetDuplicateTabs();
     localizePopup();
     loadListenerEvents();
+    const sessionData = await chrome.storage.session.get('monitoringPaused');
+    applyPausedState(sessionData.monitoringPaused || false);
 };
 
 

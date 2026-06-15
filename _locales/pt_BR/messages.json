@@ -173,6 +173,10 @@
     "message": "Ocultar abas da lista de permissões",
     "description": "Tooltip for the hide-whitelisted eye icon checkbox in the tab list footer"
   },
+  "toggleOptionsPanelTooltip": {
+    "message": "Mostrar/ocultar painel de opções",
+    "description": "Tooltip for the button that shows/hides the options column in two-column mode"
+  },
   "customization": {
     "message": "Customização",
     "description": "Customization"

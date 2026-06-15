@@ -118,6 +118,9 @@ const defaultOptions = {
     popupGroupedView: {
         value: false
     },
+    popupShowOptions: {
+        value: true
+    },
     environment: {
         value: "firefox"
     },

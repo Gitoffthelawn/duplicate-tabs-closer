@@ -173,6 +173,10 @@
     "message": "从列表中隐藏白名单标签页",
     "description": "Tooltip for the hide-whitelisted eye icon checkbox in the tab list footer"
   },
+  "toggleOptionsPanelTooltip": {
+    "message": "切换选项面板",
+    "description": "Tooltip for the button that shows/hides the options column in two-column mode"
+  },
   "customization": {
     "message": "定制",
     "description": "Customization"

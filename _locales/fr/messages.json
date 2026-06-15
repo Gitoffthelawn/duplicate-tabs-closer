@@ -173,6 +173,10 @@
     "message": "Masquer les onglets en liste blanche",
     "description": "Tooltip for the hide-whitelisted eye icon checkbox in the tab list footer"
   },
+  "toggleOptionsPanelTooltip": {
+    "message": "Afficher/masquer le panneau d'options",
+    "description": "Tooltip for the button that shows/hides the options column in two-column mode"
+  },
   "customization": {
     "message": "Personnalisation",
     "description": "Customization"

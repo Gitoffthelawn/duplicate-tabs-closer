@@ -173,6 +173,10 @@
     "message": "ホワイトリストのタブをリストから非表示にする",
     "description": "Tooltip for the hide-whitelisted eye icon checkbox in the tab list footer"
   },
+  "toggleOptionsPanelTooltip": {
+    "message": "オプションパネルを切り替える",
+    "description": "Tooltip for the button that shows/hides the options column in two-column mode"
+  },
   "customization": {
     "message": "カスタマイズ",
     "description": "Customization"

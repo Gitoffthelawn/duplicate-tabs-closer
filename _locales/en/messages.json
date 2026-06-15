@@ -173,6 +173,10 @@
     "message": "Hide whitelisted tabs from the list",
     "description": "Tooltip for the hide-whitelisted eye icon checkbox in the tab list footer"
   },
+  "toggleOptionsPanelTooltip": {
+    "message": "Toggle options panel",
+    "description": "Tooltip for the button that shows/hides the options column in two-column mode"
+  },
   "customization": {
     "message": "Customization",
     "description": "Customization"

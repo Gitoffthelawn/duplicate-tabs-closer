@@ -289,3 +289,67 @@ body.two-columns #scopeGroup.collapsed .list-group-item:last-child {
 body.two-columns #duplicateTabsCard .card-header #pauseMonitorBtn {
     margin-right: 0;
 }
+
+body:not(.two-columns) #toggleOptionsPanelBtn {
+    display: none;
+}
+
+body.two-columns #duplicateTabsCard {
+    position: relative;
+}
+
+body.two-columns #toggleOptionsPanelBtn {
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 10px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--dtc-header-bg);
+    border: 1px solid var(--dtc-header-border);
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+    color: var(--dtc-header-text);
+    opacity: 0.6;
+    transition: opacity 0.15s;
+    cursor: pointer;
+}
+
+body.two-columns #toggleOptionsPanelBtn:hover {
+    opacity: 1;
+}
+
+body.two-columns.options-hidden #toggleOptionsPanelBtn {
+    left: 0;
+    border-right: 1px solid var(--dtc-header-border);
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+}
+
+body.two-columns.options-hidden #toggleOptionsPanelBtn .fa-chevron-left {
+    transform: scaleX(-1);
+}
+
+body.two-columns.options-hidden {
+    width: 320px;
+}
+
+body.two-columns.options-hidden .panel-group {
+    gap: 0;
+}
+
+body.two-columns.options-hidden #optionsCard {
+    flex: 0 0 0;
+    min-width: 0;
+    max-width: 0;
+    overflow: hidden;
+    visibility: hidden;
+    border-width: 0;
+    box-shadow: none;
+    padding: 0;
+}
