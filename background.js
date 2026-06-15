@@ -188,9 +188,13 @@ const onActivatedTab = async (activeInfo) => {
 const onReplacedTab = async (addedTabId, removedTabId) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
+	const prevLastComplete = tabsInfo.getLastComplete(removedTabId);
 	tabsInfo.removeTab(removedTabId);
 	const tab = await getTab(addedTabId);
-	if (tab) await searchForDuplicateTabsToClose(tab);
+	if (tab) {
+		if (prevLastComplete !== null) tabsInfo.setTab(addedTabId, { url: tab.url, complete: true, lastComplete: prevLastComplete });
+		await searchForDuplicateTabsToClose(tab);
+	}
 };
 
 const onCommand = async (command) => {
