@@ -158,6 +158,10 @@ const loadPopupEvents = () => {
     });
   });
 
+  chrome.storage.session.onChanged.addListener((changes) => {
+    if ("monitoringPaused" in changes) applyPausedState(changes.monitoringPaused.newValue || false);
+  });
+
   /* Close all */
   const closeBtn = document.getElementById("closeDuplicateTabsBtn");
   if (closeBtn) closeBtn.addEventListener("click", function () {
