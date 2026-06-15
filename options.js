@@ -91,7 +91,13 @@ const defaultOptions = {
     scopePinned: {
         value: true
     },
-    customizationPinned: {
+    themePinned: {
+        value: true
+    },
+    popupPinned: {
+        value: true
+    },
+    badgePinned: {
         value: true
     },
     whiteList: {
@@ -110,6 +116,9 @@ const defaultOptions = {
         value: false
     },
     hideWhitelistedTabs: {
+        value: false
+    },
+    skipBlankTabs: {
         value: false
     },
     popupTwoColumns: {
@@ -217,6 +226,7 @@ const setOptions = (storedOptions) => {
     options.badgeColorDuplicateTabs = storedOptions.badgeColorDuplicateTabs.value;
     options.badgeColorNoDuplicateTabs = storedOptions.badgeColorNoDuplicateTabs.value;
     options.showBadgeIfNoDuplicateTabs = storedOptions.showBadgeIfNoDuplicateTabs.value;
+    options.skipBlankTabs = storedOptions.skipBlankTabs.value;
     options.openPopupOnDuplicateDetected = storedOptions.openPopupOnDuplicateDetected.value;
     options.theme = storedOptions.theme.value;
 };

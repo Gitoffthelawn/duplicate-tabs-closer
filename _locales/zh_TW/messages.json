@@ -23,6 +23,10 @@
     "message": "分頁優先順序",
     "description": "Priority"
   },
+  "priorityAndExclusions": {
+    "message": "優先順序與排除",
+    "description": "Section title for tab priority and exclusion rules (whitelist, skip blank)"
+  },
   "keepNewerTab": {
     "message": "保留較新的分頁",
     "description": "Keep newer tab"
@@ -107,6 +111,10 @@
     "message": "優先使用活動視窗（僅適用於所有視窗範圍）",
     "description": "Keep the tab in the focused window when duplicates span multiple windows"
   },
+  "skipBlankTabs": {
+    "message": "跳過空白分頁（about:blank、新分頁）",
+    "description": "Completely ignore blank and new tab pages from duplicate detection"
+  },
   "activewindow": {
     "message": "目前視窗",
     "description": "Active window"
@@ -180,6 +188,18 @@
   "customization": {
     "message": "個人化設定",
     "description": "Customization"
+  },
+  "advanced": {
+    "message": "進階",
+    "description": "Divider label above advanced sections (Theme, Popup, Badge)"
+  },
+  "popupSection": {
+    "message": "彈出視窗",
+    "description": "Section title for popup behavior options"
+  },
+  "badgeSection": {
+    "message": "徽章",
+    "description": "Section title for badge color and display options"
   },
   "badgeColorDuplicateTabs": {
     "message": "重複分頁標記顏色",

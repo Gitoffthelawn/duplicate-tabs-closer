@@ -49,7 +49,8 @@ const loadPopupEvents = () => {
     const refresh = this.className.includes("checkbox-filter")
       || this.id === "keepTabWithHttps"
       || this.id === "keepPinnedTab"
-      || this.id === "prioritizeActiveWindow";
+      || this.id === "prioritizeActiveWindow"
+      || this.id === "skipBlankTabs";
     saveOption(this.id, this.checked, refresh);
   }));
 

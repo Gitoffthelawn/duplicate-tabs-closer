@@ -23,6 +23,10 @@
     "message": "優先順位",
     "description": "Priority"
   },
+  "priorityAndExclusions": {
+    "message": "優先順位と除外",
+    "description": "Section title for tab priority and exclusion rules (whitelist, skip blank)"
+  },
   "keepNewerTab": {
     "message": "新しい方のタブを残す",
     "description": "Keep newer tab"
@@ -107,6 +111,10 @@
     "message": "アクティブウィンドウを優先（全ウィンドウスコープのみ）",
     "description": "Keep the tab in the focused window when duplicates span multiple windows"
   },
+  "skipBlankTabs": {
+    "message": "空白タブをスキップ（about:blank、新しいタブ）",
+    "description": "Completely ignore blank and new tab pages from duplicate detection"
+  },
   "activewindow": {
     "message": "アクティブなウィンドウ",
     "description": "Active window"
@@ -180,6 +188,18 @@
   "customization": {
     "message": "カスタマイズ",
     "description": "Customization"
+  },
+  "advanced": {
+    "message": "詳細設定",
+    "description": "Divider label above advanced sections (Theme, Popup, Badge)"
+  },
+  "popupSection": {
+    "message": "ポップアップ",
+    "description": "Section title for popup behavior options"
+  },
+  "badgeSection": {
+    "message": "バッジ",
+    "description": "Section title for badge color and display options"
   },
   "badgeColorDuplicateTabs": {
     "message": "タブが重複しているときのバッジの色",

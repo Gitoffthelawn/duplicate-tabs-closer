@@ -133,6 +133,7 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
         if (isTabComplete(observedTab)) refreshDuplicateTabsInfo(observedWindowsId);
         return;
     }
+    if (options.skipBlankTabs && isBlankURL(observedTabUrl)) return;
     const queryInfo = {};
     if (isValidURL(observedTabUrl) && options.urlRegexRules.length === 0 && options.titleRegexRules.length === 0) { const matchPattern = getMatchPatternURL(observedTabUrl); if (matchPattern) queryInfo.url = matchPattern; }
     queryInfo.windowId = options.searchInAllWindows ? null : observedWindowsId;
@@ -143,7 +144,7 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
     let match = false;
     for (const openedTab of openedTabs) {
         if ((openedTab.id === observedTab.id) || tabsInfo.isClosingTab(openedTab.id)) continue;
-        if (isBlankURL(openedTab.url) && !isTabComplete(openedTab)) continue;
+        if (isBlankURL(openedTab.url) && (!isTabComplete(openedTab) || options.skipBlankTabs)) continue;
         if (queryComplete && !isTabComplete(openedTab)) continue;
         if ((getMatchingURL(openedTab.url) === matchingObservedTabUrl)
             || matchTitle(openedTab, observedTab)
@@ -302,7 +303,7 @@ const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted = tru
     const retainedTabs = new Map();
     const tabsToClose = new Set();
     for (const openedTab of openedTabs) {
-        if ((isBlankURL(openedTab.url) && !isTabComplete(openedTab)) || tabsInfo.isClosingTab(openedTab.id)) continue;
+        if ((isBlankURL(openedTab.url) && (!isTabComplete(openedTab) || options.skipBlankTabs)) || tabsInfo.isClosingTab(openedTab.id)) continue;
         if (tabsInfo.isIntentionalDuplicate(openedTab.id)) continue;
         if (closeTabs && skipWhitelisted && isUrlWhiteListed(openedTab.url)) continue;
         const details = {

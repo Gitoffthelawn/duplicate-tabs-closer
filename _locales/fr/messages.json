@@ -23,6 +23,10 @@
     "message": "Priorité",
     "description": "Priority"
   },
+  "priorityAndExclusions": {
+    "message": "Priorité & Exclusions",
+    "description": "Section title for tab priority and exclusion rules (whitelist, skip blank)"
+  },
   "keepNewerTab": {
     "message": "Conserver le nouvel onglet",
     "description": "Keep newer tab"
@@ -107,6 +111,10 @@
     "message": "Prioriser la fenêtre active (portée toutes fenêtres uniquement)",
     "description": "Keep the tab in the focused window when duplicates span multiple windows"
   },
+  "skipBlankTabs": {
+    "message": "Ignorer les onglets vides (about:blank, nouvel onglet)",
+    "description": "Completely ignore blank and new tab pages from duplicate detection"
+  },
   "activewindow": {
     "message": "Fenêtre active",
     "description": "Active window"
@@ -180,6 +188,18 @@
   "customization": {
     "message": "Personnalisation",
     "description": "Customization"
+  },
+  "advanced": {
+    "message": "Avancé",
+    "description": "Divider label above advanced sections (Theme, Popup, Badge)"
+  },
+  "popupSection": {
+    "message": "Popup",
+    "description": "Section title for popup behavior options"
+  },
+  "badgeSection": {
+    "message": "Badge",
+    "description": "Section title for badge color and display options"
   },
   "badgeColorDuplicateTabs": {
     "message": "Couleur du badge pour les onglets en doublon",

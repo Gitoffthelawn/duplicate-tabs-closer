@@ -43,16 +43,7 @@
             </div>
           </li>
           <li class="list-group-item list-group-item-header">
-            <span class="list-group-item-title list-group-expanded" i18n-content="whiteList" id="whiteListTitle"></span>
-          </li>
-          <li class="list-group-item">
-            <div class="form-group" id="whiteListBody">
-              <textarea class="form-control rules-textarea" rows="4" id="whiteList"></textarea>
-              <small class="form-text text-muted mt-1" i18n-content="whiteListHint"></small>
-            </div>
-          </li>
-          <li class="list-group-item list-group-item-header">
-            <span class="list-group-item-title list-group-expanded" i18n-content="tabPriority" id="tabPriorityTitle"></span>
+            <span class="list-group-item-title list-group-expanded" i18n-content="priorityAndExclusions" id="tabPriorityTitle"></span>
           </li>
           <li class="list-group-item">
             <div class="form-group" id="tabPriorityBody">
@@ -80,6 +71,18 @@
                   <span i18n-content="prioritizeActiveWindow"></span>
                 </label>
               </div>
+              <div class="vertical-line"></div>
+              <div class="checkboxes">
+                <label for="skipBlankTabs">
+                  <input type="checkbox" id="skipBlankTabs" />
+                  <span i18n-content="skipBlankTabs"></span>
+                </label>
+              </div>
+              <div class="checkboxes checkboxes-regex-label">
+                <label for="whiteList"><span i18n-content="whiteList"></span></label>
+              </div>
+              <textarea class="form-control rules-textarea" rows="4" id="whiteList"></textarea>
+              <small class="form-text text-muted mt-1" i18n-content="whiteListHint"></small>
             </div>
           </li>
           <li class="list-group-item list-group-item-header">
@@ -184,27 +187,34 @@
               </select>
             </div>
           </li>
+          <li class="list-group-item list-group-item-advanced-divider">
+            <span i18n-content="advanced"></span>
+          </li>
           <li class="list-group-item list-group-item-header">
-            <span class="list-group-item-title list-group-expanded" i18n-content="customization" id="customization"></span>
+            <span class="list-group-item-title list-group-expanded" i18n-content="theme" id="themeTitle"></span>
           </li>
           <li class="list-group-item">
-            <div class="form-group" id="customizationBody">
-              <div class="checkboxes">
-                <label for="theme" class="titleLabel" i18n-content="theme"></label>
-                <select class="form-select form-control-xs" id="theme" name="theme">
-                  <option value="light"    i18n-content="themeLight"></option>
-                  <option value="sage"     i18n-content="themeSage"></option>
-                  <option value="rose"     i18n-content="themeRose"></option>
-                  <option value="amber"    i18n-content="themeAmber"></option>
-                  <option value="slate"    i18n-content="themeSlate"></option>
-                  <option value="violet"   i18n-content="themeViolet"></option>
-                  <option value="ocean"    i18n-content="themeOcean"></option>
-                  <option value="charcoal" i18n-content="themeCharcoal"></option>
-                  <option value="purple"   i18n-content="themePurple"></option>
-                  <option value="teal"     i18n-content="themeTeal"></option>
-                  <option value="oled"     i18n-content="themeOled"></option>
-                </select>
-              </div>
+            <div class="form-group" id="themeBody">
+              <select class="form-select form-control-xs" id="theme" name="theme">
+                <option value="light"    i18n-content="themeLight"></option>
+                <option value="sage"     i18n-content="themeSage"></option>
+                <option value="rose"     i18n-content="themeRose"></option>
+                <option value="amber"    i18n-content="themeAmber"></option>
+                <option value="slate"    i18n-content="themeSlate"></option>
+                <option value="violet"   i18n-content="themeViolet"></option>
+                <option value="ocean"    i18n-content="themeOcean"></option>
+                <option value="charcoal" i18n-content="themeCharcoal"></option>
+                <option value="purple"   i18n-content="themePurple"></option>
+                <option value="teal"     i18n-content="themeTeal"></option>
+                <option value="oled"     i18n-content="themeOled"></option>
+              </select>
+            </div>
+          </li>
+          <li class="list-group-item list-group-item-header">
+            <span class="list-group-item-title list-group-expanded" i18n-content="popupSection" id="popupSectionTitle"></span>
+          </li>
+          <li class="list-group-item">
+            <div class="form-group" id="popupSectionBody">
               <div class="checkboxes">
                 <label for="popupTwoColumns" class="titleLabel" i18n-content="popupTwoColumns"></label>
                 <select class="form-select form-control-xs" id="popupTwoColumns" name="popupTwoColumns">
@@ -224,16 +234,21 @@
                   <span i18n-content="closePopup"></span>
                 </label>
               </div>
-              <table id="color-container">
-                <tr>
-                  <td><input class="form-control badgeColor" type="color" value="#563d7c" id="badgeColorDuplicateTabs"></td>
-                  <td><label class="label-badgeColor" i18n-content="badgeColorDuplicateTabs" for="badgeColorDuplicateTabs"></label></td>
-                </tr>
-                <tr>
-                  <td><input class="form-control badgeColor" type="color" value="#563d7c" id="badgeColorNoDuplicateTabs"></td>
-                  <td><label class="label-badgeColor" i18n-content="badgeColorNoDuplicateTabs" for="badgeColorNoDuplicateTabs"></label></td>
-                </tr>
-              </table>
+            </div>
+          </li>
+          <li class="list-group-item list-group-item-header">
+            <span class="list-group-item-title list-group-expanded" i18n-content="badgeSection" id="badgeSectionTitle"></span>
+          </li>
+          <li class="list-group-item">
+            <div class="form-group" id="badgeSectionBody">
+              <div class="color-row">
+                <input class="badgeColor" type="color" id="badgeColorDuplicateTabs">
+                <label for="badgeColorDuplicateTabs" i18n-content="badgeColorDuplicateTabs"></label>
+              </div>
+              <div class="color-row">
+                <input class="badgeColor" type="color" id="badgeColorNoDuplicateTabs">
+                <label for="badgeColorNoDuplicateTabs" i18n-content="badgeColorNoDuplicateTabs"></label>
+              </div>
               <div class="checkboxes">
                 <label for="showBadgeIfNoDuplicateTabs">
                   <input type="checkbox" id="showBadgeIfNoDuplicateTabs" />

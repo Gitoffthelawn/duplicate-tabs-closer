@@ -171,7 +171,7 @@ const setPanelOptions = async () => {
             // checkbox
             if (typeof (value) === "boolean") {
                 if (el) el.checked = value;
-                if (storedOption.endsWith("Pinned") && storedOption !== "customizationPinned") {
+                if (storedOption.endsWith("Pinned") && storedOption !== "customizationPinned" && storedOption !== "themePinned" && storedOption !== "popupPinned" && storedOption !== "badgePinned") {
                     toggleExpendGroup(storedOption, false, value, false);
                     // eslint-disable-next-line max-depth
                     if (value) collapseOptions = false;

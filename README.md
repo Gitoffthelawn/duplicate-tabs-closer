@@ -51,20 +51,6 @@ Determines what happens to the kept tab after its duplicate is closed.
 | **Activate** *(default)* | Switches focus to the kept tab. |
 | **Default tab behaviour** | Moves the kept tab to the position of the closed tab and activates it if needed, mimicking the browser's normal tab behaviour. |
 
-#### Whitelisted URLs
-
-> Available in the **Options page** only.
-
-A list of URL patterns, one per line. Whitelisted tabs are always detected and shown in the duplicate tabs list, marked with a tooltip indicating they are whitelisted. In *Close tab automatically* mode, they are never auto-closed. When the **Hide whitelisted tabs** button is active, they are also excluded from the **Close duplicates** button in manual mode.
-
-**Pattern syntax:** `*` matches any sequence of characters. All other characters match literally. Lines wrapped in `/…/` are treated as regular expressions: `/^(?!.*google\.com)/` whitelists everything except Google.
-
-```text
-https://docs.google.com/*
-*://github.com/*/issues
-/^(?!.*google\.com)/
-```
-
 #### Intentional Duplicate Protection
 
 > Only active when **On duplicate tab detected** is set to *Close tab automatically*.
@@ -73,9 +59,9 @@ Tabs opened on purpose using the browser's built-in **Duplicate Tab** command ar
 
 > **Note:** This protection is only available on Firefox. On Chrome, Edge, Opera, Vivaldi, and Brave, tabs opened via "Duplicate Tab" will still be auto-closed because the required browser API is not available on those browsers.
 
-### Priority
+### Priority & Exclusions
 
-Determines which of two duplicate tabs is kept when one must be closed. Rules are applied in this order:
+Determines which of two duplicate tabs is kept when one must be closed, and defines which tabs are excluded from detection entirely. Rules are applied in this order:
 
 1. Pinned tab preference (if *Keep pinned tab* is enabled)
 2. HTTPS preference (if *Keep tab with HTTPS* is enabled)
@@ -92,6 +78,26 @@ Determines which of two duplicate tabs is kept when one must be closed. Rules ar
 | **Prioritize active window** | on | When duplicates span multiple windows and the age-based preference would close the tab in the currently focused window, keeps that tab instead. Only applies when **Scope** is set to *All windows* or *Container in all windows*. |
 
 > The first three options (Keep older tab / Keep newer tab / Keep and reload older tab) are mutually exclusive. Only one is active at a time.
+
+#### Skip blank tabs
+
+> Available in the **Options page** only.
+
+When enabled, blank tabs (`about:blank` and new tab pages) are completely invisible to the extension — they are never shown in the duplicate tabs list, never auto-closed, and never used as a reference when comparing tabs. This is distinct from the whitelist: whitelisted tabs are still detected and shown; skipped blank tabs are not processed at all.
+
+#### Whitelisted URLs
+
+> Available in the **Options page** only.
+
+A list of URL patterns, one per line. Whitelisted tabs are always detected and shown in the duplicate tabs list, marked with a tooltip indicating they are whitelisted. In *Close tab automatically* mode, they are never auto-closed. When the **Hide whitelisted tabs** button is active, they are also excluded from the **Close duplicates** button in manual mode.
+
+**Pattern syntax:** `*` matches any sequence of characters. All other characters match literally. Lines wrapped in `/…/` are treated as regular expressions: `/^(?!.*google\.com)/` whitelists everything except Google.
+
+```text
+https://docs.google.com/*
+*://github.com/*/issues
+/^(?!.*google\.com)/
+```
 
 ### Matching Rules
 
@@ -146,19 +152,13 @@ Defines which tabs are included when searching for duplicates.
 
 > The **Container** options require Firefox with the [Multi-Account Containers](https://support.mozilla.org/en-US/kb/containers) feature enabled.
 
-### Customization
+### Theme
 
-Available in the **Options page** only.
+> Available in the **Options page** only.
 
 | Option | Default | Description |
 | --- | --- | --- |
 | **Theme** | Sky *(default)* | Visual theme for the extension panel. See [Themes](#themes) below. |
-| **Popup layout** | Two columns | Layout of the popup panel. *Single column* shows options above the duplicate tabs list. *Two columns* shows them side by side. |
-| **Duplicate tabs badge color** | `#f22121` (red) | Color of the extension icon badge when duplicate tabs are detected. |
-| **No duplicate tabs badge color** | `#1e90ff` (blue) | Color of the badge when no duplicates exist. Only relevant when *Show badge if no duplicate tabs* is enabled. |
-| **Show badge if no duplicate tabs** | on | Always displays the badge. When off, the badge is hidden entirely when there are no duplicates. |
-| **Close popup after closing duplicate tabs** | off | Automatically closes the popup panel after the *Close duplicates* button is clicked. |
-| **Open popup on duplicate detected** | off | Automatically opens the popup panel whenever a new duplicate tab is detected. The Options section collapses automatically when the popup is opened this way, giving more space to the duplicate tabs list. |
 
 #### Themes
 
@@ -167,6 +167,26 @@ Available in the **Options page** only.
 **Light themes:** Sky *(default)*, Sage, Rose, Amber, Slate, Violet
 
 **Dark themes:** Ocean Night, Charcoal, Midnight Purple, Dark Teal, OLED Black
+
+### Popup
+
+> Available in the **Options page** only.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| **Popup layout** | Two columns | Layout of the popup panel. *Single column* shows options above the duplicate tabs list. *Two columns* shows them side by side. |
+| **Close popup after closing duplicate tabs** | off | Automatically closes the popup panel after the *Close duplicates* button is clicked. |
+| **Open popup on duplicate detected** | off | Automatically opens the popup panel whenever a new duplicate tab is detected. The Options section collapses automatically when the popup is opened this way, giving more space to the duplicate tabs list. |
+
+### Badge
+
+> Available in the **Options page** only.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| **Duplicate tabs badge color** | `#f22121` (red) | Color of the extension icon badge when duplicate tabs are detected. |
+| **No duplicate tabs badge color** | `#1e90ff` (blue) | Color of the badge when no duplicates exist. Only relevant when *Show badge if no duplicate tabs* is enabled. |
+| **Show badge if no duplicate tabs** | on | Always displays the badge. When off, the badge is hidden entirely when there are no duplicates. |
 
 ### Popup Panel
 

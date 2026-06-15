@@ -23,6 +23,10 @@
     "message": "Priority",
     "description": "Priority"
   },
+  "priorityAndExclusions": {
+    "message": "Priority & Exclusions",
+    "description": "Section title for tab priority and exclusion rules (whitelist, skip blank)"
+  },
   "keepNewerTab": {
     "message": "Keep newer tab",
     "description": "Keep newer tab"
@@ -107,6 +111,10 @@
     "message": "Prioritize active window (all windows scope only)",
     "description": "Keep the tab in the focused window when duplicates span multiple windows"
   },
+  "skipBlankTabs": {
+    "message": "Skip blank tabs (about:blank, new tab)",
+    "description": "Completely ignore blank and new tab pages from duplicate detection"
+  },
   "activewindow": {
     "message": "Active window",
     "description": "Active window"
@@ -180,6 +188,18 @@
   "customization": {
     "message": "Customization",
     "description": "Customization"
+  },
+  "advanced": {
+    "message": "Advanced",
+    "description": "Divider label above advanced sections (Theme, Popup, Badge)"
+  },
+  "popupSection": {
+    "message": "Popup",
+    "description": "Section title for popup behavior options"
+  },
+  "badgeSection": {
+    "message": "Badge",
+    "description": "Section title for badge color and display options"
   },
   "badgeColorDuplicateTabs": {
     "message": "Duplicate tabs badge color",

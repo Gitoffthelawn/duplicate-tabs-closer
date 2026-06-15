@@ -23,6 +23,10 @@
     "message": "Приоритет",
     "description": "Priority"
   },
+  "priorityAndExclusions": {
+    "message": "Приоритет и исключения",
+    "description": "Section title for tab priority and exclusion rules (whitelist, skip blank)"
+  },
   "keepNewerTab": {
     "message": "Сохранить новейшую вкладку",
     "description": "Keep newer tab"
@@ -107,6 +111,10 @@
     "message": "Приоритет активного окна (только при охвате всех окон)",
     "description": "Keep the tab in the focused window when duplicates span multiple windows"
   },
+  "skipBlankTabs": {
+    "message": "Пропустить пустые вкладки (about:blank, новая вкладка)",
+    "description": "Completely ignore blank and new tab pages from duplicate detection"
+  },
   "activewindow": {
     "message": "Активное окно",
     "description": "Active window"
@@ -180,6 +188,18 @@
   "customization": {
     "message": "Настройка",
     "description": "Customization"
+  },
+  "advanced": {
+    "message": "Дополнительно",
+    "description": "Divider label above advanced sections (Theme, Popup, Badge)"
+  },
+  "popupSection": {
+    "message": "Всплывающее окно",
+    "description": "Section title for popup behavior options"
+  },
+  "badgeSection": {
+    "message": "Значок",
+    "description": "Section title for badge color and display options"
   },
   "badgeColorDuplicateTabs": {
     "message": "Цвет значка о наличии дубликатов",
