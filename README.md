@@ -176,6 +176,8 @@ In the duplicate tabs list, tabs that will be closed show a strikethrough title.
 
 * **Hide whitelisted tabs:** click the hide-whitelisted icon in the duplicate tabs footer to show or hide whitelisted tabs in the list. When active, tabs whose URLs match a whitelist entry are hidden from the panel. The preference is saved and shared with the options page. When hiding is active, the **Close duplicates** button also skips whitelisted tabs.
 
+* **Hide options column:** in two-column layout, click the chevron tab on the left edge of the duplicate tabs column to hide the options column. The popup narrows to focus on the duplicate tabs list. Click the chevron again to restore the options column. The state is saved and restored the next time the popup is opened.
+
 * **Shrunk mode:** toggle the compress icon in the popup to hide all unpinned sections, keeping the panel compact. Sections can be pinned with the pin icon (📌) in the popup panel so they stay visible when shrunk mode is active.
 
 * **Pause monitoring:** click the pause icon in the popup or options page header to temporarily stop duplicate tab detection. While paused:
