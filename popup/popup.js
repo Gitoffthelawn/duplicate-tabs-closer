@@ -7,6 +7,8 @@ let closePopup = false;
 let environment = "";
 let groupedView = false;
 let lastNbRows = 0;
+let _renderGen = 0;
+let monitoringPaused = false;
 
 /* Show/Hide the AutoClose option */
 const changeAutoCloseOptionState = (state, resize) => {
@@ -108,20 +110,18 @@ const setDuplicateTabsTable = (duplicateTabs) => {
         hideBtn.removeAttribute("disabled");
     }
     else {
-        chrome.storage.session.get('monitoringPaused').then(data => {
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            td.className = "td-tab-text";
-            td.colSpan = 3;
-            const em = document.createElement("em");
-            em.textContent = data.monitoringPaused
-                ? chrome.i18n.getMessage("monitoringPaused")
-                : chrome.i18n.getMessage("noDuplicateTabs") + ".";
-            td.appendChild(em);
-            tr.appendChild(td);
-            tbody.appendChild(tr);
-            resizeDuplicateTabsPanel(isUpdate);
-        });
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.className = "td-tab-text";
+        td.colSpan = 3;
+        const em = document.createElement("em");
+        em.textContent = monitoringPaused
+            ? chrome.i18n.getMessage("monitoringPaused")
+            : chrome.i18n.getMessage("noDuplicateTabs") + ".";
+        td.appendChild(em);
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        resizeDuplicateTabsPanel(isUpdate);
         closeBtn.classList.add("disabled");
         closeBtn.setAttribute("aria-disabled", "true");
         closeBtn.setAttribute("disabled", "");
@@ -224,6 +224,7 @@ const setPanelOptions = async () => {
 };
 
 const applyPausedState = (paused) => {
+    monitoringPaused = paused;
     const sel = document.getElementById("onDuplicateTabDetected");
     if (sel) sel.disabled = paused;
     updatePauseButton(paused);
@@ -349,6 +350,10 @@ const loadListenerEvents = () => {
         sendMessage("toggleMonitorPause").then(resp => {
             if (resp) applyPausedState(resp.paused);
         });
+    });
+
+    chrome.storage.session.onChanged.addListener((changes) => {
+        if ("monitoringPaused" in changes) applyPausedState(changes.monitoringPaused.newValue || false);
     });
 
     /* Open Option tab */
@@ -477,12 +482,12 @@ const localizePopup = () => {
 };
 
 const initialize = async () => {
-    await Promise.all([setPanelOptions(), saveActiveWindowId()]);
+    const [,, sessionData] = await Promise.all([setPanelOptions(), saveActiveWindowId(), chrome.storage.session.get('monitoringPaused')]);
+    monitoringPaused = sessionData.monitoringPaused || false;
     requestGetDuplicateTabs();
     localizePopup();
     loadListenerEvents();
-    const sessionData = await chrome.storage.session.get('monitoringPaused');
-    applyPausedState(sessionData.monitoringPaused || false);
+    applyPausedState(monitoringPaused);
 };
 
 

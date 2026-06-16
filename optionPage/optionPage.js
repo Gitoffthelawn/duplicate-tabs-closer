@@ -5,16 +5,18 @@ let lastDuplicateTabs = {};
 let panelInitialized = false;
 let groupedView = false;
 let lastNbRows = 0;
+let monitoringPaused = false;
 
 const initialize = async () => {
-  await Promise.all([setPanelOptions(), saveActiveWindowId()]);
+  const [,, sessionData] = await Promise.all([setPanelOptions(), saveActiveWindowId(), chrome.storage.session.get('monitoringPaused')]);
+  monitoringPaused = sessionData.monitoringPaused || false;
   requestGetDuplicateTabs();
   localizePopup(document.documentElement);
-  const sessionData = await chrome.storage.session.get('monitoringPaused');
-  applyPausedState(sessionData.monitoringPaused || false);
+  applyPausedState(monitoringPaused);
 };
 
 const applyPausedState = (paused) => {
+  monitoringPaused = paused;
   const sel = document.getElementById("onDuplicateTabDetected");
   if (sel) sel.disabled = paused;
   const btn = document.getElementById("pauseMonitorBtn");
@@ -264,20 +266,18 @@ const setDuplicateTabsTable = (duplicateTabs) => {
     hideBtn.removeAttribute("disabled");
   }
   else {
-    chrome.storage.session.get('monitoringPaused').then(data => {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.className = "td-tab-text";
-      td.colSpan = 3;
-      const em = document.createElement("em");
-      em.textContent = data.monitoringPaused
-        ? chrome.i18n.getMessage("monitoringPaused")
-        : chrome.i18n.getMessage("noDuplicateTabs") + ".";
-      td.appendChild(em);
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-      resizeDuplicateTabsPanel(isUpdate);
-    });
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+    td.className = "td-tab-text";
+    td.colSpan = 3;
+    const em = document.createElement("em");
+    em.textContent = monitoringPaused
+      ? chrome.i18n.getMessage("monitoringPaused")
+      : chrome.i18n.getMessage("noDuplicateTabs") + ".";
+    td.appendChild(em);
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    resizeDuplicateTabsPanel(isUpdate);
     closeBtn.classList.toggle("disabled", true);
     closeBtn.setAttribute("aria-disabled", "true");
     closeBtn.setAttribute("disabled", "");
