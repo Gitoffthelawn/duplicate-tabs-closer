@@ -7,13 +7,11 @@ const getElements = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel
 
 // eslint-disable-next-line no-unused-vars
 const areSameArrays = (array1, array2) => {
-    if (!array1 && !array2) {
-        return true;
-    }
-    if (!array1 || !array2) {
-        return false;
-    }
-    return JSON.stringify(array1) === JSON.stringify(array2);
+    if (!array1 && !array2) return true;
+    if (!array1 || !array2 || array1.length !== array2.length) return false;
+    return array1.every((t, i) => t.id === array2[i].id
+        && t.isRetained === array2[i].isRetained
+        && t.whitelisted === array2[i].whitelisted);
 };
 
 // eslint-disable-next-line no-unused-vars

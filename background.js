@@ -97,7 +97,7 @@ const onCreatedTab = async (tab) => {
 const onBeforeNavigate = async (details) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
-	if (details.frameId != 0 || details.tabId === -1) return;
+	if (details.frameId !== 0 || details.tabId === -1) return;
 	// Firefox fires onBeforeNavigate twice for the same URL (~10-30ms apart). Skip the duplicate.
 	const prev = _lastNavigate.get(details.tabId);
 	if (prev && prev.url === details.url && (Date.now() - prev.ts) < 1000) return;

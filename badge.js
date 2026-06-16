@@ -1,5 +1,8 @@
 "use strict";
 
+const PAUSED_BADGE_TEXT = "⏸";
+const PAUSED_BADGE_COLOR = "#888888";
+
 // eslint-disable-next-line no-unused-vars
 const setBadgeIcon = () => {
 	chrome.action.setIcon({ path: options.autoCloseTab ? "images/auto_close_16.png" : "images/manual_close_16.png" });
@@ -7,7 +10,13 @@ const setBadgeIcon = () => {
 };
 
 const setBadge = async (windowId, activeTabId) => {
-	if (monitoringPaused) return;
+	if (monitoringPaused) {
+		if (!environment.isFirefox && activeTabId != null) {
+			setTabBadgeText(activeTabId, PAUSED_BADGE_TEXT);
+			setTabBadgeBackgroundColor(activeTabId, PAUSED_BADGE_COLOR);
+		}
+		return;
+	}
 	const nbCount = tabsInfo.getNbDuplicateTabs(windowId);
 	const badgeText = (nbCount === 0 && !options.showBadgeIfNoDuplicateTabs) ? "" : String(nbCount);
 	const backgroundColor = (nbCount !== 0) ? options.badgeColorDuplicateTabs : options.badgeColorNoDuplicateTabs;
@@ -74,19 +83,17 @@ const updateBadgeStyle = async () => {
 
 // eslint-disable-next-line no-unused-vars
 const setPausedBadge = async () => {
-	const PAUSED_COLOR = "#888888";
-	const PAUSED_TEXT = "⏸";
 	if (environment.isFirefox) {
 		const windows = await getWindows();
 		if (windows) windows.forEach(w => {
-			setWindowBadgeText(w.id, PAUSED_TEXT);
-			setWindowBadgeBackgroundColor(w.id, PAUSED_COLOR);
+			setWindowBadgeText(w.id, PAUSED_BADGE_TEXT);
+			setWindowBadgeBackgroundColor(w.id, PAUSED_BADGE_COLOR);
 		});
 	} else {
 		const tabs = await getTabs({});
 		if (tabs) tabs.forEach(tab => {
-			setTabBadgeText(tab.id, PAUSED_TEXT);
-			setTabBadgeBackgroundColor(tab.id, PAUSED_COLOR);
+			setTabBadgeText(tab.id, PAUSED_BADGE_TEXT);
+			setTabBadgeBackgroundColor(tab.id, PAUSED_BADGE_COLOR);
 		});
 	}
 };
