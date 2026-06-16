@@ -135,7 +135,10 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
     }
     if (options.skipBlankTabs && isBlankURL(observedTabUrl)) return;
     const queryInfo = {};
-    if (isValidURL(observedTabUrl) && options.urlRegexRules.length === 0 && options.titleRegexRules.length === 0) { const matchPattern = getMatchPatternURL(observedTabUrl); if (matchPattern) queryInfo.url = matchPattern; }
+    if (isValidURL(observedTabUrl) && options.urlRegexRules.length === 0 && options.titleRegexRules.length === 0) {
+        const matchPattern = getMatchPatternURL(observedTabUrl);
+        if (matchPattern) queryInfo.url = matchPattern;
+    }
     queryInfo.windowId = options.searchInAllWindows ? null : observedWindowsId;
     if (environment.isFirefox) queryInfo.cookieStoreId = options.searchPerContainer ? observedTab.cookieStoreId : null;
     const openedTabs = await getTabs(queryInfo);

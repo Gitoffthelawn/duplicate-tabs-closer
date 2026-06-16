@@ -8,21 +8,21 @@ const setBadgeIcon = () => {
 
 const setBadge = async (windowId, activeTabId) => {
 	if (monitoringPaused) return;
-	let nbDuplicateTabs = tabsInfo.getNbDuplicateTabs(windowId);
-	if (nbDuplicateTabs === "0" && !options.showBadgeIfNoDuplicateTabs) nbDuplicateTabs = "";
-	const backgroundColor = (nbDuplicateTabs !== "0") ? options.badgeColorDuplicateTabs : options.badgeColorNoDuplicateTabs;
+	const nbCount = tabsInfo.getNbDuplicateTabs(windowId);
+	const badgeText = (nbCount === 0 && !options.showBadgeIfNoDuplicateTabs) ? "" : String(nbCount);
+	const backgroundColor = (nbCount !== 0) ? options.badgeColorDuplicateTabs : options.badgeColorNoDuplicateTabs;
 	if (environment.isFirefox) {
-		setWindowBadgeText(windowId, nbDuplicateTabs);
+		setWindowBadgeText(windowId, badgeText);
 		setWindowBadgeBackgroundColor(windowId, backgroundColor);
 	}
 	else {
 		if (activeTabId != null) {
-			setTabBadgeText(activeTabId, nbDuplicateTabs);
+			setTabBadgeText(activeTabId, badgeText);
 			setTabBadgeBackgroundColor(activeTabId, backgroundColor);
 		} else {
 			const tabs = await getTabs({ windowId: windowId });
 			if (tabs) tabs.forEach(tab => {
-				setTabBadgeText(tab.id, nbDuplicateTabs);
+				setTabBadgeText(tab.id, badgeText);
 				setTabBadgeBackgroundColor(tab.id, backgroundColor);
 			});
 		}
@@ -38,8 +38,8 @@ const getNbDuplicateTabs = (duplicateTabsGroups) => {
 };
 
 const updateBadgeValue = async (nbDuplicateTabs, windowId) => {
-	if (tabsInfo.hasNbDuplicateTabs(windowId) && tabsInfo.getNbDuplicateTabs(windowId) === nbDuplicateTabs.toString()) return;
-	const prevCount = tabsInfo.hasNbDuplicateTabs(windowId) ? parseInt(tabsInfo.getNbDuplicateTabs(windowId)) : 0;
+	if (tabsInfo.hasNbDuplicateTabs(windowId) && tabsInfo.getNbDuplicateTabs(windowId) === nbDuplicateTabs) return;
+	const prevCount = tabsInfo.hasNbDuplicateTabs(windowId) ? tabsInfo.getNbDuplicateTabs(windowId) : 0;
 	tabsInfo.setNbDuplicateTabs(windowId, nbDuplicateTabs);
 	setBadge(windowId);
 	if (options.openPopupOnDuplicateDetected && nbDuplicateTabs > prevCount && !(await isPopupOpen())) {

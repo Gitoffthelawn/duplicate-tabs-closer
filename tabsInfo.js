@@ -75,11 +75,11 @@ class TabsInfo {
 
     hasDuplicateTabs(windowId) {
         // Even nothing set, return true so it will force the refresh and set the badge.
-        return this.nbDuplicateTabs.get(windowId) !== "0";
+        return this.nbDuplicateTabs.get(windowId) !== 0;
     }
 
     getNbDuplicateTabs(windowId) {
-        return this.nbDuplicateTabs.get(windowId) || "0";
+        return this.nbDuplicateTabs.get(windowId) ?? 0;
     }
 
     hasNbDuplicateTabs(windowId) {
@@ -87,9 +87,8 @@ class TabsInfo {
     }
 
     setNbDuplicateTabs(windowId, nbDuplicateTabs) {
-        const newVal = nbDuplicateTabs.toString();
-        if (this.nbDuplicateTabs.get(windowId) === newVal) return;
-        this.nbDuplicateTabs.set(windowId, newVal);
+        if (this.nbDuplicateTabs.get(windowId) === nbDuplicateTabs) return;
+        this.nbDuplicateTabs.set(windowId, nbDuplicateTabs);
     }
 
     clearDuplicateTabsInfo(windowId) {

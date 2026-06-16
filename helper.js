@@ -172,8 +172,6 @@ const getTabBadgeText = (tabId) => new Promise((resolve) => {
     });
 });
 
-// eslint-disable-next-line no-unused-vars
-const getWindowBadgeText = (windowId) => browser.action.getBadgeText({ windowId: windowId });
 
 // eslint-disable-next-line no-unused-vars
 const setTabBadgeText = (tabId, text) => new Promise((resolve) => {
@@ -213,7 +211,7 @@ const getStoredOptions = () => Promise.all([
     }),
     // chrome.storage.managed is supported on Firefox 57 and later.
     // On Windows Enterprise, the GP check can block for 5-10s on Chrome startup.
-    // Race against a 500ms timeout so the extension initializes quickly.
+    // Race against a 100ms timeout so the extension initializes quickly.
     !chrome.storage.managed ? null : Promise.race([
         new Promise((resolve) => {
             chrome.storage.managed.get(null, managedOptions => {

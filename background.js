@@ -88,7 +88,7 @@ const onCreatedTab = async (tab) => {
 	}
 	if (tab.status === "complete") {
 		tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
-		if (tab.url !== "about:blank") {
+		if (!isBlankURL(tab.url)) {
 			dispatchTabCompletion(tab, null, { queryComplete: true });
 		}
 	}
@@ -185,6 +185,7 @@ const onActivatedTab = async (activeInfo) => {
 	setBadge(activeInfo.windowId, activeInfo.tabId);
 };
 
+// Chrome only — Firefox does not fire tabs.onReplaced (used when a tab is discarded/replaced by a new one).
 const onReplacedTab = async (addedTabId, removedTabId) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
@@ -192,7 +193,9 @@ const onReplacedTab = async (addedTabId, removedTabId) => {
 	tabsInfo.removeTab(removedTabId);
 	const tab = await getTab(addedTabId);
 	if (tab) {
-		if (prevLastComplete !== null) tabsInfo.setTab(addedTabId, { url: tab.url, complete: true, lastComplete: prevLastComplete });
+		tabsInfo.setTab(addedTabId, prevLastComplete !== null
+			? { url: tab.url, complete: true, lastComplete: prevLastComplete }
+			: { url: tab.url });
 		await searchForDuplicateTabsToClose(tab);
 	}
 };
