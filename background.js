@@ -88,7 +88,11 @@ const onCreatedTab = async (tab) => {
 	}
 	if (tab.status === "complete") {
 		tabsInfo.setTab(tab.id, { url: tab.url, complete: true });
-		if (!isBlankURL(tab.url)) {
+		// Only skip about:blank (no content, no URL meaning at creation).
+		// about:newtab, about:home, chrome://newtab/ are semantic URLs and must
+		// go through dispatchTabCompletion so duplicates are detected.
+		// The skipBlankTabs option handles user-facing exclusion downstream in worker.js.
+		if (tab.url !== "about:blank") {
 			dispatchTabCompletion(tab, null, { queryComplete: true });
 		}
 	}
