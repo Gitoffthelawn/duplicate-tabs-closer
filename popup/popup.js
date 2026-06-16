@@ -1,7 +1,7 @@
 "use strict";
 
 let activeWindowId = chrome.windows.WINDOW_ID_NONE;
-let lastDuplicateTabs = {};
+let lastDuplicateTabs = null;
 let panelInitialized = false;
 let closePopup = false;
 let environment = "";
@@ -67,8 +67,15 @@ const toggleExpendGroup = (eventId, isTitleClickEvent, pinned, resize) => {
     }
 };
 
-const setDuplicateTabsTable = (duplicateTabs) => {
-    if (duplicateTabs !== null && areSameArrays(duplicateTabs, lastDuplicateTabs)) return;
+const setDuplicateTabsTable = async (duplicateTabs) => {
+    const gen = ++_renderGen;
+    const sameList = duplicateTabs !== null && lastDuplicateTabs !== null
+        && Array.isArray(duplicateTabs) && Array.isArray(lastDuplicateTabs)
+        && duplicateTabs.length === lastDuplicateTabs.length
+        && duplicateTabs.every((t, i) => t.id === lastDuplicateTabs[i].id
+            && t.isRetained === lastDuplicateTabs[i].isRetained
+            && t.whitelisted === lastDuplicateTabs[i].whitelisted);
+    if (sameList) return;
     const expandedGroups = new Set();
     if (groupedView) {
         document.querySelectorAll(".tr-group-header:not(.collapsed)").forEach(header => {
@@ -84,9 +91,19 @@ const setDuplicateTabsTable = (duplicateTabs) => {
     const groupBtn = document.getElementById("groupDuplicateTabsBtn");
     const hideBtn = document.getElementById("hideWhitelistedTabsBtn");
     if (duplicateTabs) {
-        tbody.appendChild(groupedView
+        const rows = groupedView
             ? buildGroupedDuplicateTabRows(duplicateTabs, activeWindowId)
-            : buildDuplicateTabRows(duplicateTabs, activeWindowId));
+            : buildDuplicateTabRows(duplicateTabs, activeWindowId);
+        const CHUNK = 40;
+        for (let i = 0; i < rows.length; i += CHUNK) {
+            if (_renderGen !== gen) return;
+            const frag = document.createDocumentFragment();
+            rows.slice(i, i + CHUNK).forEach(r => frag.appendChild(r));
+            tbody.appendChild(frag);
+            if (i === 0) resizeDuplicateTabsPanel(isUpdate);
+            if (i + CHUNK < rows.length) await new Promise(r => requestAnimationFrame(r));
+        }
+        if (_renderGen !== gen) return;
         if (groupedView && expandedGroups.size > 0) {
             tbody.querySelectorAll(".tr-group-header").forEach(header => {
                 if (expandedGroups.has(header.dataset.groupTabIds.split(",")[0])) {
@@ -98,6 +115,7 @@ const setDuplicateTabsTable = (duplicateTabs) => {
                     }
                 }
             });
+            resizeDuplicateTabsPanel();
         }
         closeBtn.classList.remove("disabled");
         closeBtn.setAttribute("aria-disabled", "false");
@@ -132,7 +150,6 @@ const setDuplicateTabsTable = (duplicateTabs) => {
         hideBtn.setAttribute("aria-disabled", "true");
         hideBtn.setAttribute("disabled", "");
     }
-    if (duplicateTabs) resizeDuplicateTabsPanel(isUpdate);
 };
 
 const resizeDuplicateTabsPanel = (refresh) => {
@@ -141,7 +158,11 @@ const resizeDuplicateTabsPanel = (refresh) => {
     const minRow = 2;
     const tbody = document.getElementById("duplicateTabsTableBody");
     const nbRows = lastDuplicateTabs
-        ? (tbody ? tbody.querySelectorAll("tr:not(.group-collapsed)").length : lastDuplicateTabs.length)
+        ? (groupedView
+            ? (tbody && tbody.children.length > 0
+                ? tbody.querySelectorAll("tr:not(.group-collapsed)").length
+                : new Set(lastDuplicateTabs.map(t => t.groupIndex)).size)
+            : lastDuplicateTabs.length)
         : 1;
     const maxRows = Math.min(nbRows, Math.floor((maxOptionsCardHeight - document.getElementById("optionsCard").offsetHeight + (minRow * rowHeight)) / rowHeight));
     const container = document.getElementById("duplicateTabsTableContainer");
@@ -420,11 +441,11 @@ const loadListenerEvents = () => {
         updateGroupButton(groupedView);
         saveOption("popupGroupedView", groupedView, false);
         if (lastDuplicateTabs) {
-            document.getElementById("duplicateTabsTableBody").replaceChildren(
-                groupedView
-                    ? buildGroupedDuplicateTabRows(lastDuplicateTabs, activeWindowId)
-                    : buildDuplicateTabRows(lastDuplicateTabs, activeWindowId)
-            );
+            ++_renderGen;
+            const rows = groupedView
+                ? buildGroupedDuplicateTabRows(lastDuplicateTabs, activeWindowId)
+                : buildDuplicateTabRows(lastDuplicateTabs, activeWindowId);
+            document.getElementById("duplicateTabsTableBody").replaceChildren(...rows);
             resizeDuplicateTabsPanel(false);
         }
     });

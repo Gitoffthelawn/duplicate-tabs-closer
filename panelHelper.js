@@ -70,14 +70,12 @@ const buildTabRow = (duplicateTab, activeWindowId) => {
 
 // eslint-disable-next-line no-unused-vars
 const buildDuplicateTabRows = (duplicateTabs, activeWindowId) => {
-    const fragment = document.createDocumentFragment();
-    duplicateTabs.forEach(tab => fragment.appendChild(buildTabRow(tab, activeWindowId)));
-    return fragment;
+    return duplicateTabs.map(tab => buildTabRow(tab, activeWindowId));
 };
 
 // eslint-disable-next-line no-unused-vars
 const buildGroupedDuplicateTabRows = (duplicateTabs, activeWindowId) => {
-    const fragment = document.createDocumentFragment();
+    const rows = [];
     const groups = new Map();
     duplicateTabs.forEach(tab => {
         if (!groups.has(tab.groupIndex)) groups.set(tab.groupIndex, []);
@@ -127,15 +125,15 @@ const buildGroupedDuplicateTabRows = (duplicateTabs, activeWindowId) => {
         tdClose.appendChild(closeBtn);
 
         headerTr.append(tdHeader, tdClose);
-        fragment.appendChild(headerTr);
+        rows.push(headerTr);
 
         tabs.forEach(tab => {
             const row = buildTabRow(tab, activeWindowId);
             row.classList.add("group-row", "group-collapsed");
-            fragment.appendChild(row);
+            rows.push(row);
         });
     });
-    return fragment;
+    return rows;
 };
 
 // eslint-disable-next-line no-unused-vars
