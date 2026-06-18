@@ -23,6 +23,16 @@ const findPatternSource = (value, rules) => {
     return null;
 };
 
+// eslint-disable-next-line no-unused-vars
+const shouldSkipTab = (tab, { queryComplete = false, skipWhitelisted = true } = {}) => {
+    if (tabsInfo.isClosingTab(tab.id)) return "closing";
+    if (tabsInfo.isIntentionalDuplicate(tab.id)) return "intentional-duplicate";
+    if (isBlankURL(tab.url) && (!isTabComplete(tab) || options.skipBlankTabs)) return options.skipBlankTabs ? "skip-blank-option" : "blank-loading";
+    if (skipWhitelisted && isUrlWhiteListed(tab.url)) return "whitelisted";
+    if (queryComplete && !isTabComplete(tab)) return "loading";
+    return null;
+};
+
 const matchTitle = (tab1, tab2) => {
     if (options.compareWithTitle) {
         if (isTabComplete(tab1) && isTabComplete(tab2)) {
@@ -146,16 +156,15 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
     const matchingObservedTabUrl = getMatchingURL(observedTabUrl);
     let match = false;
     for (const openedTab of openedTabs) {
-        if ((openedTab.id === observedTab.id) || tabsInfo.isClosingTab(openedTab.id)) continue;
-        if (isBlankURL(openedTab.url) && (!isTabComplete(openedTab) || options.skipBlankTabs)) continue;
-        if (queryComplete && !isTabComplete(openedTab)) continue;
+        if (openedTab.id === observedTab.id) continue;
+        const skipReason = shouldSkipTab(openedTab, { queryComplete });
+        if (skipReason) continue;
         if ((getMatchingURL(openedTab.url) === matchingObservedTabUrl)
             || matchTitle(openedTab, observedTab)
             || matchByUrlPattern(openedTab.url, observedTabUrl)
             || (isTabComplete(openedTab) && isTabComplete(observedTab) && matchByTitlePattern(openedTab.title, observedTab.title))) {
             match = true;
             const [tabToCloseId, remainingTabInfo] = getCloseInfo({ observedTab: observedTab, observedTabUrl: observedTabUrl, openedTab: openedTab });
-            if (tabToCloseId === openedTab.id && isUrlWhiteListed(openedTab.url)) continue;
             closeDuplicateTab(tabToCloseId, remainingTabInfo);
             if (remainingTabInfo.observedTabClosed) break;
         }
@@ -306,9 +315,8 @@ const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted = tru
     const retainedTabs = new Map();
     const tabsToClose = new Set();
     for (const openedTab of openedTabs) {
-        if ((isBlankURL(openedTab.url) && (!isTabComplete(openedTab) || options.skipBlankTabs)) || tabsInfo.isClosingTab(openedTab.id)) continue;
-        if (tabsInfo.isIntentionalDuplicate(openedTab.id)) continue;
-        if (closeTabs && skipWhitelisted && isUrlWhiteListed(openedTab.url)) continue;
+        const skipReason = shouldSkipTab(openedTab, { skipWhitelisted: closeTabs && skipWhitelisted });
+        if (skipReason) continue;
         const details = {
             tab: openedTab,
             retainedTabs: retainedTabs,
