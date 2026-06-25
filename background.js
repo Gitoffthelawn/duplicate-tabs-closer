@@ -30,7 +30,11 @@ const initialize = async () => {
 	if (environment.isFirefox) await initializeTabSessionIds();
 	if (!monitoringPaused) await refreshGlobalDuplicateTabsInfo();
 	postStartupBurst = true;
-	setTimeout(() => { postStartupBurst = false; }, 3000);
+	postStartupBurstStart = Date.now();
+	postStartupBurstTimer = setTimeout(() => {
+		postStartupBurst = false;
+		_seededTabIds.clear(); // all startup onCreatedTab events have now been processed
+	}, 3000);
 };
 
 // eslint-disable-next-line no-unused-vars
