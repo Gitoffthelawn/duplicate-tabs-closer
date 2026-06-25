@@ -50,6 +50,11 @@ class TabsInfo {
         return storedTab ? storedTab.lastComplete : null;
     }
 
+    getStoredUrl(tabId) {
+        const storedTab = this.storedTabs.get(tabId);
+        return storedTab ? storedTab.url : null;
+    }
+
     hasUrlChanged(openedTab) {
         const storedTab = this.storedTabs.get(openedTab.id);
         return storedTab ? storedTab.url !== openedTab.url : true;

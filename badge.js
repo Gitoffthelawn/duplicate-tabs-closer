@@ -52,9 +52,15 @@ const updateBadgeValue = async (nbDuplicateTabs, windowId) => {
 	tabsInfo.setNbDuplicateTabs(windowId, nbDuplicateTabs);
 	setBadge(windowId);
 	if (options.openPopupOnDuplicateDetected && nbDuplicateTabs > prevCount && !(await isPopupOpen())) {
-		chrome.storage.session.set({ autoOpenedPopup: true }).then(() => {
-			chrome.action.openPopup().catch(() => {});
-		});
+		// Settle delay: transient duplicates (e.g. from redirect intermediate URLs) can cause
+		// the count to spike and drop within ~300ms. Wait before opening so we don't open
+		// an empty popup for a phantom duplicate.
+		await wait(400);
+		if (tabsInfo.getNbDuplicateTabs(windowId) > prevCount && !(await isPopupOpen())) {
+			chrome.storage.session.set({ autoOpenedPopup: true }).then(() => {
+				chrome.action.openPopup().catch(() => {});
+			});
+		}
 	}
 };
 

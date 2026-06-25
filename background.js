@@ -13,6 +13,11 @@ const generateTabSessionId = () => `dtc-${Date.now().toString(36)}-${Math.random
 // Track last dispatched URL+timestamp per tab to skip the redundant second call.
 const _lastNavigate = new Map(); // tabId -> { url, ts }
 
+// Tabs that existed when DTC initialized — their session IDs are seeded by initializeTabSessionIds.
+// onCreatedTab fires for these tabs too at startup, but they must NOT be marked intentional-duplicate
+// (they are pre-existing tabs, not undo-close restores).
+const _seededTabIds = new Set();
+
 // eslint-disable-next-line no-unused-vars
 const ensureInitialized = () => {
 	if (!initPromise) initPromise = initialize().catch(err => { initPromise = null; throw err; });
@@ -58,6 +63,7 @@ const initializeTabSessionIds = async () => {
 	const tabs = await getTabs({ windowType: "normal" });
 	if (!tabs) return;
 	await Promise.allSettled(tabs.map(async tab => {
+		_seededTabIds.add(tab.id);
 		let id = await browser.sessions.getTabValue(tab.id, 'dtc-tab-id');
 		if (!id) {
 			id = generateTabSessionId();
@@ -76,9 +82,10 @@ const onCreatedTab = async (tab) => {
 		const checkPromise = (async () => {
 			if (!environment.isFirefox) return;
 			const existingId = await browser.sessions.getTabValue(tab.id, 'dtc-tab-id');
-			if (existingId !== undefined && tabsInfo.isKnownSessionId(existingId)) {
+			if (existingId !== undefined && tabsInfo.isKnownSessionId(existingId) && !_seededTabIds.has(tab.id)) {
 				tabsInfo.setIntentionalDuplicate(tab.id);
 			}
+			_seededTabIds.delete(tab.id); // clean up — no longer needed after first onCreatedTab
 			const newId = generateTabSessionId();
 			tabsInfo.storeTabSessionId(tab.id, newId);
 			browser.sessions.setTabValue(tab.id, 'dtc-tab-id', newId);
@@ -117,6 +124,16 @@ const onBeforeNavigate = async (details) => {
 		if (tab) {
 			tabsInfo.setTab(tab.id, { complete: false });
 			searchForDuplicateTabsToClose(tab, true, details.url);
+		}
+	} else if (!options.autoCloseTab && isBlankURL(details.url) && tabsInfo.hasTab(details.tabId)
+			&& tabsInfo.getStoredUrl(details.tabId) === "about:blank") {
+		// Manual mode: Firefox creates newtabs as about:blank first, then navigates to about:newtab.
+		// tabs.onUpdated is unreliable for this transition. Update the stored URL and refresh
+		// so the panel detects the newtab as a duplicate without waiting for tabs.onUpdated.
+		const tab = await getTab(details.tabId);
+		if (tab) {
+			tabsInfo.setTab(tab.id, { url: details.url, complete: true });
+			refreshDuplicateTabsInfo(tab.windowId);
 		}
 	}
 };
