@@ -164,7 +164,6 @@ const initializeOptions = async () => {
         const defaultKeys = Object.keys(defaultOptions).sort();
         if (JSON.stringify(storedKeys) !== JSON.stringify(defaultKeys)) {
             const obsoleteKeys = getNotInReferenceKeys(storedKeys, defaultKeys);
-            const legacySkipWhitelisted = storedOptions.closeAllSkipWhitelisted?.value; // TODO: remove after v4.4
             if (obsoleteKeys.length > 0) {
                 obsoleteKeys.forEach(key => delete storedOptions[key]);
                 await removeStoredOptions(obsoleteKeys);
@@ -172,8 +171,6 @@ const initializeOptions = async () => {
             const missingKeys = getNotInReferenceKeys(defaultKeys, storedKeys);
             // eslint-disable-next-line no-return-assign
             missingKeys.forEach(key => storedOptions[key] = { value: defaultOptions[key].value });
-            if (legacySkipWhitelisted !== undefined) // TODO: remove after v4.4
-                storedOptions.hideWhitelistedTabs = { value: legacySkipWhitelisted };
             const environment = getEnvironment();
             storedOptions.environment.value = environment;
             storedOptions = await saveStoredOptions(storedOptions);

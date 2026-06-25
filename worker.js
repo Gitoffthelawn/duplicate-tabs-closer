@@ -416,13 +416,9 @@ const _refreshDuplicateTabsInfo = async (windowId) => {
 const refreshDuplicateTabsInfo = debounce(_refreshDuplicateTabsInfo, 300, false);
 
 // eslint-disable-next-line no-unused-vars
-let postStartupBurst = false;
-// eslint-disable-next-line no-unused-vars
-let postStartupBurstTimer = null;
+const startupBurst = { active: false, timerId: null, startedAt: 0 };
 const POST_STARTUP_BURST_EXTEND_MS = 3000;
 const POST_STARTUP_BURST_MAX_MS = 30000;
-// eslint-disable-next-line no-unused-vars
-let postStartupBurstStart = 0;
 
 // eslint-disable-next-line no-unused-vars
 const debouncedBatchClose = debounce(closeDuplicateTabs, 300, false);
@@ -433,13 +429,13 @@ const debouncedBatchClose = debounce(closeDuplicateTabs, 300, false);
 // queryComplete:  require matched tabs to be complete before matching (pre-navigation scan).
 // eslint-disable-next-line no-unused-vars
 const dispatchTabCompletion = (tab, activeTabId, { queryComplete = false, alreadyComplete = false } = {}) => {
-    if (postStartupBurst && (Date.now() - postStartupBurstStart) < POST_STARTUP_BURST_MAX_MS) {
-        clearTimeout(postStartupBurstTimer);
-        postStartupBurstTimer = setTimeout(() => { postStartupBurst = false; }, POST_STARTUP_BURST_EXTEND_MS);
+    if (startupBurst.active && (Date.now() - startupBurst.startedAt) < POST_STARTUP_BURST_MAX_MS) {
+        clearTimeout(startupBurst.timerId);
+        startupBurst.timerId = setTimeout(() => { startupBurst.active = false; }, POST_STARTUP_BURST_EXTEND_MS);
     }
     if (options.autoCloseTab) {
         if (!alreadyComplete) {
-            postStartupBurst ? debouncedBatchClose(tab.windowId) : searchForDuplicateTabsToClose(tab, queryComplete);
+            startupBurst.active ? debouncedBatchClose(tab.windowId) : searchForDuplicateTabsToClose(tab, queryComplete);
         }
         if (environment.isChrome) setBadge(tab.windowId, activeTabId || null);
     } else {
