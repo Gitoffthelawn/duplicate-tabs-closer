@@ -101,6 +101,14 @@ const getLastUpdatedTabId = (observedTab, openedTab) => {
     }
 };
 
+const getActiveTabWinnerId = (tab1, tab2) => {
+    if (options.keepActiveTab && tab1.windowId === tab2.windowId) {
+        if (tab1.active) return tab2.active ? null : tab1.id;
+        return tab2.active ? tab2.id : null;
+    }
+    return null;
+};
+
 const getActiveWindowTabId = (observedTab, openedTab, activeWindowId, retainedTabId) => {
     if (observedTab.windowId === activeWindowId) return observedTab.id;
     if (openedTab.windowId === activeWindowId) return openedTab.id;
@@ -115,14 +123,17 @@ const getCloseInfo = (details) => {
     const activeWindowId = details.activeWindowId;
     let retainedTabId = getPinnedTabId(observedTab, openedTab);
     if (!retainedTabId) {
-        retainedTabId = getHttpsTabId(observedTab, observedTabUrl, openedTab);
+        retainedTabId = getActiveTabWinnerId(observedTab, openedTab);
         if (!retainedTabId) {
+            retainedTabId = getHttpsTabId(observedTab, observedTabUrl, openedTab);
+            if (!retainedTabId) {
             retainedTabId = getLastUpdatedTabId(observedTab, openedTab);
             const retainedByAge = retainedTabId;
             if (options.prioritizeActiveWindow && activeWindowId && observedTab.windowId !== openedTab.windowId) {
                 retainedTabId = getActiveWindowTabId(observedTab, openedTab, activeWindowId, retainedByAge);
                 if (retainedTabId !== retainedByAge) {
                 }
+            }
             }
         }
     }

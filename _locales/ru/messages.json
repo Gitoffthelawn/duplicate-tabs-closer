@@ -47,6 +47,10 @@
     "message": "Сохранить закрепленную вкладку",
     "description": "Keep pinned tab"
   },
+  "keepActiveTab": {
+    "message": "Оставлять активную вкладку",
+    "description": "Keep the active tab"
+  },
   "onRemainingTab": {
     "message": "Оставшуюся вкладку...",
     "description": "On remaining tab"

@@ -47,6 +47,10 @@
     "message": "ピン留めされたタブを残す",
     "description": "Keep pinned tab"
   },
+  "keepActiveTab": {
+    "message": "アクティブなタブを保持する",
+    "description": "Keep the active tab"
+  },
   "onRemainingTab": {
     "message": "残されたタブがある場合",
     "description": "On remaining tab"

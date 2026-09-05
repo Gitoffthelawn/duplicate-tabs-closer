@@ -47,6 +47,10 @@
     "message": "Conserver l'onglet épinglé",
     "description": "Keep pinned tab"
   },
+  "keepActiveTab": {
+    "message": "Garder l'onglet actif",
+    "description": "Keep the active tab"
+  },
   "onRemainingTab": {
     "message": "Sur l'onglet restant",
     "description": "On remaining tab"

@@ -47,6 +47,10 @@
     "message": "Keep pinned tab",
     "description": "Keep pinned tab"
   },
+  "keepActiveTab": {
+    "message": "Keep the active tab",
+    "description": "Keep the active tab"
+  },
   "onRemainingTab": {
     "message": "On remaining tab",
     "description": "On remaining tab"

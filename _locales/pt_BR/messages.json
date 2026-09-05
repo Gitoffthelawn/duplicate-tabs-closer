@@ -47,6 +47,10 @@
     "message": "Manter a aba fixada",
     "description": "Keep pinned tab"
   },
+  "keepActiveTab": {
+    "message": "Manter a aba ativa",
+    "description": "Keep the active tab"
+  },
   "onRemainingTab": {
     "message": "Na aba restante",
     "description": "On remaining tab"

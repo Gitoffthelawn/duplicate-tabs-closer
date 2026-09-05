@@ -22,6 +22,9 @@ const defaultOptions = {
     keepPinnedTab: {
         value: true
     },
+    keepActiveTab: {
+        value: true
+    },
     scope: {
         value: "C"
     },
@@ -209,6 +212,7 @@ const setOptions = (storedOptions) => {
     options.keepReloadOlderTab = storedOptions.keepTabBasedOnAge.value === "R";
     options.keepTabWithHttps = storedOptions.keepTabWithHttps.value;
     options.keepPinnedTab = storedOptions.keepPinnedTab.value;
+    options.keepActiveTab = storedOptions.keepActiveTab.value;
     options.ignoreHashPart = storedOptions.ignoreHashPart.value;
     options.ignoreSearchPart = storedOptions.ignoreSearchPart.value;
     options.ignorePathPart = storedOptions.ignorePathPart.value;

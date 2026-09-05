@@ -47,6 +47,10 @@
     "message": "保留已釘選的分頁",
     "description": "Keep pinned tab"
   },
+  "keepActiveTab": {
+    "message": "保留使用中的分頁",
+    "description": "Keep the active tab"
+  },
   "onRemainingTab": {
     "message": "剩餘分頁的處理方式",
     "description": "On remaining tab"

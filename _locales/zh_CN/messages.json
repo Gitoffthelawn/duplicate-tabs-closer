@@ -47,6 +47,10 @@
     "message": "保留固定的标签页",
     "description": "Keep pinned tab"
   },
+  "keepActiveTab": {
+    "message": "保留活动标签页",
+    "description": "Keep the active tab"
+  },
   "onRemainingTab": {
     "message": "剩余标签页",
     "description": "On remaining tab"
