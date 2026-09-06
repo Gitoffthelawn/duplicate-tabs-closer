@@ -13,3 +13,6 @@ manifest.json
 
 ### Node ###
 node_modules/
+
+# Test logs
+*.log
