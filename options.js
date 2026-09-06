@@ -148,7 +148,7 @@ const setupDefaultOptions = () => {
     return options;
 };
 
-const getEnvironment = () => navigator.userAgent.includes("Firefox") ? "firefox" : "chrome";
+const getEnvironment = () => (navigator.userAgent.includes("Firefox") ? "firefox" : "chrome");
 
 const getNotInReferenceKeys = (referenceKeys, keys) => {
     const setKeys = new Set(keys);
@@ -163,8 +163,7 @@ const initializeOptions = async () => {
         const initialOptions = setupDefaultOptions();
         storedOptions = await saveStoredOptions(initialOptions);
     } else {
-        if (storedOptions.compareWithTitle?.value === true && !storedOptions.titleMatchMode)
-            storedOptions.titleMatchMode = { value: "T" };
+        if (storedOptions.compareWithTitle?.value === true && !storedOptions.titleMatchMode) storedOptions.titleMatchMode = { value: "T" };
         const storedKeys = Object.keys(storedOptions).sort();
         const defaultKeys = Object.keys(defaultOptions).sort();
         if (storedKeys.length !== defaultKeys.length || storedKeys.some((k, i) => k !== defaultKeys[i])) {
@@ -257,13 +256,11 @@ const isPanelOptionOpen = async () => {
     const contexts = await chrome.runtime.getContexts({});
     const popupUrl = chrome.runtime.getURL("popup/popup.html");
     const optionPageUrl = chrome.runtime.getURL("optionPage/optionPage.html");
-    return contexts.some(ctx =>
-        ctx.contextType === "POPUP" ||
+    return contexts.some(ctx => ctx.contextType === "POPUP" ||
         (ctx.contextType === "TAB" && ctx.documentUrl && (
             ctx.documentUrl.startsWith(popupUrl) ||
             ctx.documentUrl.startsWith(optionPageUrl)
-        ))
-    );
+        )));
 };
 
 // Returns true only if the popup itself is already open, not the options page.
@@ -272,13 +269,11 @@ const isPanelOptionOpen = async () => {
 const isPopupOpen = async () => {
     const contexts = await chrome.runtime.getContexts({});
     const popupUrl = chrome.runtime.getURL("popup/popup.html");
-    return contexts.some(ctx =>
-        ctx.contextType === "POPUP" ||
-        (ctx.contextType === "TAB" && ctx.documentUrl && ctx.documentUrl.startsWith(popupUrl))
-    );
+    return contexts.some(ctx => ctx.contextType === "POPUP" ||
+        (ctx.contextType === "TAB" && ctx.documentUrl && ctx.documentUrl.startsWith(popupUrl)));
 };
 
-const escapeRegexChar = (ch) => ch.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+const escapeRegexChar = (ch) => ch.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
 
 const whiteListToPattern = (whiteList) => {
     const MAX_WILDCARDS = 5;
@@ -287,7 +282,11 @@ const whiteListToPattern = (whiteList) => {
     whiteListLines.forEach(whiteListLine => {
         const regexMatch = whiteListLine.match(/^\/(.+)\/([gimsuy]*)$/);
         if (regexMatch) {
-            try { whiteListPatterns.add(new RegExp(regexMatch[1], regexMatch[2].replace(/[gy]/g, ""))); } catch (_) {}
+            try {
+                whiteListPatterns.add(new RegExp(regexMatch[1], regexMatch[2].replace(/[gy]/g, "")));
+            } catch {
+                // ignore: invalid regex in whitelist rule
+            }
         } else {
             const normalizedLine = whiteListLine.replace(/\/$/, "");
             if ((normalizedLine.match(/\*/g) || []).length > MAX_WILDCARDS) return;
@@ -312,7 +311,11 @@ const parsePatternRules = (text) => {
         if (!line) continue;
         const regexMatch = line.match(/^\/(.+)\/([gimsuy]*)$/);
         if (regexMatch) {
-            try { results.push({ source: line, regex: new RegExp(regexMatch[1], regexMatch[2].replace(/[gy]/g, "")) }); } catch (_) {}
+            try {
+                results.push({ source: line, regex: new RegExp(regexMatch[1], regexMatch[2].replace(/[gy]/g, "")) });
+            } catch {
+                // ignore: invalid regex in pattern rule
+            }
         } else {
             if ((line.match(/\*/g) || []).length > MAX_WILDCARDS) continue;
             let pattern = "^";

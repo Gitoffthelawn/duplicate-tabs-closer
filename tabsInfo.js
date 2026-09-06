@@ -18,22 +18,25 @@ class TabsInfo {
             const lastComplete = openedTab.lastAccessed ?? openedTab.index;
             this.setTab(openedTab.id, { url: openedTab.url, complete: true, lastComplete: lastComplete });
         }
-        const result = await chrome.storage.session.get('intentionalDuplicates');
+        const result = await chrome.storage.session.get("intentionalDuplicates");
         const ids = result.intentionalDuplicates || [];
         ids.forEach(id => this.intentionalDuplicates.add(id));
     }
 
     setTab(tabId, details) {
-        const storedTab = this.storedTabs.get(tabId)
-            || { url: null, lastComplete: null, closing: false };
+        const storedTab = this.storedTabs.get(tabId) ||
+            { url: null, lastComplete: null, closing: false };
+        const urlChanged = Object.prototype.hasOwnProperty.call(details, "url") && details.url !== storedTab.url;
         const completeChanged = Object.prototype.hasOwnProperty.call(details, "complete");
-        if (Object.prototype.hasOwnProperty.call(details, "url"))
-            storedTab.url = details.url;
-        if (completeChanged)
-            storedTab.lastComplete = details.complete ? (details.lastComplete ?? Date.now()) : null;
-        if (Object.prototype.hasOwnProperty.call(details, "closing"))
-            storedTab.closing = details.closing;
+        if (Object.prototype.hasOwnProperty.call(details, "url")) storedTab.url = details.url;
+        if (completeChanged) storedTab.lastComplete = details.complete ? (details.lastComplete ?? Date.now()) : null;
+        if (Object.prototype.hasOwnProperty.call(details, "closing")) storedTab.closing = details.closing;
         this.storedTabs.set(tabId, storedTab);
+        if (urlChanged || completeChanged) {
+            const payload = { tabId };
+            if (urlChanged) payload.url = details.url;
+            if (completeChanged) payload.complete = details.complete;
+        }
     }
 
     setClosingTab(tabId, state) {
@@ -67,7 +70,7 @@ class TabsInfo {
             this._persistIntentionalDuplicates();
         }
         const sessionId = this.tabSessionIdMap.get(tabId);
-        if (sessionId !== undefined) {
+        if (typeof sessionId !== "undefined") {
             this.knownSessionIds.delete(sessionId);
             this.tabSessionIdMap.delete(tabId);
         }
@@ -132,12 +135,16 @@ class TabsInfo {
 
     setPendingCheck(tabId, promise) {
         this.pendingChecks.set(tabId, promise);
-        promise.finally(() => { if (this.pendingChecks.get(tabId) === promise) this.pendingChecks.delete(tabId); });
+        promise.finally(() => {
+            if (this.pendingChecks.get(tabId) === promise) this.pendingChecks.delete(tabId);
+        });
     }
 
     awaitPendingCheck(tabId) {
         const p = this.pendingChecks.get(tabId);
-        return p ? p.catch(() => {}) : Promise.resolve();
+        return p ? p.catch(() => {
+            // ignore pending check rejection
+        }) : Promise.resolve();
     }
 
 }

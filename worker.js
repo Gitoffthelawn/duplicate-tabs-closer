@@ -45,18 +45,16 @@ const restoreDiscardedUrls = (tabs) => {
     }
 };
 
-const titleMatchesExact = (tab1, tab2) =>
-    isTabComplete(tab1) && isTabComplete(tab2) &&
+const titleMatchesExact = (tab1, tab2) => isTabComplete(tab1) && isTabComplete(tab2) &&
     tab1.title.toLowerCase() === tab2.title.toLowerCase();
 
 const matchTitle = (tab1, tab2) => {
     if (options.compareWithTitle) {
         if (isTabComplete(tab1) && isTabComplete(tab2)) {
-            if (options.titleSimilarityThreshold >= 100)
-                return tab1.title.toLowerCase() === tab2.title.toLowerCase();
+            if (options.titleSimilarityThreshold >= 100) return tab1.title.toLowerCase() === tab2.title.toLowerCase();
             const t = options.titleSimilarityThreshold;
             const maxLen = Math.max(tab1.title.length, tab2.title.length);
-            if (maxLen > 0 && Math.abs(tab1.title.length - tab2.title.length) > maxLen * (1 - t / 100)) return false;
+            if (maxLen > 0 && Math.abs(tab1.title.length - tab2.title.length) > maxLen * ((100 - t) / 100)) return false;
             return titleSimilarity(tab1.title, tab2.title) >= t;
         }
     }
@@ -131,8 +129,6 @@ const getCloseInfo = (details) => {
             const retainedByAge = retainedTabId;
             if (options.prioritizeActiveWindow && activeWindowId && observedTab.windowId !== openedTab.windowId) {
                 retainedTabId = getActiveWindowTabId(observedTab, openedTab, activeWindowId, retainedByAge);
-                if (retainedTabId !== retainedByAge) {
-                }
             }
             }
         }
@@ -154,13 +150,13 @@ const getCloseInfo = (details) => {
             tabIndex: observedTab.index,
             tabId: openedTab.id,
             windowId: openedTab.windowId,
-            reloadTab: !!options.keepReloadOlderTab
+            reloadTab: Boolean(options.keepReloadOlderTab)
         };
         return [observedTab.id, keepInfo];
     }
 };
 
-// eslint-disable-next-line no-unused-vars
+ 
 const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loadingUrl) => {
     const observedTabUrl = loadingUrl || observedTab.url;
     const observedWindowsId = observedTab.windowId;
@@ -178,8 +174,8 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
     if (options.skipBlankTabs && isBlankURL(observedTabUrl)) return;
     if (observedTabUrl.startsWith("view-source:")) return;
     const queryInfo = {};
-    if (isValidURL(observedTabUrl) && options.urlRegexRules.length === 0
-        && (!options.compareWithTitle || options.titleRegexRules.length === 0)) {
+    if (isValidURL(observedTabUrl) && options.urlRegexRules.length === 0 &&
+        (!options.compareWithTitle || options.titleRegexRules.length === 0)) {
         const matchPattern = getMatchPatternURL(observedTabUrl);
         if (matchPattern) queryInfo.url = matchPattern;
     }
@@ -196,14 +192,18 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
         : null;
     let match = false;
     for (const openedTab of openedTabs) {
-        if (openedTab.id === observedTab.id) continue;
+        if (openedTab.id === observedTab.id) {
+            continue;
+        }
         const skipReason = shouldSkipTab(openedTab, { queryComplete });
-        if (skipReason) continue;
-        if ((getMatchingURL(openedTab.url) === matchingObservedTabUrl
-            && (!options.requireTitleMatch || titleMatchesExact(openedTab, observedTab)))
-            || matchTitle(openedTab, observedTab)
-            || matchByUrlPattern(openedTab.url, observedTabUrl)
-            || (options.compareWithTitle && isTabComplete(openedTab) && isTabComplete(observedTab) && matchByTitlePattern(openedTab.title, observedTab.title))) {
+        if (skipReason) {
+            continue;
+        }
+        if ((getMatchingURL(openedTab.url) === matchingObservedTabUrl &&
+            (!options.requireTitleMatch || titleMatchesExact(openedTab, observedTab))) ||
+            matchTitle(openedTab, observedTab) ||
+            matchByUrlPattern(openedTab.url, observedTabUrl) ||
+            (options.compareWithTitle && isTabComplete(openedTab) && isTabComplete(observedTab) && matchByTitlePattern(openedTab.title, observedTab.title))) {
             match = true;
             const [tabToCloseId, remainingTabInfo] = getCloseInfo({ observedTab: observedTab, observedTabUrl: observedTabUrl, openedTab: openedTab, activeWindowId: activeWindowId });
             closeDuplicateTab(tabToCloseId, remainingTabInfo);
@@ -231,7 +231,7 @@ const closeDuplicateTab = async (tabToCloseId, remainingTabInfo) => {
         }
         await removeTab(tabToCloseId);
     }
-    catch (ex) {
+    catch {
         tabsInfo.setClosingTab(tabToCloseId, false);
         return;
     }
@@ -271,8 +271,7 @@ const invalidateAllRetainedKeys = (retainedTab, currentMatchingKey, retainedTabs
 const findRetainedTab = (observedTab, retainedTabs, matchingTabURL, matchingTabTitle) => {
     // 1. Direct URL key
     let tab = retainedTabs.get(matchingTabURL);
-    if (tab && (!options.requireTitleMatch || titleMatchesExact(tab, observedTab)))
-        return { tab, key: matchingTabURL };
+    if (tab && (!options.requireTitleMatch || titleMatchesExact(tab, observedTab))) return { tab, key: matchingTabURL };
     // 2. Fuzzy title key
     if (matchingTabTitle) {
         const titleKey = findFuzzyTitleKey(observedTab.title, retainedTabs) || matchingTabTitle;
@@ -301,10 +300,8 @@ const findRetainedTab = (observedTab, retainedTabs, matchingTabURL, matchingTabT
 };
 
 const registerTab = (observedTab, retainedTabs, matchingTabURL, matchingTabTitle) => {
-    if (isTabComplete(observedTab) || tabsInfo.getLastComplete(observedTab.id) !== null)
-        retainedTabs.set(matchingTabURL, observedTab);
-    if (matchingTabTitle && !retainedTabs.has(matchingTabTitle))
-        retainedTabs.set(matchingTabTitle, observedTab);
+    if (isTabComplete(observedTab) || tabsInfo.getLastComplete(observedTab.id) !== null) retainedTabs.set(matchingTabURL, observedTab);
+    if (matchingTabTitle && !retainedTabs.has(matchingTabTitle)) retainedTabs.set(matchingTabTitle, observedTab);
     if (options.urlRegexRules.length > 0) {
         const urlPatSource = findPatternSource(observedTab.url, options.urlRegexRules);
         if (urlPatSource) {
@@ -373,13 +370,13 @@ const findFuzzyTitleKey = (title, retainedTabs) => {
         if (!key.startsWith("title=")) continue;
         const candidate = key.slice(6);
         const maxLen = Math.max(titleLen, candidate.length);
-        if (maxLen > 0 && Math.abs(titleLen - candidate.length) > maxLen * (1 - t / 100)) continue;
+        if (maxLen > 0 && Math.abs(titleLen - candidate.length) > maxLen * ((100 - t) / 100)) continue;
         if (titleSimilarity(title, candidate) >= t) return key;
     }
     return null;
 };
 
-// eslint-disable-next-line no-unused-vars
+ 
 const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted = true) => {
     const queryInfo = { windowType: "normal" };
     if (!options.searchInAllWindows) queryInfo.windowId = windowId;
@@ -430,7 +427,7 @@ const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted = tru
     };
 };
 
-// eslint-disable-next-line no-unused-vars
+ 
 const closeDuplicateTabs = (windowId, skipWhitelisted) => searchForDuplicateTabs(windowId, true, skipWhitelisted);
 
 const setDuplicateTabPanel = async (duplicateTab, duplicateTabs, groupIndex, retainedTabId) => {
@@ -439,7 +436,9 @@ const setDuplicateTabPanel = async (duplicateTab, duplicateTabs, groupIndex, ret
         try {
             const getContext = await browser.contextualIdentities.get(duplicateTab.cookieStoreId);
             if (getContext) containerColor = getContext.color;
-        } catch { /* container deleted or unavailable */ }
+        } catch {
+            // container deleted or unavailable
+        }
     }
     duplicateTabs.add({
         id: duplicateTab.id,
@@ -461,8 +460,9 @@ const getDuplicateTabsForPanel = async (duplicateTabsGroups, retainedTabs) => {
     for (const [key, duplicateTabs] of duplicateTabsGroups) {
         const retainedTab = retainedTabs ? retainedTabs.get(key) : null;
         const retainedTabId = retainedTab ? retainedTab.id : null;
-        await Promise.all(Array.from(duplicateTabs, duplicateTab => setDuplicateTabPanel(duplicateTab, duplicateTabsPanel, groupIndex, retainedTabId)));
-        groupIndex++;
+        const currentGroupIndex = groupIndex;
+        await Promise.all(Array.from(duplicateTabs, duplicateTab => setDuplicateTabPanel(duplicateTab, duplicateTabsPanel, currentGroupIndex, retainedTabId)));
+        groupIndex += 1;
     }
     return Array.from(duplicateTabsPanel);
 };
@@ -479,7 +479,9 @@ const sendDuplicateTabs = async (duplicateTabsGroups, retainedTabs) => {
     chrome.runtime.sendMessage({
         action: "updateDuplicateTabsTable",
         data: { "duplicateTabs": duplicateTabs }
-    }).catch(() => {});
+    }).catch(() => {
+        // ignore: panel may not be open
+    });
 };
 
 const _refreshDuplicateTabsInfo = async (windowId) => {
@@ -487,25 +489,25 @@ const _refreshDuplicateTabsInfo = async (windowId) => {
     const triggerTabId = _pendingTriggerTabId.get(windowId) ?? null;
     _pendingTriggerTabId.delete(windowId);
     const searchResult = await searchForDuplicateTabs(windowId, false);
-    const count = getNbDuplicateTabs(searchResult.duplicateTabsGroups);
     updateBadgesValue(searchResult.duplicateTabsGroups, windowId, triggerTabId);
     const panelOpen = await isPanelOptionOpen();
     if (panelOpen && (options.searchInAllWindows || (windowId === searchResult.activeWindowId))) {
         sendDuplicateTabs(searchResult.duplicateTabsGroups, searchResult.retainedTabs);
-    } else {
     }
 };
 
 const refreshDuplicateTabsInfo = debounce(_refreshDuplicateTabsInfo, 300, false);
 
-// eslint-disable-next-line no-unused-vars
+ 
 const startupBurst = { active: false, timerId: null, startedAt: 0 };
-const POST_STARTUP_BURST_EXTEND_MS = 3000;  // reset window on each tab completion during burst
-const POST_STARTUP_BURST_MAX_MS = 30000;    // absolute ceiling so a stalled tab can't hold burst forever
+// reset window on each tab completion during burst
+const POST_STARTUP_BURST_EXTEND_MS = 3000;
+// absolute ceiling: a stalled tab cannot hold burst open forever
+const POST_STARTUP_BURST_MAX_MS = 30000;
 
-let _pendingTriggerTabId = new Map();
+const _pendingTriggerTabId = new Map();
 
-// eslint-disable-next-line no-unused-vars
+ 
 const debouncedBatchClose = debounce(closeDuplicateTabs, 300, false);
 
 // Dispatch the appropriate action after a tab completes or navigates.
@@ -515,7 +517,10 @@ const debouncedBatchClose = debounce(closeDuplicateTabs, 300, false);
 const dispatchTabCompletion = (tab, activeTabId, { queryComplete = false, alreadyComplete = false } = {}) => {
     if (startupBurst.active && (Date.now() - startupBurst.startedAt) < POST_STARTUP_BURST_MAX_MS) {
         clearTimeout(startupBurst.timerId);
-        startupBurst.timerId = setTimeout(() => { startupBurst.active = false; _seededTabIds.clear(); }, POST_STARTUP_BURST_EXTEND_MS);
+        startupBurst.timerId = setTimeout(() => {
+            startupBurst.active = false;
+            _seededTabIds.clear();
+        }, POST_STARTUP_BURST_EXTEND_MS);
     }
     if (options.autoCloseTab) {
         if (!alreadyComplete) {

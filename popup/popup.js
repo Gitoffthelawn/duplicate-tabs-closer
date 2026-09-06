@@ -1,10 +1,9 @@
 "use strict";
 
-let activeWindowId = chrome.windows.WINDOW_ID_NONE;
+const activeWindowId = chrome.windows.WINDOW_ID_NONE;
 let lastDuplicateTabs = null;
 let panelInitialized = false;
 let closePopup = false;
-let environment = "";
 let groupedView = false;
 let lastNbRows = 0;
 let _renderGen = 0;
@@ -69,24 +68,23 @@ const toggleExpendGroup = (eventId, isTitleClickEvent, pinned, resize) => {
 };
 
 const setDuplicateTabsTable = async (duplicateTabs) => {
-    const gen = ++_renderGen;
-    const sameList = duplicateTabs !== null && lastDuplicateTabs !== null
-        && Array.isArray(duplicateTabs) && Array.isArray(lastDuplicateTabs)
-        && duplicateTabs.length === lastDuplicateTabs.length
-        && duplicateTabs.every((t, i) => t.id === lastDuplicateTabs[i].id
-            && t.isRetained === lastDuplicateTabs[i].isRetained
-            && t.whitelisted === lastDuplicateTabs[i].whitelisted);
+    _renderGen += 1;
+    const gen = _renderGen;
+    const sameList = duplicateTabs !== null && lastDuplicateTabs !== null &&
+        Array.isArray(duplicateTabs) && Array.isArray(lastDuplicateTabs) &&
+        duplicateTabs.length === lastDuplicateTabs.length &&
+        duplicateTabs.every((t, i) => t.id === lastDuplicateTabs[i].id &&
+            t.isRetained === lastDuplicateTabs[i].isRetained &&
+            t.whitelisted === lastDuplicateTabs[i].whitelisted);
     if (sameList) return;
-    const isFirstRender = lastDuplicateTabs == null;
+    const isFirstRender = lastDuplicateTabs === null;
     const highlightTabId = isFirstRender ? _highlightOnOpen : false;
     if (isFirstRender) _highlightOnOpen = false;
-    const newTabIds = new Set(
-        highlightTabId != null && highlightTabId !== false && duplicateTabs
+    const newTabIds = new Set(highlightTabId !== null && highlightTabId !== false && duplicateTabs
             ? duplicateTabs.filter(t => t.id === highlightTabId).map(t => t.id)
             : !isFirstRender && duplicateTabs
                 ? duplicateTabs.filter(t => !lastDuplicateTabs.some(p => p.id === t.id) && !t.isRetained).map(t => t.id)
-                : []
-    );
+                : []);
     const expandedGroups = new Set();
     if (groupedView) {
         document.querySelectorAll(".tr-group-header:not(.collapsed)").forEach(header => {
@@ -171,7 +169,7 @@ const setDuplicateTabsTable = async (duplicateTabs) => {
         const em = document.createElement("em");
         em.textContent = monitoringPaused
             ? chrome.i18n.getMessage("monitoringPaused")
-            : chrome.i18n.getMessage("noDuplicateTabs") + ".";
+            : `${chrome.i18n.getMessage("noDuplicateTabs")}.`;
         td.appendChild(em);
         tr.appendChild(td);
         tbody.appendChild(tr);
@@ -285,15 +283,14 @@ const setPanelOptions = async () => {
     applyPopupRuleVisibility(storedOptions);
     updateIgnorePathPartDependents(storedOptions.ignorePathPart ? storedOptions.ignorePathPart.value : false);
     updateTitleMatchModeDependents(storedOptions.titleMatchMode ? storedOptions.titleMatchMode.value : "N");
-    const sessionData = await chrome.storage.session.get(['autoOpenedPopup', 'autoOpenedTabId']);
+    const sessionData = await chrome.storage.session.get(["autoOpenedPopup", "autoOpenedTabId"]);
     if (sessionData.autoOpenedPopup) {
-        chrome.storage.session.remove(['autoOpenedPopup', 'autoOpenedTabId']);
+        chrome.storage.session.remove(["autoOpenedPopup", "autoOpenedTabId"]);
         _highlightOnOpen = sessionData.autoOpenedTabId ?? null;
         document.getElementById("optionHeader").classList.add("collapsed");
         resizeDuplicateTabsPanel();
     }
-    if (document.body.classList.contains("two-columns"))
-        document.getElementById("optionHeader").classList.remove("collapsed");
+    if (document.body.classList.contains("two-columns")) document.getElementById("optionHeader").classList.remove("collapsed");
 };
 
 const applyPausedState = (paused) => {
@@ -331,14 +328,16 @@ const updateTitleMatchModeDependents = (value) => {
 };
 
 const applyPopupRuleVisibility = (storedOptions) => {
-    const rules = ["caseInsensitive", "ignore3w", "ignoreHashPart", "ignoreSearchPart",
-        "ignorePathPart", "urlRegexRules", "titleMatchMode"];
+    const rules = [
+"caseInsensitive", "ignore3w", "ignoreHashPart", "ignoreSearchPart",
+        "ignorePathPart", "urlRegexRules", "titleMatchMode"
+];
     rules.forEach(rule => {
-        const visible = storedOptions[rule + "_popup"] ? storedOptions[rule + "_popup"].value : true;
+        const visible = storedOptions[`${rule}_popup`] ? storedOptions[`${rule}_popup`].value : true;
         const el = document.getElementById(rule);
         if (el) el.closest(".checkboxes").classList.toggle("hidden", !visible);
     });
-    const titleMatchValue = storedOptions["titleMatchMode"] ? storedOptions["titleMatchMode"].value : "N";
+    const titleMatchValue = storedOptions.titleMatchMode ? storedOptions.titleMatchMode.value : "N";
     updateTitleMatchModeDependents(titleMatchValue);
 };
 
@@ -364,7 +363,7 @@ const handleMessage = (message) => {
 
 chrome.runtime.onMessage.addListener(handleMessage);
 
-// eslint-disable-next-line max-lines-per-function
+ 
 const loadListenerEvents = () => {
 
     /* Save checkbox settings */
@@ -374,9 +373,9 @@ const loadListenerEvents = () => {
         else if (this.id === "ignorePathPart") {
             updateIgnorePathPartDependents(this.checked);
         }
-        const refresh = this.className.includes("checkbox-filter")
-            || this.id === "keepTabWithHttps"
-            || this.id === "keepPinnedTab";
+        const refresh = this.className.includes("checkbox-filter") ||
+            this.id === "keepTabWithHttps" ||
+            this.id === "keepPinnedTab";
         saveOption(this.id, this.checked, refresh);
     }));
 
@@ -393,7 +392,7 @@ const loadListenerEvents = () => {
     /* Save title similarity threshold */
     const threshEl = document.getElementById("titleSimilarityThreshold");
     if (threshEl) threshEl.addEventListener("change", function () {
-        const val = Math.min(100, Math.max(1, parseInt(this.value) || 100));
+        const val = Math.min(100, Math.max(1, parseInt(this.value, 10) || 100));
         this.value = val;
         saveOption("titleSimilarityThreshold", val, true);
     });
@@ -412,10 +411,12 @@ const loadListenerEvents = () => {
             const s = textarea.scrollTop;
             textarea.style.backgroundImage = `linear-gradient(transparent ${top - s}px, rgba(0, 0, 0, 0.075) ${top - s}px, rgba(0, 0, 0, 0.075) ${bottom - s}px, transparent ${bottom - s}px)`;
         };
-        ["keyup", "click", "select", "focus", "scroll"].forEach(ev =>
-            el.addEventListener(ev, function () { applyLineHighlight(this); })
-        );
-        el.addEventListener("blur", function () { this.style.backgroundImage = ""; });
+        ["keyup", "click", "select", "focus", "scroll"].forEach(ev => el.addEventListener(ev, function () {
+            applyLineHighlight(this);
+        }));
+        el.addEventListener("blur", function () {
+            this.style.backgroundImage = "";
+        });
     });
 
     /* Pause/resume monitoring */
@@ -441,7 +442,7 @@ const loadListenerEvents = () => {
     /* Active selected tab (delegated) */
     const table = document.getElementById("duplicateTabsTable");
     if (table) {
-        table.addEventListener("click", function (e) {
+        table.addEventListener("click", (e) => {
             const groupCloseBtn = e.target.closest(".btn-group-close");
             if (groupCloseBtn) {
                 e.stopPropagation();
@@ -494,7 +495,7 @@ const loadListenerEvents = () => {
         updateGroupButton(groupedView);
         saveOption("popupGroupedView", groupedView, false);
         if (lastDuplicateTabs) {
-            ++_renderGen;
+            _renderGen += 1;
             const rows = groupedView
                 ? buildGroupedDuplicateTabRows(lastDuplicateTabs, activeWindowId)
                 : buildDuplicateTabRows(lastDuplicateTabs, activeWindowId);
@@ -556,7 +557,7 @@ const localizePopup = () => {
 };
 
 const initialize = async () => {
-    const [,, sessionData] = await Promise.all([setPanelOptions(), saveActiveWindowId(), chrome.storage.session.get('monitoringPaused')]);
+    const [,, sessionData] = await Promise.all([setPanelOptions(), saveActiveWindowId(), chrome.storage.session.get("monitoringPaused")]);
     monitoringPaused = sessionData.monitoringPaused || false;
     requestGetDuplicateTabs();
     localizePopup();

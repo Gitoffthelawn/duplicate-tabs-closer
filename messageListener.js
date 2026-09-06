@@ -5,8 +5,8 @@ const handleMessage = (message, sender, response) => {
     switch (message.action) {
         case "setStoredOption": {
             if (!message.data || !(message.data.name in defaultOptions)) return response({});
-            setStoredOption(message.data.name, message.data.value, message.data.refresh)
-                .then(() => response({})).catch(() => response({}));
+            setStoredOption(message.data.name, message.data.value, message.data.refresh).
+                then(() => response({})).catch(() => response({}));
             return true;
         }
         case "getStoredOptions": {
@@ -16,7 +16,9 @@ const handleMessage = (message, sender, response) => {
         case "getDuplicateTabs": {
             if (!message.data) return response({});
             if (monitoringPaused) {
-                chrome.runtime.sendMessage({ action: "updateDuplicateTabsTable", data: { duplicateTabs: null } }).catch(() => {});
+                chrome.runtime.sendMessage({ action: "updateDuplicateTabsTable", data: { duplicateTabs: null } }).catch(() => {
+                // ignore: panel may not be open
+            });
             } else {
                 requestDuplicateTabsFromPanel(message.data.windowId);
             }

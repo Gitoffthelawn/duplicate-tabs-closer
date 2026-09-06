@@ -9,15 +9,15 @@ const getElements = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel
 const areSameArrays = (array1, array2) => {
     if (!array1 && !array2) return true;
     if (!array1 || !array2 || array1.length !== array2.length) return false;
-    return array1.every((t, i) => t.id === array2[i].id
-        && t.isRetained === array2[i].isRetained
-        && t.whitelisted === array2[i].whitelisted);
+    return array1.every((t, i) => t.id === array2[i].id &&
+        t.isRetained === array2[i].isRetained &&
+        t.whitelisted === array2[i].whitelisted);
 };
 
 // eslint-disable-next-line no-unused-vars
-const escapeHTML = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+const escapeHTML = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#39;");
 
-// eslint-disable-next-line no-unused-vars
+ 
 const buildTabRow = (duplicateTab, activeWindowId) => {
     const tr = document.createElement("tr");
     tr.setAttribute("tabId", parseInt(duplicateTab.id, 10));
@@ -69,9 +69,7 @@ const buildTabRow = (duplicateTab, activeWindowId) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const buildDuplicateTabRows = (duplicateTabs, activeWindowId) => {
-    return duplicateTabs.map(tab => buildTabRow(tab, activeWindowId));
-};
+const buildDuplicateTabRows = (duplicateTabs, activeWindowId) => duplicateTabs.map(tab => buildTabRow(tab, activeWindowId));
 
 // eslint-disable-next-line no-unused-vars
 const buildGroupedDuplicateTabRows = (duplicateTabs, activeWindowId) => {
@@ -191,18 +189,18 @@ const getHighlightBounds = (textarea) => {
     const pt = parseFloat(cs.paddingTop);
     const text = textarea.value;
     const pos = textarea.selectionStart;
-    const lineStart = text.lastIndexOf('\n', pos - 1) + 1;
-    const lineEndRaw = text.indexOf('\n', pos);
+    const lineStart = text.lastIndexOf("\n", pos - 1) + 1;
+    const lineEndRaw = text.indexOf("\n", pos);
     const lineEnd = lineEndRaw === -1 ? text.length : lineEndRaw;
     let m = textarea._mirror;
     if (!m) {
-        m = document.createElement('div');
-        m.setAttribute('aria-hidden', 'true');
-        m.style.cssText = 'position:fixed;top:-9999px;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;padding:0;margin:0;border:0;box-sizing:content-box;';
+        m = document.createElement("div");
+        m.setAttribute("aria-hidden", "true");
+        m.style.cssText = "position:fixed;top:-9999px;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;padding:0;margin:0;border:0;box-sizing:content-box;";
         document.body.appendChild(m);
         textarea._mirror = m;
     }
-    m.style.width = (textarea.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)) + 'px';
+    m.style.width = `${textarea.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)}px`;
     m.style.font = cs.font;
     m.style.lineHeight = cs.lineHeight;
     let topOffset = 0;
@@ -210,7 +208,7 @@ const getHighlightBounds = (textarea) => {
         m.textContent = text.substring(0, lineStart);
         topOffset = m.scrollHeight;
     }
-    m.textContent = text.substring(lineStart, lineEnd) || ' ';
+    m.textContent = text.substring(lineStart, lineEnd) || " ";
     return { top: pt + topOffset, bottom: pt + topOffset + m.scrollHeight };
 };
 

@@ -11,7 +11,7 @@ const setBadgeIcon = () => {
 
 const setBadge = async (windowId, activeTabId) => {
 	if (monitoringPaused) {
-		if (!environment.isFirefox && activeTabId != null) {
+		if (!environment.isFirefox && activeTabId !== null) {
 			setTabBadgeText(activeTabId, PAUSED_BADGE_TEXT);
 			setTabBadgeBackgroundColor(activeTabId, PAUSED_BADGE_COLOR);
 		}
@@ -25,7 +25,7 @@ const setBadge = async (windowId, activeTabId) => {
 		setWindowBadgeBackgroundColor(windowId, backgroundColor);
 	}
 	else {
-		if (activeTabId != null) {
+		if (activeTabId !== null) {
 			setTabBadgeText(activeTabId, badgeText);
 			setTabBadgeBackgroundColor(activeTabId, backgroundColor);
 		} else {
@@ -43,7 +43,9 @@ const getNbDuplicateTabs = (duplicateTabsGroups) => {
 	duplicateTabsGroups.forEach(duplicateTabs => {
 		if (options.hideWhitelistedTabs) {
 			const firstTab = duplicateTabs.values().next().value;
-			if (firstTab && isUrlWhiteListed(firstTab.url)) return;
+			if (firstTab && isUrlWhiteListed(firstTab.url)) {
+				return;
+			}
 		}
 		nbDuplicateTabs += duplicateTabs.size - 1;
 	});
@@ -51,7 +53,9 @@ const getNbDuplicateTabs = (duplicateTabsGroups) => {
 };
 
 const updateBadgeValue = async (nbDuplicateTabs, windowId, triggerTabId) => {
-	if (tabsInfo.hasNbDuplicateTabs(windowId) && tabsInfo.getNbDuplicateTabs(windowId) === nbDuplicateTabs) return;
+	if (tabsInfo.hasNbDuplicateTabs(windowId) && tabsInfo.getNbDuplicateTabs(windowId) === nbDuplicateTabs) {
+		return;
+	}
 	const hadPriorCount = tabsInfo.hasNbDuplicateTabs(windowId);
 	const prevCount = hadPriorCount ? tabsInfo.getNbDuplicateTabs(windowId) : 0;
 	tabsInfo.setNbDuplicateTabs(windowId, nbDuplicateTabs);
@@ -61,12 +65,16 @@ const updateBadgeValue = async (nbDuplicateTabs, windowId, triggerTabId) => {
 	// hadPriorCount is true so the popup fires correctly.
 	if (options.openPopupOnDuplicateDetected && hadPriorCount && nbDuplicateTabs > prevCount && !(await isPopupOpen())) {
 		chrome.storage.session.set({ autoOpenedPopup: true, autoOpenedTabId: triggerTabId ?? null }).then(() => {
-			chrome.action.openPopup().catch(() => {});
+			chrome.action.openPopup().catch(() => {
+					// ignore: popup may fail if dismissed or already open
+				});
 		});
 		// Cancel the highlight flag if the duplicate was transient (count dropped within 400ms).
-		wait(400).then(async () => {
+		wait(400).then(() => {
 			if (tabsInfo.getNbDuplicateTabs(windowId) <= prevCount) {
-				chrome.storage.session.remove(['autoOpenedPopup', 'autoOpenedTabId']).catch(() => {});
+				chrome.storage.session.remove(["autoOpenedPopup", "autoOpenedTabId"]).catch(() => {
+					// ignore
+				});
 			}
 		});
 	}

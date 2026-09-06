@@ -1,6 +1,6 @@
 "use strict";
 
-let activeWindowId = chrome.windows.WINDOW_ID_NONE;
+const activeWindowId = chrome.windows.WINDOW_ID_NONE;
 let lastDuplicateTabs = null;
 let panelInitialized = false;
 let groupedView = false;
@@ -8,7 +8,7 @@ let lastNbRows = 0;
 let monitoringPaused = false;
 
 const initialize = async () => {
-  const [,, sessionData] = await Promise.all([setPanelOptions(), saveActiveWindowId(), chrome.storage.session.get('monitoringPaused')]);
+  const [,, sessionData] = await Promise.all([setPanelOptions(), saveActiveWindowId(), chrome.storage.session.get("monitoringPaused")]);
   monitoringPaused = sessionData.monitoringPaused || false;
   requestGetDuplicateTabs();
   localizePopup(document.documentElement);
@@ -44,7 +44,7 @@ const updateTitleMatchModeDependents = (value) => {
   if (titleRulesGroup) titleRulesGroup.classList.toggle("hidden", !titleOnly);
 };
 
-// eslint-disable-next-line max-lines-per-function
+ 
 const loadPopupEvents = () => {
 
   /* Save checkbox settings */
@@ -54,11 +54,11 @@ const loadPopupEvents = () => {
       return;
     }
     if (this.id === "ignorePathPart") updateIgnorePathPartDependents(this.checked);
-    const refresh = this.className.includes("checkbox-filter")
-      || this.id === "keepTabWithHttps"
-      || this.id === "keepPinnedTab"
-      || this.id === "prioritizeActiveWindow"
-      || this.id === "skipBlankTabs";
+    const refresh = this.className.includes("checkbox-filter") ||
+      this.id === "keepTabWithHttps" ||
+      this.id === "keepPinnedTab" ||
+      this.id === "prioritizeActiveWindow" ||
+      this.id === "skipBlankTabs";
     saveOption(this.id, this.checked, refresh);
   }));
 
@@ -81,7 +81,7 @@ const loadPopupEvents = () => {
   /* Save title similarity threshold */
   const threshEl = getElement(".list-group #titleSimilarityThreshold");
   if (threshEl) threshEl.addEventListener("change", function () {
-    const val = Math.min(100, Math.max(1, parseInt(this.value) || 100));
+    const val = Math.min(100, Math.max(1, parseInt(this.value, 10) || 100));
     this.value = val;
     saveOption("titleSimilarityThreshold", val, true);
   });
@@ -110,23 +110,27 @@ const loadPopupEvents = () => {
       this.value = cleaned;
       saveOption(this.id, cleaned, true);
     });
-    ["keyup", "click", "select", "focus", "scroll"].forEach(ev =>
-      el.addEventListener(ev, function () { applyLineHighlight(this); })
-    );
-    el.addEventListener("blur", function () { this.style.backgroundImage = ""; });
+    ["keyup", "click", "select", "focus", "scroll"].forEach(ev => el.addEventListener(ev, function () {
+      applyLineHighlight(this);
+    }));
+    el.addEventListener("blur", function () {
+      this.style.backgroundImage = "";
+    });
   });
 
   if (whiteListEl) {
-    ["keyup", "click", "select", "focus", "scroll"].forEach(ev =>
-      whiteListEl.addEventListener(ev, function () { applyLineHighlight(this); })
-    );
-    whiteListEl.addEventListener("blur", function () { this.style.backgroundImage = ""; });
+    ["keyup", "click", "select", "focus", "scroll"].forEach(ev => whiteListEl.addEventListener(ev, function () {
+      applyLineHighlight(this);
+    }));
+    whiteListEl.addEventListener("blur", function () {
+      this.style.backgroundImage = "";
+    });
   }
 
   /* Active selected tab (delegated) */
   const table = document.getElementById("duplicateTabsTable");
   if (table) {
-    table.addEventListener("click", function (e) {
+    table.addEventListener("click", (e) => {
       const groupCloseBtn = e.target.closest(".btn-group-close");
       if (groupCloseBtn) {
         e.stopPropagation();
@@ -287,7 +291,7 @@ const setDuplicateTabsTable = (duplicateTabs) => {
     const em = document.createElement("em");
     em.textContent = monitoringPaused
       ? chrome.i18n.getMessage("monitoringPaused")
-      : chrome.i18n.getMessage("noDuplicateTabs") + ".";
+      : `${chrome.i18n.getMessage("noDuplicateTabs")}.`;
     td.appendChild(em);
     tr.appendChild(td);
     tbody.appendChild(tr);
@@ -337,11 +341,17 @@ const setPanelOption = (details) => {
   }
   else if (storedOption === "whiteList") {
     const el = document.getElementById("whiteList");
-    if (el) { el.value = value; if (isLockedKey) el.disabled = true; }
+    if (el) {
+      el.value = value;
+      if (isLockedKey) el.disabled = true;
+    }
   }
   else if (storedOption === "urlRegexRules" || storedOption === "titleRegexRules") {
     const el = document.getElementById(storedOption);
-    if (el) { el.value = value; if (isLockedKey) el.disabled = true; }
+    if (el) {
+      el.value = value;
+      if (isLockedKey) el.disabled = true;
+    }
   }
   else {
     const el = document.getElementById(storedOption);
