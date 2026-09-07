@@ -3,7 +3,7 @@
 :root {
     --dtc-header-bg: #0facf3;
     --dtc-header-border: #2EADE7;
-    --dtc-header-text: #ffffff;
+    --dtc-header-text: #fff;
     --dtc-section-title: #0FACF3;
     --dtc-section-collapsed: #9FACBD;
     --dtc-section-hover: #0a95d3;
@@ -20,7 +20,7 @@
 html.theme-ocean {
     --dtc-header-bg: #0facf3;
     --dtc-header-border: #0d9fd8;
-    --dtc-header-text: #ffffff;
+    --dtc-header-text: #fff;
     --dtc-section-title: #4dc8f5;
     --dtc-section-collapsed: #4a6a88;
     --dtc-section-hover: #7dd8f7;
@@ -31,24 +31,24 @@ html.theme-ocean {
     --dtc-textarea-bg: #0c1827;
     --dtc-textarea-alt-bg: #0e1e30;
     --dtc-scrollbar-track: #0c1827;
-    --dtc-scrollbar-thumb: #ffffff22;
+    --dtc-scrollbar-thumb: #fff2;
 }
 
 html.theme-charcoal {
     --dtc-header-bg: #0facf3;
     --dtc-header-border: #0d9fd8;
-    --dtc-header-text: #ffffff;
+    --dtc-header-text: #fff;
     --dtc-section-title: #0facf3;
-    --dtc-section-collapsed: #666666;
+    --dtc-section-collapsed: #666;
     --dtc-section-hover: #3bbfec;
     --dtc-text: #d4d4d4;
     --dtc-close-btn: #d4d4d4;
-    --dtc-close-btn-hover: #ffffff;
+    --dtc-close-btn-hover: #fff;
     --dtc-footer-border: #3a3a3a44;
     --dtc-textarea-bg: #1a1a1a;
     --dtc-textarea-alt-bg: #1d1d1d;
     --dtc-scrollbar-track: #1a1a1a;
-    --dtc-scrollbar-thumb: #ffffff22;
+    --dtc-scrollbar-thumb: #fff2;
 }
 
 html.theme-purple {
@@ -60,18 +60,18 @@ html.theme-purple {
     --dtc-section-hover: #c4b5fd;
     --dtc-text: #e2dff4;
     --dtc-close-btn: #e2dff4;
-    --dtc-close-btn-hover: #ffffff;
+    --dtc-close-btn-hover: #fff;
     --dtc-footer-border: #3d345744;
     --dtc-textarea-bg: #15111e;
     --dtc-textarea-alt-bg: #181226;
     --dtc-scrollbar-track: #15111e;
-    --dtc-scrollbar-thumb: #ffffff22;
+    --dtc-scrollbar-thumb: #fff2;
 }
 
 html.theme-teal {
     --dtc-header-bg: #0d9488;
     --dtc-header-border: #0b8279;
-    --dtc-header-text: #ffffff;
+    --dtc-header-text: #fff;
     --dtc-section-title: #2dd4bf;
     --dtc-section-collapsed: #3d6e6a;
     --dtc-section-hover: #5ee5d0;
@@ -82,30 +82,30 @@ html.theme-teal {
     --dtc-textarea-bg: #091918;
     --dtc-textarea-alt-bg: #0c1f1e;
     --dtc-scrollbar-track: #091918;
-    --dtc-scrollbar-thumb: #ffffff22;
+    --dtc-scrollbar-thumb: #fff2;
 }
 
 html.theme-oled {
-    --dtc-header-bg: #111111;
-    --dtc-header-border: #222222;
-    --dtc-header-text: #ffffff;
+    --dtc-header-bg: #111;
+    --dtc-header-border: #222;
+    --dtc-header-text: #fff;
     --dtc-section-title: #0facf3;
-    --dtc-section-collapsed: #444444;
+    --dtc-section-collapsed: #444;
     --dtc-section-hover: #3bbfec;
-    --dtc-text: #ffffff;
-    --dtc-close-btn: #cccccc;
-    --dtc-close-btn-hover: #ffffff;
+    --dtc-text: #fff;
+    --dtc-close-btn: #ccc;
+    --dtc-close-btn-hover: #fff;
     --dtc-footer-border: #2a2a2a44;
     --dtc-textarea-bg: #080808;
     --dtc-textarea-alt-bg: #0a0a0a;
     --dtc-scrollbar-track: #080808;
-    --dtc-scrollbar-thumb: #ffffff33;
+    --dtc-scrollbar-thumb: #fff3;
 }
 
 html.theme-sage {
     --dtc-header-bg: #16a34a;
     --dtc-header-border: #15803d;
-    --dtc-header-text: #ffffff;
+    --dtc-header-text: #fff;
     --dtc-section-title: #16a34a;
     --dtc-section-collapsed: #9facbd;
     --dtc-section-hover: #15803d;
@@ -113,7 +113,7 @@ html.theme-sage {
     --dtc-close-btn: #3c4859;
     --dtc-close-btn-hover: #1c2b3a;
     --dtc-footer-border: #c8ced64d;
-    --dtc-textarea-bg: #ffffff;
+    --dtc-textarea-bg: #fff;
     --dtc-textarea-alt-bg: #f0fdf4;
     --dtc-scrollbar-track: #f5f5f5;
     --dtc-scrollbar-thumb: #0000001a;
@@ -122,7 +122,7 @@ html.theme-sage {
 html.theme-rose {
     --dtc-header-bg: #e11d48;
     --dtc-header-border: #be123c;
-    --dtc-header-text: #ffffff;
+    --dtc-header-text: #fff;
     --dtc-section-title: #e11d48;
     --dtc-section-collapsed: #9facbd;
     --dtc-section-hover: #be123c;
@@ -130,7 +130,7 @@ html.theme-rose {
     --dtc-close-btn: #3c4859;
     --dtc-close-btn-hover: #1c2b3a;
     --dtc-footer-border: #c8ced64d;
-    --dtc-textarea-bg: #ffffff;
+    --dtc-textarea-bg: #fff;
     --dtc-textarea-alt-bg: #fff1f2;
     --dtc-scrollbar-track: #f5f5f5;
     --dtc-scrollbar-thumb: #0000001a;
@@ -139,7 +139,7 @@ html.theme-rose {
 html.theme-amber {
     --dtc-header-bg: #d97706;
     --dtc-header-border: #b45309;
-    --dtc-header-text: #ffffff;
+    --dtc-header-text: #fff;
     --dtc-section-title: #d97706;
     --dtc-section-collapsed: #9facbd;
     --dtc-section-hover: #b45309;
@@ -147,7 +147,7 @@ html.theme-amber {
     --dtc-close-btn: #3c4859;
     --dtc-close-btn-hover: #1c2b3a;
     --dtc-footer-border: #c8ced64d;
-    --dtc-textarea-bg: #ffffff;
+    --dtc-textarea-bg: #fff;
     --dtc-textarea-alt-bg: #fffbeb;
     --dtc-scrollbar-track: #f5f5f5;
     --dtc-scrollbar-thumb: #0000001a;
@@ -164,7 +164,7 @@ html.theme-slate {
     --dtc-close-btn: #475569;
     --dtc-close-btn-hover: #1e293b;
     --dtc-footer-border: #c8ced64d;
-    --dtc-textarea-bg: #ffffff;
+    --dtc-textarea-bg: #fff;
     --dtc-textarea-alt-bg: #f8fafc;
     --dtc-scrollbar-track: #f5f5f5;
     --dtc-scrollbar-thumb: #0000001a;
@@ -173,7 +173,7 @@ html.theme-slate {
 html.theme-violet {
     --dtc-header-bg: #7c3aed;
     --dtc-header-border: #6d28d9;
-    --dtc-header-text: #ffffff;
+    --dtc-header-text: #fff;
     --dtc-section-title: #7c3aed;
     --dtc-section-collapsed: #9facbd;
     --dtc-section-hover: #6d28d9;
@@ -181,7 +181,7 @@ html.theme-violet {
     --dtc-close-btn: #3c4859;
     --dtc-close-btn-hover: #1c2b3a;
     --dtc-footer-border: #c8ced64d;
-    --dtc-textarea-bg: #ffffff;
+    --dtc-textarea-bg: #fff;
     --dtc-textarea-alt-bg: #f5f3ff;
     --dtc-scrollbar-track: #f5f5f5;
     --dtc-scrollbar-thumb: #0000001a;
@@ -231,7 +231,7 @@ html.theme-violet {
 .table-scrollable {
     position: relative;
     display: block;
-    margin: 2px 10px 1px 10px;
+    margin: 2px 10px 1px;
 }
 
 .table-scrollable-overflow {
@@ -253,6 +253,7 @@ html.theme-violet {
     line-height: inherit;
     color: inherit;
     font-family: inherit;
+
     --bs-table-color: var(--dtc-text);
     --bs-table-bg: transparent;
 }
@@ -296,7 +297,7 @@ html.theme-violet {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 0px !important;
+    padding: 0 !important;
     vertical-align: middle !important;
     line-height: 26px;
     cursor: pointer;
@@ -358,7 +359,11 @@ html.theme-violet {
     position: relative;
     top: 1px;
 }
-.btn-tab-close:hover { opacity: 1; color: var(--dtc-close-btn-hover); }
+
+.btn-tab-close:hover {
+    opacity: 1;
+    color: var(--dtc-close-btn-hover);
+}
 
 /* ── Group view ── */
 
@@ -370,6 +375,7 @@ html.theme-violet {
 
 .tr-group-header:hover > * {
     --bs-table-hover-bg: var(--dtc-header-bg);
+
     cursor: pointer;
 }
 
@@ -431,7 +437,7 @@ html.theme-violet {
 /* ── Footer ── */
 
 .table-footer {
-    margin: 0px 10px 4px 10px;
+    margin: 0 10px 4px;
     border-color: var(--dtc-footer-border);
     border-width: 1px;
     border-top-style: solid;
@@ -517,10 +523,7 @@ html.theme-violet {
 
 .form-control-xs {
     height: 26px;
-    padding-left: 4px;
-    padding-top: 0;
-    padding-bottom: 2px;
-    padding-right: 20px;
+    padding: 0 20px 2px 4px;
     font-size: 12px;
     line-height: 1.5;
     border: 1px solid #dee2e6;
@@ -533,7 +536,7 @@ html.theme-violet {
 
 textarea.rules-textarea {
     height: auto;
-    padding: 4px 4px 4px 4px;
+    padding: 4px;
     font-size: 12px;
     font-family: Arial, Helvetica, sans-serif;
     color: var(--dtc-text);
@@ -544,24 +547,22 @@ textarea.rules-textarea {
 }
 
 #urlRegexRules,
-#titleRegexRules { background-color: var(--dtc-textarea-alt-bg); }
+#titleRegexRules {
+    background-color: var(--dtc-textarea-alt-bg);
+    margin-top: 4px;
+}
 
 textarea.rules-textarea:focus,
 input[type="number"].form-control-xs:focus {
     outline: 0;
     border-color: #86b7fe;
-    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
+    box-shadow: 0 0 0 .25rem rgb(13, 110, 253, .25);
 }
 
 input[type="number"].form-control-xs {
     padding-right: 2px;
     padding-top: 2px;
     padding-bottom: 4px;
-}
-
-#urlRegexRules,
-#titleRegexRules {
-    margin-top: 4px;
 }
 
 #titleSimilarityThreshold {
@@ -608,7 +609,7 @@ label>input:disabled~* {
 /* ── Scroll shadow ── */
 
 .highlight-scroll-bottom {
-    box-shadow: inset 0px -5px 5px -5px #3BB4EC;
+    box-shadow: inset 0 -5px 5px -5px #3BB4EC;
     transition: box-shadow 0s;
 }
 

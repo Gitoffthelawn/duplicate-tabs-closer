@@ -29,14 +29,14 @@ body {
 }
 
 .card-body {
-  padding: 1px 0px;
+  padding: 1px 0;
   max-height: calc(100vh - 60px);
   overflow: auto;
   scrollbar-width: thin;
 }
 
 .list-group-item {
-  padding: 2px 15px 1px 15px;
+  padding: 2px 15px 1px;
 }
 
 .list-group-item-overflow {
@@ -45,7 +45,7 @@ body {
 
 
 .list-group-item-header {
-  border-bottom: 0px;
+  border-bottom: 0;
   padding-top: 4px;
   padding-bottom: 5px;
 }
@@ -256,7 +256,7 @@ body {
 }
 
 #themeBody .titleLabel {
-  margin-top: 0px;
+  margin-top: 0;
 }
 
 #popupSectionBody label[for="openPopupOnDuplicateDetected"] {
