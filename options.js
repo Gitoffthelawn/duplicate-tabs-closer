@@ -155,7 +155,6 @@ const getNotInReferenceKeys = (referenceKeys, keys) => {
     return Array.from(referenceKeys).filter(key => !setKeys.has(key));
 };
 
-// eslint-disable-next-line no-unused-vars
 const initializeOptions = async () => {
     const options = await getStoredOptions();
     let storedOptions = options.storedOptions;
@@ -173,8 +172,7 @@ const initializeOptions = async () => {
                 await removeStoredOptions(obsoleteKeys);
             }
             const missingKeys = getNotInReferenceKeys(defaultKeys, storedKeys);
-            // eslint-disable-next-line no-return-assign
-            missingKeys.forEach(key => storedOptions[key] = { value: defaultOptions[key].value });
+            missingKeys.forEach(key => (storedOptions[key] = { value: defaultOptions[key].value }));
             const environment = getEnvironment();
             storedOptions.environment.value = environment;
             storedOptions = await saveStoredOptions(storedOptions);
@@ -184,10 +182,8 @@ const initializeOptions = async () => {
     setEnvironment(storedOptions);
 };
 
-// eslint-disable-next-line no-unused-vars
 let _savingLocally = false;
 
-// eslint-disable-next-line no-unused-vars
 const setStoredOption = async (name, value, refresh) => {
     const options = await getStoredOptions();
     const storedOptions = options.storedOptions;
@@ -251,7 +247,6 @@ const setEnvironment = (storedOptions) => {
     }
 };
 
-// eslint-disable-next-line no-unused-vars
 const isPanelOptionOpen = async () => {
     const contexts = await chrome.runtime.getContexts({});
     const popupUrl = chrome.runtime.getURL("popup/popup.html");
@@ -265,7 +260,6 @@ const isPanelOptionOpen = async () => {
 
 // Returns true only if the popup itself is already open, not the options page.
 // Used to avoid opening a second popup when duplicates are detected.
-// eslint-disable-next-line no-unused-vars
 const isPopupOpen = async () => {
     const contexts = await chrome.runtime.getContexts({});
     const popupUrl = chrome.runtime.getURL("popup/popup.html");

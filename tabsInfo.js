@@ -16,7 +16,7 @@ class TabsInfo {
         if (!openedTabs) return;
         for (const openedTab of openedTabs) {
             const lastComplete = openedTab.lastAccessed ?? openedTab.index;
-            this.setTab(openedTab.id, { url: openedTab.url, complete: true, lastComplete: lastComplete });
+            this.setTab(openedTab.id, { url: openedTab.url, complete: true, lastComplete });
         }
         const result = await chrome.storage.session.get("intentionalDuplicates");
         const ids = result.intentionalDuplicates || [];
@@ -149,5 +149,4 @@ class TabsInfo {
 
 }
 
-// eslint-disable-next-line no-unused-vars
 const tabsInfo = new TabsInfo();

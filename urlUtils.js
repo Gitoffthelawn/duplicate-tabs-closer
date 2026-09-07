@@ -1,9 +1,7 @@
 "use strict";
 
-// eslint-disable-next-line no-unused-vars
 const isBlankURL = (url) => url === "about:blank" || url === "about:newtab" || url === "about:home" || url === "chrome://newtab/";
 
-// eslint-disable-next-line no-unused-vars
 const isChromeURL = (url) => url.startsWith("chrome://") || url.startsWith("chrome-extension://") || url.startsWith("edge://") || url.startsWith("opera://") || url.startsWith("vivaldi://") || url.startsWith("brave://") || url.startsWith("view-source:chrome-search");
 
 const isBrowserURL = (url) => url.startsWith("about:") || url.startsWith("chrome://") || url.startsWith("edge://") || url.startsWith("opera://") || url.startsWith("vivaldi://") || url.startsWith("brave://");
@@ -13,13 +11,11 @@ const isValidURL = (url) => {
 	return regex.test(url);
 };
 
-// eslint-disable-next-line no-unused-vars
 const isHttps = (url) => {
 	const regex = /^https:\/\//i;
 	return regex.test(url);
 };
 
-// eslint-disable-next-line no-unused-vars
 const getMatchingURL = (url) => {	
 	if (!isValidURL(url)) return url;
 	let matchingURL = url;
@@ -47,7 +43,6 @@ const getMatchingURL = (url) => {
 	return matchingURL;
 };
 
-// eslint-disable-next-line no-unused-vars
 const getMatchPatternURL = (url) => {
 	let urlPattern = null;
 	if (isValidURL(url)) {

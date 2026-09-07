@@ -3,7 +3,6 @@
 const PAUSED_BADGE_TEXT = "⏸";
 const PAUSED_BADGE_COLOR = "#888888";
 
-// eslint-disable-next-line no-unused-vars
 const setBadgeIcon = () => {
 	chrome.action.setIcon({ path: options.autoCloseTab ? "images/auto_close_16.png" : "images/manual_close_16.png" });
 	if (environment.isFirefox) browser.action.setBadgeTextColor({ color: "white" });
@@ -24,17 +23,15 @@ const setBadge = async (windowId, activeTabId = null) => {
 		setWindowBadgeText(windowId, badgeText);
 		setWindowBadgeBackgroundColor(windowId, backgroundColor);
 	}
-	else {
-		if (activeTabId !== null) {
-			setTabBadgeText(activeTabId, badgeText);
-			setTabBadgeBackgroundColor(activeTabId, backgroundColor);
-		} else {
-			const tabs = await getTabs({ windowId: windowId });
-			if (tabs) tabs.forEach(tab => {
-				setTabBadgeText(tab.id, badgeText);
-				setTabBadgeBackgroundColor(tab.id, backgroundColor);
-			});
-		}
+	else if (activeTabId !== null) {
+		setTabBadgeText(activeTabId, badgeText);
+		setTabBadgeBackgroundColor(activeTabId, backgroundColor);
+	} else {
+		const tabs = await getTabs({ windowId });
+		if (tabs) tabs.forEach(tab => {
+			setTabBadgeText(tab.id, badgeText);
+			setTabBadgeBackgroundColor(tab.id, backgroundColor);
+		});
 	}
 };
 
@@ -80,7 +77,6 @@ const updateBadgeValue = async (nbDuplicateTabs, windowId, triggerTabId) => {
 	}
 };
 
-// eslint-disable-next-line no-unused-vars
 const updateBadgesValue = async (duplicateTabsGroups, windowId, triggerTabId) => {
 	const nbDuplicateTabs = getNbDuplicateTabs(duplicateTabsGroups);
 	if (options.searchInAllWindows) {
@@ -93,7 +89,6 @@ const updateBadgesValue = async (duplicateTabsGroups, windowId, triggerTabId) =>
 	}
 };
 
-// eslint-disable-next-line no-unused-vars
 const updateBadgeStyle = async () => {
 	const windows = await getWindows();
 	if (!windows) return;
@@ -103,7 +98,6 @@ const updateBadgeStyle = async () => {
 	}));
 };
 
-// eslint-disable-next-line no-unused-vars
 const setPausedBadge = async () => {
 	if (environment.isFirefox) {
 		const windows = await getWindows();

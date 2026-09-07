@@ -390,7 +390,7 @@ const setPanelOptions = async () => {
   const storedOptions = response.data.storedOptions;
   const lockedKeys = response.data.lockedKeys;
   for (const storedOption in storedOptions) {
-    setPanelOption({ storedOption: storedOption, value: storedOptions[storedOption].value, isLockedKey: lockedKeys.includes(storedOption) });
+    setPanelOption({ storedOption, value: storedOptions[storedOption].value, isLockedKey: lockedKeys.includes(storedOption) });
   }
   updateIgnorePathPartDependents(storedOptions.ignorePathPart ? storedOptions.ignorePathPart.value : false);
   updateTitleMatchModeDependents(storedOptions.titleMatchMode ? storedOptions.titleMatchMode.value : "N");

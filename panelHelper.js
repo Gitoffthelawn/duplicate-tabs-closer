@@ -1,11 +1,8 @@
 "use strict";
 
-// eslint-disable-next-line no-unused-vars
 const getElement = (sel, ctx = document) => ctx.querySelector(sel);
-// eslint-disable-next-line no-unused-vars
 const getElements = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
-// eslint-disable-next-line no-unused-vars
 const areSameArrays = (array1, array2) => {
     if (!array1 && !array2) return true;
     if (!array1 || !array2 || array1.length !== array2.length) return false;
@@ -14,7 +11,6 @@ const areSameArrays = (array1, array2) => {
         t.whitelisted === array2[i].whitelisted);
 };
 
-// eslint-disable-next-line no-unused-vars
 const escapeHTML = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&#39;");
 
  
@@ -68,10 +64,8 @@ const buildTabRow = (duplicateTab, activeWindowId) => {
     return tr;
 };
 
-// eslint-disable-next-line no-unused-vars
 const buildDuplicateTabRows = (duplicateTabs, activeWindowId) => duplicateTabs.map(tab => buildTabRow(tab, activeWindowId));
 
-// eslint-disable-next-line no-unused-vars
 const buildGroupedDuplicateTabRows = (duplicateTabs, activeWindowId) => {
     const rows = [];
     const groups = new Map();
@@ -134,7 +128,6 @@ const buildGroupedDuplicateTabRows = (duplicateTabs, activeWindowId) => {
     return rows;
 };
 
-// eslint-disable-next-line no-unused-vars
 const applyTheme = (value) => {
     const darkThemes = ["ocean", "charcoal", "purple", "teal", "oled"];
     const lightThemes = ["sage", "rose", "amber", "slate", "violet"];
@@ -144,19 +137,16 @@ const applyTheme = (value) => {
     if (value !== "light") document.documentElement.classList.add(`theme-${value}`);
 };
 
-// eslint-disable-next-line no-unused-vars
 const updateIgnorePathPartDependents = (checked) => {
     document.getElementById("ignoreSearchPart").disabled = checked;
     document.getElementById("ignoreHashPart").disabled = checked;
 };
 
-// eslint-disable-next-line no-unused-vars
 const updatePrioritizeActiveWindowState = (scopeValue) => {
     const el = document.getElementById("prioritizeActiveWindow");
     if (el) el.disabled = scopeValue !== "A" && scopeValue !== "CA";
 };
 
-// eslint-disable-next-line no-unused-vars
 const updateGroupButton = (grouped) => {
     const btn = document.getElementById("groupDuplicateTabsBtn");
     if (!btn) return;
@@ -164,7 +154,6 @@ const updateGroupButton = (grouped) => {
     btn.setAttribute("aria-pressed", String(grouped));
 };
 
-// eslint-disable-next-line no-unused-vars
 const updateHideWhitelistedButton = (hidden) => {
     const btn = document.getElementById("hideWhitelistedTabsBtn");
     if (!btn) return;
@@ -174,7 +163,6 @@ const updateHideWhitelistedButton = (hidden) => {
 };
 
 let highlightBottomScrollShadowTimer = null;
-// eslint-disable-next-line no-unused-vars
 const highlightBottomScrollShadow = () => {
     clearTimeout(highlightBottomScrollShadowTimer);
     const container = document.getElementById("duplicateTabsTableContainer");
@@ -183,7 +171,6 @@ const highlightBottomScrollShadow = () => {
     highlightBottomScrollShadowTimer = setTimeout(() => container.classList.toggle("highlight-scroll-bottom", false), 400);
 };
 
-// eslint-disable-next-line no-unused-vars
 const getHighlightBounds = (textarea) => {
     const cs = window.getComputedStyle(textarea);
     const pt = parseFloat(cs.paddingTop);
@@ -212,14 +199,10 @@ const getHighlightBounds = (textarea) => {
     return { top: pt + topOffset, bottom: pt + topOffset + m.scrollHeight };
 };
 
-// eslint-disable-next-line no-unused-vars
 const saveActiveWindowId = () => getActiveWindowId();
 
-// eslint-disable-next-line no-unused-vars
-const requestCloseDuplicateTabs = (skipWhitelisted) => sendMessage("closeDuplicateTabs", { "windowId": activeWindowId, "skipWhitelisted": skipWhitelisted });
+const requestCloseDuplicateTabs = (skipWhitelisted) => sendMessage("closeDuplicateTabs", { "windowId": activeWindowId, skipWhitelisted });
 
-// eslint-disable-next-line no-unused-vars
-const saveOption = (name, value, refresh) => sendMessage("setStoredOption", { "name": name, "value": value, "refresh": refresh });
+const saveOption = (name, value, refresh) => sendMessage("setStoredOption", { name, value, refresh });
 
-// eslint-disable-next-line no-unused-vars
 const requestGetDuplicateTabs = () => sendMessage("getDuplicateTabs", { "windowId": activeWindowId });

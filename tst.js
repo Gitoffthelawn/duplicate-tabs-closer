@@ -5,7 +5,6 @@ let _tstAvailable = false;
 
 const _tstSend = (message) => browser.runtime.sendMessage(TST_ID, message).catch(() => null);
 
-// eslint-disable-next-line no-unused-vars
 const registerWithTST = async () => {
     const result = await _tstSend({
         type: "register-self",
@@ -17,7 +16,6 @@ const registerWithTST = async () => {
 // Returns "handled" if TST closed the tab atomically (caller must NOT call browser.tabs.remove()),
 // true if safe to proceed with browser.tabs.remove(), or false if expansion failed
 // and the close must be aborted. TST not present → always true.
-// eslint-disable-next-line no-unused-vars
 const expandTSTTabIfCollapsed = async (tabId) => {
     if (!_tstAvailable) return true;
     // Try the atomic API (TST 4.4.0+). Old TST returns undefined; _tstSend returns null on error.

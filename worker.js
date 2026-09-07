@@ -67,9 +67,8 @@ const getHttpsTabId = (observedTab, observedTabUrl, openedTab) => {
         const match2 = isHttps(openedTab.url);
         if (match1) {
             return match2 ? null : observedTab.id;
-        } else {
-            return match2 ? openedTab.id : null;
         }
+        return match2 ? openedTab.id : null;
     }
     return null;
 };
@@ -78,9 +77,8 @@ const getPinnedTabId = (tab1, tab2) => {
     if (options.keepPinnedTab) {
         if (tab1.pinned) {
             return tab2.pinned ? null : tab1.id;
-        } else {
-            return tab2.pinned ? tab2.id : null;
         }
+        return tab2.pinned ? tab2.id : null;
     }
     return null;
 };
@@ -92,11 +90,10 @@ const getLastUpdatedTabId = (observedTab, openedTab) => {
         if (observedTabLastUpdate === null) return openedTab.id;
         if (openedTabLastUpdate === null) return observedTab.id;
         return (observedTabLastUpdate > openedTabLastUpdate) ? observedTab.id : openedTab.id;
-    } else {
-        if (observedTabLastUpdate === null) return openedTab.id;
-        if (openedTabLastUpdate === null) return observedTab.id;
-        return (observedTabLastUpdate < openedTabLastUpdate) ? observedTab.id : openedTab.id;
     }
+    if (observedTabLastUpdate === null) return openedTab.id;
+    if (openedTabLastUpdate === null) return observedTab.id;
+    return (observedTabLastUpdate < openedTabLastUpdate) ? observedTab.id : openedTab.id;
 };
 
 const getActiveTabWinnerId = (tab1, tab2) => {
@@ -143,17 +140,16 @@ const getCloseInfo = (details) => {
             reloadTab: false
         };
         return [openedTab.id, keepInfo];
-    } else {
-        const keepInfo = {
-            observedTabClosed: true,
-            active: observedTab.active,
-            tabIndex: observedTab.index,
-            tabId: openedTab.id,
-            windowId: openedTab.windowId,
-            reloadTab: Boolean(options.keepReloadOlderTab)
-        };
-        return [observedTab.id, keepInfo];
     }
+    const keepInfo = {
+        observedTabClosed: true,
+        active: observedTab.active,
+        tabIndex: observedTab.index,
+        tabId: openedTab.id,
+        windowId: openedTab.windowId,
+        reloadTab: Boolean(options.keepReloadOlderTab)
+    };
+    return [observedTab.id, keepInfo];
 };
 
  
@@ -205,7 +201,7 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
             matchByUrlPattern(openedTab.url, observedTabUrl) ||
             (options.compareWithTitle && isTabComplete(openedTab) && isTabComplete(observedTab) && matchByTitlePattern(openedTab.title, observedTab.title))) {
             match = true;
-            const [tabToCloseId, remainingTabInfo] = getCloseInfo({ observedTab: observedTab, observedTabUrl: observedTabUrl, openedTab: openedTab, activeWindowId: activeWindowId });
+            const [tabToCloseId, remainingTabInfo] = getCloseInfo({ observedTab, observedTabUrl, openedTab, activeWindowId });
             closeDuplicateTab(tabToCloseId, remainingTabInfo);
             if (remainingTabInfo.observedTabClosed) break;
         }
@@ -329,18 +325,16 @@ const applyDuplicateAction = (details, observedTab, match) => {
     const retainedTabs = details.retainedTabs;
     const duplicateTabsGroups = details.duplicateTabsGroups;
     if (details.closeTab) {
-        const [tabToCloseId] = getCloseInfo({ observedTab: observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
+        const [tabToCloseId] = getCloseInfo({ observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
         if (tabToCloseId === observedTab.id) {
             if (!details.skipWhitelisted || !isUrlWhiteListed(observedTab.url)) details.tabsToClose.add(observedTab.id);
-        } else {
-            if (!details.skipWhitelisted || !isUrlWhiteListed(retainedTab.url)) {
-                details.tabsToClose.add(retainedTab.id);
-                invalidateAllRetainedKeys(retainedTab, matchingKey, retainedTabs);
-                retainedTabs.set(matchingKey, observedTab);
-            }
+        } else if (!details.skipWhitelisted || !isUrlWhiteListed(retainedTab.url)) {
+            details.tabsToClose.add(retainedTab.id);
+            invalidateAllRetainedKeys(retainedTab, matchingKey, retainedTabs);
+            retainedTabs.set(matchingKey, observedTab);
         }
     } else {
-        const [tabToCloseId] = getCloseInfo({ observedTab: observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
+        const [tabToCloseId] = getCloseInfo({ observedTab, openedTab: retainedTab, activeWindowId: details.activeWindowId });
         if (tabToCloseId === retainedTab.id) {
             invalidateAllRetainedKeys(retainedTab, matchingKey, retainedTabs);
             retainedTabs.set(matchingKey, observedTab);
@@ -398,12 +392,12 @@ const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted = tru
         }
         const details = {
             tab: openedTab,
-            retainedTabs: retainedTabs,
-            activeWindowId: activeWindowId,
+            retainedTabs,
+            activeWindowId,
             closeTab: closeTabs,
-            skipWhitelisted: skipWhitelisted,
-            duplicateTabsGroups: duplicateTabsGroups,
-            tabsToClose: tabsToClose
+            skipWhitelisted,
+            duplicateTabsGroups,
+            tabsToClose
         };
         handleObservedTab(details);
     }
@@ -428,9 +422,9 @@ const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted = tru
         return;
     }
     return {
-        duplicateTabsGroups: duplicateTabsGroups,
-        retainedTabs: retainedTabs,
-        activeWindowId: activeWindowId
+        duplicateTabsGroups,
+        retainedTabs,
+        activeWindowId
     };
 };
 
@@ -452,10 +446,10 @@ const setDuplicateTabPanel = async (duplicateTab, duplicateTabs, groupIndex, ret
         url: duplicateTab.url,
         title: duplicateTab.title || duplicateTab.url,
         windowId: duplicateTab.windowId,
-        containerColor: containerColor,
+        containerColor,
         icon: (duplicateTab.favIconUrl && !isChromeURL(duplicateTab.favIconUrl)) ? duplicateTab.favIconUrl : "../images/default-favicon.png",
         whitelisted: isUrlWhiteListed(duplicateTab.url),
-        groupIndex: groupIndex,
+        groupIndex,
         isRetained: duplicateTab.id === retainedTabId
     });
 };
@@ -474,7 +468,6 @@ const getDuplicateTabsForPanel = async (duplicateTabsGroups, retainedTabs) => {
     return Array.from(duplicateTabsPanel);
 };
 
-// eslint-disable-next-line no-unused-vars
 const requestDuplicateTabsFromPanel = async (windowId) => {
     const searchResult = await searchForDuplicateTabs(windowId, false);
     if (!searchResult) return;
@@ -485,7 +478,7 @@ const sendDuplicateTabs = async (duplicateTabsGroups, retainedTabs) => {
     const duplicateTabs = await getDuplicateTabsForPanel(duplicateTabsGroups, retainedTabs);
     chrome.runtime.sendMessage({
         action: "updateDuplicateTabsTable",
-        data: { "duplicateTabs": duplicateTabs }
+        data: { duplicateTabs }
     }).catch(() => {
         // ignore: panel may not be open
     });
@@ -520,7 +513,6 @@ const debouncedBatchClose = debounce(closeDuplicateTabs, 300, false);
 // Dispatch the appropriate action after a tab completes or navigates.
 // alreadyComplete: onUpdatedTab already stamped this completion — skip search/refresh in both modes.
 // queryComplete:  require matched tabs to be complete before matching (pre-navigation scan).
-// eslint-disable-next-line no-unused-vars
 const dispatchTabCompletion = (tab, activeTabId, { queryComplete = false, alreadyComplete = false } = {}) => {
     if (startupBurst.active && (Date.now() - startupBurst.startedAt) < POST_STARTUP_BURST_MAX_MS) {
         clearTimeout(startupBurst.timerId);
@@ -543,7 +535,6 @@ const dispatchTabCompletion = (tab, activeTabId, { queryComplete = false, alread
     }
 };
 
-// eslint-disable-next-line no-unused-vars
 const refreshGlobalDuplicateTabsInfo = async () => {
     if (options.searchInAllWindows) {
         refreshDuplicateTabsInfo(null);
