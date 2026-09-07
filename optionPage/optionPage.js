@@ -1,6 +1,6 @@
 "use strict";
 
-let activeWindowId = chrome.windows.WINDOW_ID_NONE;
+const activeWindowId = chrome.windows.WINDOW_ID_NONE;
 let lastDuplicateTabs = null;
 let panelInitialized = false;
 let groupedView = false;

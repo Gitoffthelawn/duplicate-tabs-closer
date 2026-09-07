@@ -1,7 +1,6 @@
 "use strict";
 
-let activeWindowId = chrome.windows.WINDOW_ID_NONE;
-let environment = "";
+const activeWindowId = chrome.windows.WINDOW_ID_NONE;
 let lastDuplicateTabs = null;
 let panelInitialized = false;
 let closePopup = false;
@@ -236,7 +235,6 @@ const setPanelOptions = async () => {
         const value = storedOptions[storedOption].value;
         const isLockedKey = lockedKeys.includes(storedOption);
         if (storedOption === "environment") {
-            environment = value;
             if (value === "chrome") getElements(".containerItem").forEach(el => el.classList.toggle("hidden", true));
         }
         else {
