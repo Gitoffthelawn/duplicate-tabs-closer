@@ -9,7 +9,7 @@ const setBadgeIcon = () => {
 	if (environment.isFirefox) browser.action.setBadgeTextColor({ color: "white" });
 };
 
-const setBadge = async (windowId, activeTabId) => {
+const setBadge = async (windowId, activeTabId = null) => {
 	if (monitoringPaused) {
 		if (!environment.isFirefox && activeTabId !== null) {
 			setTabBadgeText(activeTabId, PAUSED_BADGE_TEXT);
