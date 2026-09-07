@@ -1,6 +1,7 @@
 "use strict";
 
-const activeWindowId = chrome.windows.WINDOW_ID_NONE;
+let activeWindowId = chrome.windows.WINDOW_ID_NONE;
+let environment = "";
 let lastDuplicateTabs = null;
 let panelInitialized = false;
 let closePopup = false;
