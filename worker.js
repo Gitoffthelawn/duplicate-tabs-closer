@@ -415,7 +415,9 @@ const searchForDuplicateTabs = async (windowId, closeTabs, skipWhitelisted = tru
                 const results = await Promise.all(safeToClose.map(expandTSTTabIfCollapsed));
                 const blocked = safeToClose.filter((_, i) => !results[i]);
                 blocked.forEach(tabId => tabsInfo.setClosingTab(tabId, false));
-                safeToClose = safeToClose.filter((_, i) => results[i]);
+                const alreadyClosed = safeToClose.filter((_, i) => results[i] === "handled");
+                alreadyClosed.forEach(tabId => tabsInfo.setClosingTab(tabId, false));
+                safeToClose = safeToClose.filter((_, i) => results[i] === true);
             }
             if (safeToClose.length > 0) {
                 chrome.tabs.remove(safeToClose).catch(() => {

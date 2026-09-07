@@ -14,12 +14,16 @@ const registerWithTST = async () => {
     _tstAvailable = Boolean(result);
 };
 
-// Returns true if it is safe to close the tab (TST not present, tab has no collapsed
-// children, or children were successfully expanded). Returns false if expansion was
-// needed but failed — caller must NOT close the tab in that case.
+// Returns "handled" if TST closed the tab atomically (caller must NOT call browser.tabs.remove()),
+// true if safe to proceed with browser.tabs.remove(), or false if expansion failed
+// and the close must be aborted. TST not present → always true.
 // eslint-disable-next-line no-unused-vars
 const expandTSTTabIfCollapsed = async (tabId) => {
     if (!_tstAvailable) return true;
+    // Try the atomic API (TST 4.4.0+). Old TST returns undefined; _tstSend returns null on error.
+    const atomicResult = await _tstSend({ type: "remove-tab-keeping-children", tab: tabId, method: "promote-first" });
+    if (atomicResult === true) return "handled";
+    // Fallback for TST < 4.4.0: expand collapsed children before the caller removes the tab.
     const tree = await _tstSend({ type: "get-tree", tab: tabId });
     if (!tree) return true;
     if (tree.children && tree.children.length > 0 &&
