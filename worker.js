@@ -224,12 +224,17 @@ const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loading
 const closeDuplicateTab = async (tabToCloseId, remainingTabInfo) => {
     try {
         tabsInfo.setClosingTab(tabToCloseId, true);
-        if (environment.isFirefox && !(await expandTSTTabIfCollapsed(tabToCloseId))) {
-            tabsInfo.setClosingTab(tabToCloseId, false);
-            refreshDuplicateTabsInfo(remainingTabInfo.windowId);
-            return;
+        if (environment.isFirefox) {
+            const tstResult = await expandTSTTabIfCollapsed(tabToCloseId);
+            if (!tstResult) {
+                tabsInfo.setClosingTab(tabToCloseId, false);
+                refreshDuplicateTabsInfo(remainingTabInfo.windowId);
+                return;
+            }
+            if (tstResult !== "handled") await removeTab(tabToCloseId);
+        } else {
+            await removeTab(tabToCloseId);
         }
-        await removeTab(tabToCloseId);
     }
     catch {
         tabsInfo.setClosingTab(tabToCloseId, false);
