@@ -1,6 +1,6 @@
 "use strict";
 
-const activeWindowId = chrome.windows.WINDOW_ID_NONE;
+let activeWindowId = chrome.windows.WINDOW_ID_NONE;
 let lastDuplicateTabs = null;
 let panelInitialized = false;
 let groupedView = false;
@@ -8,8 +8,9 @@ let lastNbRows = 0;
 let monitoringPaused = false;
 
 const initialize = async () => {
-  const [,, sessionData] = await Promise.all([setPanelOptions(), saveActiveWindowId(), chrome.storage.session.get("monitoringPaused")]);
+  const [, windowId, sessionData] = await Promise.all([setPanelOptions(), saveActiveWindowId(), chrome.storage.session.get("monitoringPaused")]);
   monitoringPaused = sessionData.monitoringPaused || false;
+  activeWindowId = windowId;
   requestGetDuplicateTabs();
   localizePopup(document.documentElement);
   applyPausedState(monitoringPaused);

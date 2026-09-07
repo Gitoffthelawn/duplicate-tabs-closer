@@ -213,9 +213,7 @@ const getHighlightBounds = (textarea) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const saveActiveWindowId = async () => {
-    activeWindowId = await getActiveWindowId();
-};
+const saveActiveWindowId = () => getActiveWindowId();
 
 // eslint-disable-next-line no-unused-vars
 const requestCloseDuplicateTabs = (skipWhitelisted) => sendMessage("closeDuplicateTabs", { "windowId": activeWindowId, "skipWhitelisted": skipWhitelisted });
