@@ -168,15 +168,17 @@
                 <option value="T" i18n-content="titleMatchModeT"></option>
                 <option value="U" i18n-content="titleMatchModeU"></option>
               </select>
-              <div class="checkboxes checkboxes-threshold d-flex align-items-center justify-content-between">
-                <label for="titleSimilarityThreshold">
-                  <input type="number" id="titleSimilarityThreshold" min="1" max="100" class="form-control-xs" disabled />
-                  <span i18n-content="titleSimilarityThreshold"></span>
-                </label>
-                <input type="checkbox" class="checkbox-fa" id="titleSimilarityThreshold_popup" />
-                <label for="titleSimilarityThreshold_popup" class="checkbox-fa-label popup-pin-label" title="popupPinTooltip">
-                  <span class="fa-regular fa-eye"></span>
-                </label>
+              <div id="titleSimilarityThresholdGroup">
+                <div class="checkboxes checkboxes-threshold d-flex align-items-center justify-content-between">
+                  <label for="titleSimilarityThreshold">
+                    <input type="number" id="titleSimilarityThreshold" min="1" max="100" class="form-control-xs" disabled />
+                    <span i18n-content="titleSimilarityThreshold"></span>
+                  </label>
+                  <input type="checkbox" class="checkbox-fa" id="titleSimilarityThreshold_popup" />
+                  <label for="titleSimilarityThreshold_popup" class="checkbox-fa-label popup-pin-label" title="popupPinTooltip">
+                    <span class="fa-regular fa-eye"></span>
+                  </label>
+                </div>
               </div>
               <div id="titleRegexRulesGroup">
                 <div class="checkboxes checkboxes-regex-label d-flex align-items-center justify-content-between">
