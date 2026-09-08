@@ -19,6 +19,10 @@ Duplicate Tabs Closer detects and closes duplicate tabs automatically or display
 
 > **Note:** The **Container** scope options are exclusive to Firefox and require the [Multi-Account Containers](https://support.mozilla.org/en-US/kb/containers) feature. They are not available on Chrome, Edge, Opera, Vivaldi, or Brave.
 
+## Tree Style Tab (Firefox)
+
+When [Tree Style Tab](https://addons.mozilla.org/en-US/firefox/addon/tree-style-tab/) (TST) v4.4.0 or later is installed, Duplicate Tabs Closer uses the TST API to preserve a closed duplicate tab's child tabs rather than orphaning them. If TST is not installed, or is older than v4.4.0, the extension falls back to standard tab removal with no loss of other functionality.
+
 ## Accessing Options
 
 The extension offers two configuration interfaces:
@@ -100,6 +104,8 @@ https://docs.google.com/*
 *://github.com/*/issues
 /^(?!.*google\.com)/
 ```
+
+> **Note (Firefox):** On Firefox 153 and later, a warning may appear here if the extension has not been granted access to local `file://` URLs. To resolve it, open `about:addons`, find Duplicate Tabs Closer, and check the **Permissions** tab to enable file access.
 
 ### Matching Rules
 
