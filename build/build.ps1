@@ -63,6 +63,20 @@ function Build-Package {
             $json | ConvertTo-Json -Depth 10 | Set-Content $manifestInTmp -Encoding UTF8
         }
 
+        # Patch inline importScripts() in background.js to match manifest strip
+        if ($StripScripts.Count -gt 0) {
+            $bgPath = Join-Path $TempDir "background.js"
+            if (Test-Path $bgPath) {
+                $bgContent = Get-Content $bgPath -Raw
+                foreach ($script in $StripScripts) {
+                    $esc = [regex]::Escape($script)
+                    $bgContent = $bgContent -replace ",\s*""$esc""", ""
+                    $bgContent = $bgContent -replace """$esc"",\s*", ""
+                }
+                Set-Content $bgPath -Value $bgContent -Encoding UTF8 -NoNewline
+            }
+        }
+
         foreach ($dir in $Directories) {
             $src = Join-Path $Root $dir
             $dst = Join-Path $TempDir $dir
@@ -104,5 +118,5 @@ if ($Target -eq "firefox" -or $Target -eq "all") {
     Build-Package "manifest-f.json" "duplicate-tabs-closer-firefox.xpi" -StripScripts @("dtcLog.js", "testHooks.js")
 }
 if ($Target -eq "chrome" -or $Target -eq "all") {
-    Build-Package "manifest-c.json" "duplicate-tabs-closer-chrome.zip" -StripKeys @("externally_connectable")
+    Build-Package "manifest-c.json" "duplicate-tabs-closer-chrome.zip" -StripKeys @("externally_connectable") -StripScripts @("testHooks.js")
 }

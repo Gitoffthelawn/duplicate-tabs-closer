@@ -171,6 +171,10 @@
     "message": "Закрити групу",
     "description": "Close all duplicate tabs in a group"
   },
+  "closeTabButton": {
+    "message": "Закрити",
+    "description": "Aria-label for the close button on each duplicate tab row"
+  },
   "tabsCount": {
     "message": "$COUNT$ tabs",
     "description": "Badge showing how many tabs are in a group",

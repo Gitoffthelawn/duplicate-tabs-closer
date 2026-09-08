@@ -24,6 +24,7 @@ const applyPausedState = (paused) => {
   if (!btn) return;
   const icon = btn.querySelector("span");
   btn.classList.toggle("paused", paused);
+  btn.setAttribute("aria-pressed", paused ? "true" : "false");
   if (paused) {
     icon.className = "fa-solid fa-play fa-lg";
     btn.setAttribute("aria-label", chrome.i18n.getMessage("resumeMonitoring"));
@@ -59,7 +60,8 @@ const loadPopupEvents = () => {
       this.id === "keepTabWithHttps" ||
       this.id === "keepPinnedTab" ||
       this.id === "prioritizeActiveWindow" ||
-      this.id === "skipBlankTabs";
+      this.id === "skipBlankTabs" ||
+      this.id === "keepActiveTab";
     saveOption(this.id, this.checked, refresh);
   }));
 
@@ -182,7 +184,7 @@ const loadPopupEvents = () => {
   const closeBtn = document.getElementById("closeDuplicateTabsBtn");
   if (closeBtn) closeBtn.addEventListener("click", function () {
     if (!this.classList.contains("disabled")) {
-      const skipWhitelisted = document.getElementById("hideWhitelistedTabsBtn")?.classList.contains("active") ?? false;
+      const skipWhitelisted = true;
       requestCloseDuplicateTabs(skipWhitelisted);
     }
   });
@@ -220,7 +222,11 @@ const setWhiteList = (whiteList) => {
 };
 
 const updateFileAccessWarning = () => {
-  document.getElementById("fileAccessWarning")?.classList.add("hidden");
+  const el = document.getElementById("fileAccessWarning");
+  if (!el) return;
+  const whiteList = document.getElementById("whiteList")?.value ?? "";
+  const hasFileEntry = whiteList.split("\n").some(line => line.trim().startsWith("file://"));
+  el.classList.toggle("hidden", !hasFileEntry);
 };
 
 const cleanUpWhiteList = (whiteList) => {

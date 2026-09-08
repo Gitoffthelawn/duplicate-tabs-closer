@@ -90,7 +90,6 @@ module.exports = [
                 getNbDuplicateTabs: "readonly",
                 highlightBottomScrollShadowTimer: "writable",
                 isHttps: "readonly",
-                isPopupOpen: "readonly",
                 isUrlWhiteListed: "readonly",
                 isValidURL: "readonly",
                 monitoringPaused: "writable",

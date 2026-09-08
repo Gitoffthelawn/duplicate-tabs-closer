@@ -203,6 +203,7 @@ const resizeDuplicateTabsPanel = (refresh) => {
         const dtcBody = document.getElementById("duplicateTabsCard").querySelector(".card-body");
         container.style.height = "";
         container.style.maxHeight = `${dtcBody.offsetHeight}px`;
+        const moreRows = nbRows > lastNbRows;
         requestAnimationFrame(() => {
             const overflows = container.scrollHeight > container.clientHeight;
             container.classList.toggle("table-scrollable-overflow", overflows);
@@ -210,7 +211,7 @@ const resizeDuplicateTabsPanel = (refresh) => {
                 clearTimeout(highlightBottomScrollShadowTimer);
                 container.classList.remove("highlight-scroll-bottom");
             }
-            if (refresh && overflows && nbRows > lastNbRows) highlightBottomScrollShadow();
+            if (refresh && overflows && moreRows) highlightBottomScrollShadow();
         });
     } else {
         const maxOptionsCardHeight = 432;
@@ -305,6 +306,7 @@ const updatePauseButton = (paused) => {
     if (!btn) return;
     const icon = btn.querySelector("span");
     btn.classList.toggle("paused", paused);
+    btn.setAttribute("aria-pressed", paused ? "true" : "false");
     if (paused) {
         icon.className = "fa-solid fa-play fa-lg";
         btn.setAttribute("aria-label", chrome.i18n.getMessage("resumeMonitoring"));
@@ -490,7 +492,7 @@ const loadListenerEvents = () => {
     const closeBtn = document.getElementById("closeDuplicateTabsBtn");
     if (closeBtn) closeBtn.addEventListener("click", function () {
         if (!this.classList.contains("disabled")) {
-            const skipWhitelisted = document.getElementById("hideWhitelistedTabsBtn")?.classList.contains("active") ?? false;
+            const skipWhitelisted = true;
             requestCloseDuplicateTabs(skipWhitelisted);
         }
         if (closePopup) window.close();

@@ -38,18 +38,15 @@ const setBadge = async (windowId, activeTabId = null) => {
 const getNbDuplicateTabs = (duplicateTabsGroups) => {
 	let nbDuplicateTabs = 0;
 	duplicateTabsGroups.forEach(duplicateTabs => {
-		if (options.hideWhitelistedTabs) {
-			const firstTab = duplicateTabs.values().next().value;
-			if (firstTab && isUrlWhiteListed(firstTab.url)) {
-				return;
-			}
+		if (options.hideWhitelistedTabs && [...duplicateTabs].some(tab => isUrlWhiteListed(tab.url))) {
+			return;
 		}
 		nbDuplicateTabs += duplicateTabs.size - 1;
 	});
 	return nbDuplicateTabs;
 };
 
-const updateBadgeValue = async (nbDuplicateTabs, windowId, triggerTabId) => {
+const updateBadgeValue = (nbDuplicateTabs, windowId, triggerTabId) => {
 	if (tabsInfo.hasNbDuplicateTabs(windowId) && tabsInfo.getNbDuplicateTabs(windowId) === nbDuplicateTabs) {
 		return;
 	}
@@ -60,7 +57,7 @@ const updateBadgeValue = async (nbDuplicateTabs, windowId, triggerTabId) => {
 	// hadPriorCount guards against startup hydration (count going from unset→N on addon load).
 	// For a new browser window (count goes 0→N where 0 was explicitly set by onCreatedTab),
 	// hadPriorCount is true so the popup fires correctly.
-	if (options.openPopupOnDuplicateDetected && hadPriorCount && nbDuplicateTabs > prevCount && !(await isPopupOpen())) {
+	if (options.openPopupOnDuplicateDetected && hadPriorCount && nbDuplicateTabs > prevCount) {
 		chrome.storage.session.set({ autoOpenedPopup: true, autoOpenedTabId: triggerTabId ?? null }).then(() => {
 			chrome.action.openPopup().catch(() => {
 					// ignore: popup may fail if dismissed or already open

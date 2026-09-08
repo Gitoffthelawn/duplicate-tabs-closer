@@ -54,7 +54,7 @@ const buildTabRow = (duplicateTab, activeWindowId) => {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "btn-tab-close";
-    btn.setAttribute("aria-label", "Close");
+    btn.setAttribute("aria-label", chrome.i18n.getMessage("closeTabButton"));
     btn.textContent = "×";
     tdClose.appendChild(btn);
 

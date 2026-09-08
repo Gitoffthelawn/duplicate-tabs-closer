@@ -489,6 +489,7 @@ const _refreshDuplicateTabsInfo = async (windowId) => {
     const triggerTabId = _pendingTriggerTabId.get(windowId) ?? null;
     _pendingTriggerTabId.delete(windowId);
     const searchResult = await searchForDuplicateTabs(windowId, false);
+    if (!searchResult) return;
     updateBadgesValue(searchResult.duplicateTabsGroups, windowId, triggerTabId);
     const panelOpen = await isPanelOptionOpen();
     if (panelOpen && (options.searchInAllWindows || (windowId === searchResult.activeWindowId))) {

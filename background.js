@@ -285,7 +285,7 @@ const onCommittedTab = async (details) => {
 	}
 };
 
-const onHistoryStateUpdated = async (details) => {
+const _handleSpaNavigation = async (details, eventName) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
 	if (details.frameId !== 0 || details.tabId === -1) return;
@@ -305,25 +305,9 @@ const onHistoryStateUpdated = async (details) => {
 	if (wasIntentionalDup) refreshDuplicateTabsInfo(tab.windowId);
 };
 
-const onReferenceFragmentUpdated = async (details) => {
-	await ensureInitialized();
-	if (monitoringPaused) return;
-	if (details.frameId !== 0 || details.tabId === -1) return;
-	if (isBlankURL(details.url)) return;
-	if (!tabsInfo.hasTab(details.tabId)) return;
-	if (tabsInfo.isClosingTab(details.tabId)) return;
-	const prev = _lastNavigate.get(details.tabId);
-	if (prev && prev.url === details.url && (Date.now() - prev.ts) < 1000) return;
-	_lastNavigate.set(details.tabId, { url: details.url, ts: Date.now() });
-	const tab = await getTab(details.tabId);
-	if (!tab) return;
-	if (!tabsInfo.hasUrlChanged(tab)) return;
-	const wasIntentionalDup = tabsInfo.isIntentionalDuplicate(tab.id);
-	if (wasIntentionalDup) tabsInfo.clearIntentionalDuplicate(tab.id);
-	tabsInfo.setTab(tab.id, { url: details.url, complete: true });
-	dispatchTabCompletion(tab, tab.id);
-	if (wasIntentionalDup) refreshDuplicateTabsInfo(tab.windowId);
-};
+const onHistoryStateUpdated = (details) => _handleSpaNavigation(details, "history-state-updated");
+
+const onReferenceFragmentUpdated = (details) => _handleSpaNavigation(details, "reference-fragment-updated");
 
 const onCommand = async (command) => {
 	await ensureInitialized();
