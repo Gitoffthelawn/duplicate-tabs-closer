@@ -348,7 +348,7 @@ const applyDuplicateAction = (details, observedTab, match) => {
 const handleObservedTab = (details) => {
     const observedTab = details.tab;
     let matchingTabURL = getMatchingURL(observedTab.url);
-    let matchingTabTitle = options.compareWithTitle && isTabComplete(observedTab) ? `title=${observedTab.title}` : null;
+    let matchingTabTitle = options.compareWithTitle && isTabComplete(observedTab) ? `title=${observedTab.title.toLowerCase()}` : null;
     if (options.searchPerContainer) {
         matchingTabURL += observedTab.cookieStoreId;
         if (matchingTabTitle) matchingTabTitle += observedTab.cookieStoreId;

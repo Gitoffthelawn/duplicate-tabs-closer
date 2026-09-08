@@ -36,13 +36,13 @@ const applyPausedState = (paused) => {
 };
 
 const updateTitleMatchModeDependents = (value) => {
-  const titleOnly = value === "T";
+  const showTitleDependents = value === "T";
   const thresh = document.getElementById("titleSimilarityThreshold");
-  if (thresh) thresh.disabled = !titleOnly;
+  if (thresh) thresh.disabled = !showTitleDependents;
   const threshRow = thresh?.closest(".checkboxes");
-  if (threshRow) threshRow.classList.toggle("hidden", !titleOnly);
+  if (threshRow) threshRow.classList.toggle("hidden", !showTitleDependents);
   const titleRulesGroup = document.getElementById("titleRegexRulesGroup");
-  if (titleRulesGroup) titleRulesGroup.classList.toggle("hidden", !titleOnly);
+  if (titleRulesGroup) titleRulesGroup.classList.toggle("hidden", !showTitleDependents);
 };
 
  

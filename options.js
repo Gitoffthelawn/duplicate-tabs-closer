@@ -76,6 +76,9 @@ const defaultOptions = {
     titleMatchMode_popup: {
         value: true
     },
+    titleSimilarityThreshold_popup: {
+        value: true
+    },
     urlRegexRules_popup: {
         value: true
     },

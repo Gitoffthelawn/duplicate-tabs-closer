@@ -9,6 +9,8 @@ let lastNbRows = 0;
 let _renderGen = 0;
 let monitoringPaused = false;
 let _highlightOnOpen = false;
+let titleSimilarityThresholdPopupVisible = true;
+let titleRegexRulesPopupVisible = false;
 
 /* Show/Hide the AutoClose option */
 const changeAutoCloseOptionState = (state, resize) => {
@@ -315,14 +317,14 @@ const updatePauseButton = (paused) => {
 };
 
 const updateTitleMatchModeDependents = (value) => {
-    const titleOnly = value === "T";
+    const showTitleDependents = value === "T";
     const thresh = document.getElementById("titleSimilarityThreshold");
-    if (thresh) thresh.disabled = !titleOnly;
+    if (thresh) thresh.disabled = !showTitleDependents;
     const threshRow = thresh?.closest(".checkboxes");
-    if (threshRow) threshRow.classList.toggle("hidden", !titleOnly);
+    if (threshRow) threshRow.classList.toggle("hidden", !showTitleDependents || !titleSimilarityThresholdPopupVisible);
     const titleRulesEl = document.getElementById("titleRegexRules");
     const titleRulesRow = titleRulesEl?.closest(".checkboxes");
-    if (titleRulesRow) titleRulesRow.classList.toggle("hidden", !titleOnly);
+    if (titleRulesRow) titleRulesRow.classList.toggle("hidden", !showTitleDependents || !titleRegexRulesPopupVisible);
 };
 
 const applyPopupRuleVisibility = (storedOptions) => {
@@ -335,6 +337,8 @@ const applyPopupRuleVisibility = (storedOptions) => {
         const el = document.getElementById(rule);
         if (el) el.closest(".checkboxes").classList.toggle("hidden", !visible);
     });
+    titleSimilarityThresholdPopupVisible = storedOptions.titleSimilarityThreshold_popup ? storedOptions.titleSimilarityThreshold_popup.value : true;
+    titleRegexRulesPopupVisible = storedOptions.titleRegexRules_popup ? storedOptions.titleRegexRules_popup.value : false;
     const titleMatchValue = storedOptions.titleMatchMode ? storedOptions.titleMatchMode.value : "N";
     updateTitleMatchModeDependents(titleMatchValue);
 };
@@ -344,8 +348,15 @@ const handleMessage = (message) => {
     if (message.action === "setStoredOption" && message.data.name.endsWith("_popup")) {
         const rule = message.data.name.replace("_popup", "");
         const visible = message.data.value;
-        const el = document.getElementById(rule);
-        if (el) el.closest(".checkboxes").classList.toggle("hidden", !visible);
+        if (rule === "titleSimilarityThreshold" || rule === "titleRegexRules") {
+            if (rule === "titleSimilarityThreshold") titleSimilarityThresholdPopupVisible = visible;
+            else titleRegexRulesPopupVisible = visible;
+            const titleMatchModeEl = document.getElementById("titleMatchMode");
+            updateTitleMatchModeDependents(titleMatchModeEl ? titleMatchModeEl.value : "N");
+        } else {
+            const el = document.getElementById(rule);
+            if (el) el.closest(".checkboxes").classList.toggle("hidden", !visible);
+        }
         resizeDuplicateTabsPanel();
     }
     if (message.action === "setStoredOption" && message.data.name === "titleMatchMode") {
