@@ -285,7 +285,7 @@ const onCommittedTab = async (details) => {
 	}
 };
 
-const _handleSpaNavigation = async (details, eventName) => {
+const _handleSpaNavigation = async (details) => {
 	await ensureInitialized();
 	if (monitoringPaused) return;
 	if (details.frameId !== 0 || details.tabId === -1) return;
@@ -305,9 +305,9 @@ const _handleSpaNavigation = async (details, eventName) => {
 	if (wasIntentionalDup) refreshDuplicateTabsInfo(tab.windowId);
 };
 
-const onHistoryStateUpdated = (details) => _handleSpaNavigation(details, "history-state-updated");
+const onHistoryStateUpdated = (details) => _handleSpaNavigation(details);
 
-const onReferenceFragmentUpdated = (details) => _handleSpaNavigation(details, "reference-fragment-updated");
+const onReferenceFragmentUpdated = (details) => _handleSpaNavigation(details);
 
 const onCommand = async (command) => {
 	await ensureInitialized();
