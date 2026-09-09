@@ -243,6 +243,10 @@ body {
     margin-top: -4px;
 }
 
+#titleMatchMode {
+    margin-bottom: 8px;
+}
+
 #scopeBody {
     margin-bottom: 5px;
 }

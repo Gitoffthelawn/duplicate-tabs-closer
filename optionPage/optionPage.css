@@ -267,6 +267,10 @@ body {
   margin-bottom: 5px;
 }
 
+#titleMatchMode {
+  margin-bottom: 8px;
+}
+
 .color-row {
   display: flex;
   align-items: center;
