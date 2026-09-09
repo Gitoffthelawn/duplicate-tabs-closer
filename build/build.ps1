@@ -26,7 +26,7 @@ $Directories = @(
     "popup",
     "optionPage",
     "panel",
-    "ext_lib\bootstrap-5.3.3-dist",
+    "ext_lib\bootstrap-5.3.8-dist",
     "ext_lib\font-awesome-6.7"
 )
 
